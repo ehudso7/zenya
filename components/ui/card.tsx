@@ -11,8 +11,8 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     const variants = {
       default: 'bg-white dark:bg-gray-800 shadow-sm',
       bordered: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
-      glass: 'bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-gray-700/20 shadow-premium',
-      'glass-subtle': 'bg-white/50 dark:bg-gray-900/50 backdrop-blur-md border border-gray-200/20 dark:border-gray-700/20',
+      glass: 'glass shadow-premium',
+      'glass-subtle': 'glass-subtle',
       premium: 'bg-gradient-to-br from-white/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/60 backdrop-blur-lg border border-white/30 dark:border-gray-700/30 shadow-premium',
     }
 
