@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { MoodSelector } from '@/components/mood-selector'
@@ -58,6 +59,25 @@ export default function HomePage() {
               Welcome to Zenya - Your calm learning companion
             </motion.p>
           </header>
+
+          {/* Quick Access Links */}
+          <motion.div
+            className="mb-8 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              First time here? Check out our{' '}
+              <Link href="/landing" className="text-blue-600 hover:underline">
+                features
+              </Link>{' '}
+              or{' '}
+              <Link href="/about" className="text-blue-600 hover:underline">
+                learn more about us
+              </Link>
+            </p>
+          </motion.div>
 
           <div className="space-y-8">
             {/* Mood Selection */}
