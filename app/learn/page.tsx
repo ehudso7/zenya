@@ -146,35 +146,55 @@ export default function LearnPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-4 max-w-4xl">
+    <div className="min-h-screen gradient-mesh">
+      <div className="container mx-auto px-4 py-4 max-w-4xl relative">
         {/* Header */}
-        <header className="flex items-center justify-between mb-6">
+        <motion.header 
+          className="flex items-center justify-between mb-6 glass-subtle rounded-2xl p-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <Button
             variant="ghost"
             onClick={() => router.push('/')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 hover:bg-white/20 dark:hover:bg-gray-800/20"
           >
             <ChevronLeft className="w-4 h-4" />
             Back
           </Button>
           <div className="text-center">
-            <h1 className="text-lg font-semibold">{currentLesson?.title || 'Loading...'}</h1>
+            <h1 className="text-lg font-semibold text-gradient">{currentLesson?.title || 'Loading...'}</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {user?.mood && `Feeling ${user.mood}`}
             </p>
           </div>
           <div className="w-20" /> {/* Spacer for alignment */}
-        </header>
+        </motion.header>
 
         {/* Progress Bar */}
-        <div className="mb-4">
-          <Progress value={lessonProgress} max={100} size="sm" />
-        </div>
+        <motion.div 
+          className="mb-6"
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+        >
+          <div className="relative">
+            <Progress value={lessonProgress} max={100} size="sm" className="h-3" />
+            <div className="absolute inset-0 h-3 rounded-full overflow-hidden">
+              <div className="progress-fill h-full" style={{ width: `${lessonProgress}%` }} />
+            </div>
+          </div>
+        </motion.div>
 
         {/* Chat Interface */}
-        <Card className="mb-4 h-[400px] overflow-hidden">
-          <CardContent className="p-0 h-full flex flex-col">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <Card variant="glass" className="mb-6 h-[500px] overflow-hidden shadow-premium" hover={false}>
+            <CardContent className="p-0 h-full flex flex-col">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               <AnimatePresence>
                 {messages.map((message) => (
@@ -188,10 +208,10 @@ export default function LearnPage() {
                     }`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                      className={`max-w-[80%] ${
                         message.role === 'user'
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+                          ? 'chat-bubble chat-bubble-user animate-slide-in'
+                          : 'chat-bubble chat-bubble-ai animate-slide-in'
                       }`}
                     >
                       {message.content}
@@ -205,11 +225,11 @@ export default function LearnPage() {
                   animate={{ opacity: 1 }}
                   className="flex justify-start"
                 >
-                  <div className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2">
+                  <div className="chat-bubble chat-bubble-ai">
                     <div className="flex gap-1">
-                      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100" />
-                      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200" />
+                      <span className="loading-dot" />
+                      <span className="loading-dot" />
+                      <span className="loading-dot" />
                     </div>
                   </div>
                 </motion.div>
@@ -218,32 +238,32 @@ export default function LearnPage() {
             </div>
 
             {/* Input Area */}
-            <div className="border-t p-4">
+            <div className="border-t border-gray-200/20 dark:border-gray-700/20 p-4 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
               <div className="flex gap-2 mb-2">
                 <Button
                   size="sm"
                   variant="secondary"
                   onClick={handleExplainLikeImFive}
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 glass-subtle hover:scale-105 transition-all"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="w-4 h-4 text-yellow-500" />
                   Explain Like I'm 5
                 </Button>
                 <Button
                   size="sm"
                   variant="secondary"
                   onClick={handleIDontGetIt}
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 glass-subtle hover:scale-105 transition-all"
                 >
-                  <HelpCircle className="w-4 h-4" />
+                  <HelpCircle className="w-4 h-4 text-blue-500" />
                   I Don't Get It
                 </Button>
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 hover:bg-purple-100/20 dark:hover:bg-purple-900/20 hover:scale-105 transition-all"
                 >
-                  <Brain className="w-4 h-4" />
+                  <Brain className="w-4 h-4 text-purple-500" />
                   Brain Fog Mode
                 </Button>
               </div>
@@ -260,25 +280,35 @@ export default function LearnPage() {
                   placeholder="Type your answer or ask a question..."
                   disabled={isTyping}
                 />
-                <Button type="submit" disabled={!input.trim() || isTyping}>
+                <Button type="submit" disabled={!input.trim() || isTyping} className="btn-premium">
                   <Send className="w-4 h-4" />
                 </Button>
               </form>
             </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Today's Journal */}
-        <Card variant="bordered">
-          <CardContent className="py-4">
-            <h3 className="font-medium mb-2">Today's Reflection</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-              {lessonProgress > 50
-                ? "You're making great progress! Keep going, you've got this!"
-                : "Every step forward is a victory. Take your time!"}
-            </p>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <Card variant="glass-subtle" className="shadow-sm hover:shadow-premium transition-all">
+            <CardContent className="py-6">
+              <h3 className="font-semibold mb-3 text-gradient flex items-center gap-2">
+                <span className="text-2xl">📝</span>
+                Today's Reflection
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 italic leading-relaxed">
+                {lessonProgress > 50
+                  ? "You're making great progress! Keep going, you've got this! 🌟"
+                  : "Every step forward is a victory. Take your time! 🌱"}
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   )

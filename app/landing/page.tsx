@@ -88,9 +88,12 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-primary-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen">
+      {/* Premium Background */}
+      <div className="fixed inset-0 gradient-mesh z-0" />
+      
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden z-10">
         <div className="container mx-auto px-4 py-20 max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -98,45 +101,87 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
             className="text-center space-y-6"
           >
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
+            <motion.h1 
+              className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.8, type: "spring" }}
+            >
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
                 Zenya
               </span>
-            </h1>
-            <p className="text-2xl md:text-3xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+            </motion.h1>
+            <motion.p 
+              className="text-2xl md:text-3xl lg:text-4xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto font-medium"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
               Your calm, focused AI tutor — built for real humans with real attention struggles
-            </p>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            </motion.p>
+            <motion.p 
+              className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
               Learn anything in 5-minute bursts. Adapt to your mood. Celebrate every win.
               No judgment, just progress.
-            </p>
-            <div className="pt-8">
+            </motion.p>
+            <motion.div 
+              className="pt-8"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4, type: "spring" }}
+            >
               <a href="#waitlist">
-                <Button size="lg" className="text-lg px-8 py-6">
+                <Button size="lg" className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300">
                   Join the Waitlist
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                  <ArrowRight className="ml-2 w-5 h-5 animate-pulse" />
                 </Button>
               </a>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
         
-        {/* Decorative elements */}
-        <div className="absolute top-10 left-10 w-72 h-72 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
-        <div className="absolute top-0 right-20 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
+        {/* Premium Decorative elements */}
+        <motion.div 
+          className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          animate={{ 
+            x: [0, 100, 0],
+            y: [0, -100, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute top-0 right-20 w-96 h-96 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          animate={{ 
+            x: [0, -100, 0],
+            y: [0, 100, 0],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute -bottom-8 left-20 w-96 h-96 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          animate={{ 
+            x: [0, 50, 0],
+            y: [0, -50, 0],
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        />
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 max-w-6xl">
+      <section className="py-24 relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/30 to-transparent dark:via-gray-900/30 backdrop-blur-sm" />
+        <div className="container mx-auto px-4 max-w-6xl relative z-20">
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-16 text-gradient">
               Learning that works with your brain, not against it
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -148,11 +193,13 @@ export default function LandingPage() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
                 >
-                  <Card className="h-full hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6 text-center space-y-4">
-                      <feature.icon className="w-12 h-12 mx-auto text-primary-600" />
-                      <h3 className="font-semibold text-lg">{feature.title}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <Card variant="glass" className="h-full hover:shadow-premium hover:-translate-y-2 transition-all duration-300 group">
+                    <CardContent className="p-8 text-center space-y-4">
+                      <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-600/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <feature.icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">{feature.title}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                         {feature.description}
                       </p>
                     </CardContent>
@@ -165,7 +212,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20">
+      <section className="py-20 relative z-10">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div
             initial={{ opacity: 0 }}
@@ -174,51 +221,73 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="space-y-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-center">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-gradient mb-4">
               How Zenya works
             </h2>
             <div className="space-y-8">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">
+              <motion.div 
+                className="flex items-start gap-4 p-6 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300"
+                whileHover={{ x: 10 }}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg">
                   1
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Check in with your mood</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <h3 className="font-semibold text-xl mb-2 text-gray-800 dark:text-gray-100">Check in with your mood</h3>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     Tell us how you're feeling today. Tired? Energized? We'll adapt.
                   </p>
                 </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">
+              </motion.div>
+              <motion.div 
+                className="flex items-start gap-4 p-6 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300"
+                whileHover={{ x: 10 }}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg">
                   2
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Get a bite-sized lesson</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <h3 className="font-semibold text-xl mb-2 text-gray-800 dark:text-gray-100">Get a bite-sized lesson</h3>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     5 minutes of focused learning, tailored to your energy level.
                   </p>
                 </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">
+              </motion.div>
+              <motion.div 
+                className="flex items-start gap-4 p-6 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300"
+                whileHover={{ x: 10 }}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg">
                   3
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Celebrate your progress</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <h3 className="font-semibold text-xl mb-2 text-gray-800 dark:text-gray-100">Celebrate your progress</h3>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     Earn XP, maintain streaks, and see your growth over time.
                   </p>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Demo Section */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-800/50">
-        <div className="container mx-auto px-4 max-w-4xl">
+      <section className="py-20 relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent dark:from-gray-900/50 dark:to-transparent" />
+        <div className="container mx-auto px-4 max-w-4xl relative z-20">
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -226,16 +295,21 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center space-y-8"
           >
-            <h2 className="text-3xl md:text-4xl font-bold">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gradient mb-4">
               See Zenya in action
             </h2>
-            <Card className="max-w-2xl mx-auto">
+            <Card variant="glass" className="max-w-2xl mx-auto shadow-premium hover:shadow-2xl transition-all duration-300">
               <CardContent className="p-8">
-                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6 text-left space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-primary-600 rounded-full flex-shrink-0" />
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 text-left space-y-4 shadow-inner">
+                  <motion.div 
+                    className="flex items-start gap-3"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex-shrink-0 shadow-lg animate-pulse-slow" />
                     <div>
-                      <p className="font-medium mb-1">Zenya</p>
+                      <p className="font-semibold mb-1 text-gradient">Zenya</p>
                       <p className="text-gray-700 dark:text-gray-300">
                         Hi! Today's quick win is about fractions. 🍕
                       </p>
@@ -243,36 +317,51 @@ export default function LandingPage() {
                         Imagine a pizza cut into 4 slices. If you eat 1 slice, you've eaten 1/4 of the pizza!
                       </p>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-gray-400 rounded-full flex-shrink-0" />
+                  </motion.div>
+                  <motion.div 
+                    className="flex items-start gap-3"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex-shrink-0 shadow-md" />
                     <div>
-                      <p className="font-medium mb-1">You</p>
+                      <p className="font-semibold mb-1">You</p>
                       <p className="text-gray-700 dark:text-gray-300">
                         So 2 slices would be 2/4?
                       </p>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-primary-600 rounded-full flex-shrink-0" />
+                  </motion.div>
+                  <motion.div 
+                    className="flex items-start gap-3"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex-shrink-0 shadow-lg animate-pulse-slow" />
                     <div>
-                      <p className="font-medium mb-1">Zenya</p>
+                      <p className="font-semibold mb-1 text-gradient">Zenya</p>
                       <p className="text-gray-700 dark:text-gray-300">
                         Exactly! And here's a cool trick: 2/4 is the same as 1/2. You've got half the pizza! 🎉
                       </p>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
-                <div className="mt-4 flex gap-2 justify-center">
-                  <Button size="sm" variant="secondary">
-                    <Sparkles className="w-4 h-4 mr-1" />
+                <motion.div 
+                  className="mt-6 flex gap-3 justify-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.8 }}
+                >
+                  <Button size="sm" variant="secondary" className="glass-subtle hover:scale-105 transition-all">
+                    <Sparkles className="w-4 h-4 mr-1 text-yellow-500" />
                     Explain Like I'm 5
                   </Button>
-                  <Button size="sm" variant="secondary">
-                    <Zap className="w-4 h-4 mr-1" />
+                  <Button size="sm" variant="secondary" className="glass-subtle hover:scale-105 transition-all">
+                    <Zap className="w-4 h-4 mr-1 text-purple-500" />
                     Brain Fog Mode
                   </Button>
-                </div>
+                </motion.div>
               </CardContent>
             </Card>
           </motion.div>
@@ -280,7 +369,7 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20">
+      <section className="py-20 relative z-10">
         <div className="container mx-auto px-4 max-w-6xl">
           <motion.div
             initial={{ opacity: 0 }}
@@ -288,7 +377,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-16 text-gradient">
               Loved by learners like you
             </h2>
             <div className="grid md:grid-cols-3 gap-8">
@@ -300,18 +389,26 @@ export default function LandingPage() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
                 >
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
+                  <Card variant="glass" className="h-full hover:shadow-premium hover:-translate-y-2 transition-all duration-300 group">
+                    <CardContent className="p-8 space-y-4">
                       <div className="flex gap-1">
                         {[...Array(5)].map((_, i) => (
-                          <span key={i} className="text-yellow-500">★</span>
+                          <motion.span 
+                            key={i} 
+                            className="text-yellow-500 text-xl"
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.3, delay: i * 0.1 }}
+                          >
+                            ★
+                          </motion.span>
                         ))}
                       </div>
-                      <p className="text-gray-700 dark:text-gray-300 italic">
+                      <p className="text-gray-700 dark:text-gray-300 italic text-lg leading-relaxed">
                         "{testimonial.quote}"
                       </p>
-                      <div>
-                        <p className="font-semibold">{testimonial.author}</p>
+                      <div className="pt-2">
+                        <p className="font-semibold text-gray-800 dark:text-gray-100">{testimonial.author}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {testimonial.role}
                         </p>
@@ -326,8 +423,9 @@ export default function LandingPage() {
       </section>
 
       {/* Waitlist Section */}
-      <section id="waitlist" className="py-20 bg-primary-600 text-white">
-        <div className="container mx-auto px-4 max-w-2xl text-center">
+      <section id="waitlist" className="py-24 relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" />
+        <div className="container mx-auto px-4 max-w-2xl text-center relative z-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -335,19 +433,25 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="space-y-6"
           >
-            <h2 className="text-3xl md:text-4xl font-bold">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
               Be the first to try Zenya
             </h2>
-            <p className="text-xl opacity-90">
+            <p className="text-xl md:text-2xl text-white/90">
               Get early access, shape the future of calm learning, and lock in founder pricing.
             </p>
-            <form onSubmit={handleWaitlistSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <motion.form 
+              onSubmit={handleWaitlistSubmit} 
+              className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               <Input
                 type="email"
                 placeholder="Your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                className="flex-1 bg-white/20 backdrop-blur-md border-white/30 text-white placeholder:text-white/70 focus:bg-white/30 hover:bg-white/25 transition-all"
                 required
               />
               <Button
@@ -356,41 +460,55 @@ export default function LandingPage() {
                 variant="secondary"
                 isLoading={isSubmitting}
                 disabled={isSubmitting}
+                className="bg-white text-indigo-600 hover:bg-white/90 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
               >
                 Join Waitlist
               </Button>
-            </form>
-            <div className="flex items-center justify-center gap-4 text-sm opacity-80">
-              <span className="flex items-center gap-1">
-                <CheckCircle className="w-4 h-4" />
+            </motion.form>
+            <motion.div 
+              className="flex items-center justify-center gap-6 text-sm text-white/80"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <span className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-400" />
                 No spam, ever
               </span>
-              <span className="flex items-center gap-1">
-                <CheckCircle className="w-4 h-4" />
+              <span className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-400" />
                 Early bird perks
               </span>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-gray-100 dark:bg-gray-900">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-600 dark:text-gray-400">
-            © 2025 Zenya. Built for brains that zig when others zag.
-          </p>
-          <div className="mt-4 flex justify-center gap-6 text-sm">
-            <a href="/privacy" className="hover:text-primary-600 transition-colors">
-              Privacy Policy
-            </a>
-            <a href="/terms" className="hover:text-primary-600 transition-colors">
-              Terms of Service
-            </a>
-            <a href="mailto:hello@zenya.app" className="hover:text-primary-600 transition-colors">
-              Contact
-            </a>
-          </div>
+      <footer className="py-16 relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-100 to-white dark:from-gray-900 dark:to-gray-800" />
+        <div className="container mx-auto px-4 text-center relative z-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h3 className="text-3xl font-bold mb-4 text-gradient">Zenya</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-8">
+              © 2025 Zenya. Built for brains that zig when others zag.
+            </p>
+            <div className="flex justify-center gap-8 text-sm">
+              <a href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+                Privacy Policy
+              </a>
+              <a href="/terms" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+                Terms of Service
+              </a>
+              <a href="mailto:hello@zenya.app" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+                Contact
+              </a>
+            </div>
+          </motion.div>
         </div>
       </footer>
     </div>

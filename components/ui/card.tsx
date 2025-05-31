@@ -2,22 +2,27 @@ import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'bordered'
+  variant?: 'default' | 'bordered' | 'glass' | 'glass-subtle' | 'premium'
+  hover?: boolean
 }
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = 'default', ...props }, ref) => {
+  ({ className, variant = 'default', hover = true, ...props }, ref) => {
     const variants = {
       default: 'bg-white dark:bg-gray-800 shadow-sm',
       bordered: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+      glass: 'bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-gray-700/20 shadow-premium',
+      'glass-subtle': 'bg-white/50 dark:bg-gray-900/50 backdrop-blur-md border border-gray-200/20 dark:border-gray-700/20',
+      premium: 'bg-gradient-to-br from-white/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/60 backdrop-blur-lg border border-white/30 dark:border-gray-700/30 shadow-premium',
     }
 
     return (
       <div
         ref={ref}
         className={cn(
-          'rounded-xl p-6',
+          'rounded-2xl p-6 transition-all duration-300',
           variants[variant],
+          hover && 'hover:shadow-xl hover:-translate-y-1',
           className
         )}
         {...props}
@@ -32,7 +37,7 @@ const CardHeader = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('mb-4 space-y-1', className)}
+      className={cn('mb-6 space-y-2', className)}
       {...props}
     />
   )
@@ -44,7 +49,7 @@ const CardTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadin
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-xl font-semibold tracking-tight', className)}
+      className={cn('text-xl font-semibold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent', className)}
       {...props}
     />
   )
@@ -76,7 +81,7 @@ const CardFooter = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('mt-4 flex items-center', className)}
+      className={cn('mt-6 flex items-center pt-4 border-t border-gray-100 dark:border-gray-800', className)}
       {...props}
     />
   )

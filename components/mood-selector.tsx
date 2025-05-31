@@ -19,31 +19,35 @@ const moods: { value: Mood; label: string }[] = [
 
 export function MoodSelector({ value, onChange }: MoodSelectorProps) {
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <h2 className="text-xl font-medium">How are you feeling today?</h2>
-      <div className="flex gap-4">
-        {moods.map((mood) => (
+    <div className="flex flex-col items-center space-y-6">
+      <div className="flex flex-wrap justify-center gap-4">
+        {moods.map((mood, index) => (
           <motion.button
             key={mood.value}
             onClick={() => onChange(mood.value)}
             className={cn(
-              'relative flex flex-col items-center gap-1 p-3 rounded-xl transition-all',
-              'hover:bg-gray-100 dark:hover:bg-gray-800',
-              'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-              value === mood.value && 'bg-primary-50 dark:bg-primary-900/20'
+              'mood-button relative flex flex-col items-center gap-2 p-6 min-w-[100px]',
+              'bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm',
+              'border border-gray-200/50 dark:border-gray-700/50',
+              'hover:bg-white/70 dark:hover:bg-gray-800/70',
+              'focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2',
+              value === mood.value && 'selected'
             )}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <span className="text-3xl" role="img" aria-label={mood.label}>
+            <span className="text-4xl" role="img" aria-label={mood.label}>
               {mood.value}
             </span>
-            <span className="text-xs text-gray-600 dark:text-gray-400">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {mood.label}
             </span>
             {value === mood.value && (
               <motion.div
-                className="absolute inset-0 rounded-xl ring-2 ring-primary"
+                className="absolute inset-0 rounded-2xl ring-2 ring-blue-400 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/20 dark:to-indigo-900/20"
                 layoutId="mood-selector"
                 transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
               />
