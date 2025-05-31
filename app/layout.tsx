@@ -12,11 +12,11 @@ export const metadata: Metadata = {
   description: 'Calm, focused AI tutoring built for neurodiverse learners',
   keywords: ['ADHD', 'learning', 'AI tutor', 'neurodiverse', 'education', 'adult learning', 'micro-learning'],
   authors: [{ name: 'Zenya Team' }],
-  metadataBase: new URL('https://zenya.app'),
+  metadataBase: new URL('https://zenyaai.com'),
   openGraph: {
     title: 'Zenya - Your AI Learning Companion',
     description: 'Calm, focused AI tutoring built for neurodiverse learners',
-    url: 'https://zenya.app',
+    url: 'https://zenyaai.com',
     siteName: 'Zenya',
     images: [
       {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: 'Zenya - Your AI Learning Companion',
     description: 'Calm, focused AI tutoring built for neurodiverse learners',
     images: ['/og-image.png'],
-    creator: '@zenya_app',
+    creator: '@zenyaai',
   },
   robots: {
     index: true,

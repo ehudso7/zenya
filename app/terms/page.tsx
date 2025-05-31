@@ -344,9 +344,9 @@ export default function TermsPage() {
                         For questions about these Terms, please contact us:
                       </p>
                       <div className="space-y-2">
-                        <a href="mailto:legal@zenya.app" className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline">
+                        <a href="mailto:legal@zenyaai.com" className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline">
                           <Mail className="w-4 h-4" />
-                          legal@zenya.app
+                          legal@zenyaai.com
                         </a>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Response time: Within 48 hours

@@ -326,9 +326,9 @@ export default function PrivacyPage() {
                         If you have questions about this Privacy Policy or our data practices, please contact us:
                       </p>
                       <div className="space-y-2">
-                        <a href="mailto:privacy@zenya.app" className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline">
+                        <a href="mailto:privacy@zenyaai.com" className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline">
                           <Mail className="w-4 h-4" />
-                          privacy@zenya.app
+                          privacy@zenyaai.com
                         </a>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Response time: Within 48 hours

@@ -14,25 +14,25 @@ const contactReasons = [
     icon: HelpCircle,
     title: 'General Questions',
     description: 'Curious about Zenya? We'd love to hear from you!',
-    email: 'hello@zenya.app'
+    email: 'hello@zenyaai.com'
   },
   {
     icon: Heart,
     title: 'Partnership Opportunities',
     description: 'Interested in working together? Let's chat!',
-    email: 'partnerships@zenya.app'
+    email: 'partnerships@zenyaai.com'
   },
   {
     icon: Users,
     title: 'Press & Media',
     description: 'Writing about Zenya? We're here to help.',
-    email: 'press@zenya.app'
+    email: 'press@zenyaai.com'
   },
   {
     icon: Sparkles,
     title: 'Feature Requests',
     description: 'Have ideas to make Zenya better? Share them!',
-    email: 'feedback@zenya.app'
+    email: 'feedback@zenyaai.com'
   }
 ]
 

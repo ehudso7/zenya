@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/learn/', '/profile/'],
     },
-    sitemap: 'https://zenya.app/sitemap.xml',
+    sitemap: 'https://zenyaai.com/sitemap.xml',
   }
 }

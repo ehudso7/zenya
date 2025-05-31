@@ -109,11 +109,11 @@ const faqCategories = [
       },
       {
         q: 'How do I get help if I\'m stuck?',
-        a: 'Multiple ways! Use the in-app help button, email support@zenya.app, or ask in our community. We typically respond within 24 hours and are always working to improve based on your feedback.'
+        a: 'Multiple ways! Use the in-app help button, email support@zenyaai.com, or ask in our community. We typically respond within 24 hours and are always working to improve based on your feedback.'
       },
       {
         q: 'Can I suggest new features or subjects?',
-        a: 'Absolutely! We love hearing from our users. Use the feedback button in the app or email feedback@zenya.app. Many of our best features came from user suggestions!'
+        a: 'Absolutely! We love hearing from our users. Use the feedback button in the app or email feedback@zenyaai.com. Many of our best features came from user suggestions!'
       }
     ]
   }

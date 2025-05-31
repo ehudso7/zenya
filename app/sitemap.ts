@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://zenya.app'
+  const baseUrl = 'https://zenyaai.com'
   
   return [
     {
