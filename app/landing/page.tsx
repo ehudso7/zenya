@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { ArrowRight, Brain, Sparkles, Target, Heart, Zap, CheckCircle } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
@@ -497,16 +498,22 @@ export default function LandingPage() {
             <p className="text-gray-600 dark:text-gray-400 mb-8">
               © 2025 Zenya. Built for brains that zig when others zag.
             </p>
-            <div className="flex justify-center gap-8 text-sm">
-              <a href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
-                Privacy Policy
-              </a>
-              <a href="/terms" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
-                Terms of Service
-              </a>
-              <a href="mailto:hello@zenya.app" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+            <div className="grid grid-cols-2 md:flex md:justify-center gap-4 md:gap-8 text-sm">
+              <Link href="/about" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+                About
+              </Link>
+              <Link href="/faq" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+                FAQ
+              </Link>
+              <Link href="/contact" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
                 Contact
-              </a>
+              </Link>
+              <Link href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+                Privacy
+              </Link>
+              <Link href="/terms" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+                Terms
+              </Link>
             </div>
           </motion.div>
         </div>

@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Zenya - Your AI Learning Companion',
   description: 'Calm, focused AI tutoring built for neurodiverse learners',
-  keywords: ['ADHD', 'learning', 'AI tutor', 'neurodiverse', 'education'],
+  keywords: ['ADHD', 'learning', 'AI tutor', 'neurodiverse', 'education', 'adult learning', 'micro-learning'],
   authors: [{ name: 'Zenya Team' }],
   metadataBase: new URL('https://zenya.app'),
   openGraph: {
@@ -23,6 +23,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
+        alt: 'Zenya - AI-powered learning for ADHD minds',
       },
     ],
     locale: 'en_US',
@@ -33,8 +34,23 @@ export const metadata: Metadata = {
     title: 'Zenya - Your AI Learning Companion',
     description: 'Calm, focused AI tutoring built for neurodiverse learners',
     images: ['/og-image.png'],
+    creator: '@zenya_app',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   manifest: '/manifest.json',
+  verification: {
+    google: 'your-google-verification-code',
+  },
 }
 
 export const viewport = {
