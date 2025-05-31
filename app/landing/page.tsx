@@ -17,8 +17,8 @@ const features = [
   },
   {
     icon: Sparkles,
-    title: '"Explain Like I\'m 5" mode',
-    description: 'Instant simplification when things get overwhelming'
+    title: 'Simplify This mode',
+    description: 'Instant clarification when you need a different perspective'
   },
   {
     icon: Target,
@@ -118,7 +118,7 @@ export default function LandingPage() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              Your calm, focused AI tutor — built for real humans with real attention struggles
+              Your calm, focused AI tutor — built for real humans with unique attention styles
             </motion.p>
             <motion.p 
               className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
@@ -363,11 +363,11 @@ export default function LandingPage() {
                 >
                   <Button size="sm" variant="secondary" className="glass-subtle hover:scale-105 transition-all">
                     <Sparkles className="w-4 h-4 mr-1 text-yellow-500" />
-                    Explain Like I'm 5
+                    Simplify This
                   </Button>
                   <Button size="sm" variant="secondary" className="glass-subtle hover:scale-105 transition-all">
                     <Zap className="w-4 h-4 mr-1 text-purple-500" />
-                    Brain Fog Mode
+                    Gentle Pace
                   </Button>
                 </motion.div>
               </CardContent>

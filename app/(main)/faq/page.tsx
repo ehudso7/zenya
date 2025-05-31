@@ -19,11 +19,11 @@ const faqCategories = [
       },
       {
         q: 'Who is Zenya for?',
-        a: 'Zenya is built for adults with ADHD, autism, dyslexia, and other neurodevelopmental differences. However, anyone who struggles with traditional learning methods or wants a more personalized, flexible approach to education can benefit from Zenya.'
+        a: 'Zenya is built for adults with ADHD, autism, dyslexia, and other neurodevelopmental differences. However, anyone who finds traditional learning methods challenging or wants a more personalized, flexible approach to education can benefit from Zenya.'
       },
       {
         q: 'How does the mood check-in work?',
-        a: 'Before each lesson, Zenya asks how you\'re feeling - energized, focused, tired, or overwhelmed. Based on your response, we adapt the lesson length, complexity, and style to match your current state. This ensures you\'re always learning at your optimal capacity.'
+        a: 'Before each lesson, Zenya asks how you\'re feeling - energized, focused, low energy, or needing extra support. Based on your response, we adapt the lesson length, complexity, and style to match your current state. This ensures you\'re always learning at your optimal capacity.'
       }
     ]
   },
@@ -32,8 +32,8 @@ const faqCategories = [
     title: 'Features',
     questions: [
       {
-        q: 'What is "Explain Like I\'m 5" mode?',
-        a: 'It\'s our instant simplification feature. When a concept feels overwhelming, just tap this button and Zenya will break it down into the simplest possible terms, using everyday analogies and examples. Perfect for brain fog days!'
+        q: 'What is "Simplify This" mode?',
+        a: 'It\'s our instant clarification feature. When a concept needs clearer explanation, just tap this button and Zenya will break it down into simpler terms, using everyday analogies and examples. Perfect for when you need a different perspective!'
       },
       {
         q: 'How long are the lessons?',
@@ -95,7 +95,7 @@ const faqCategories = [
       },
       {
         q: 'How does the AI tutor work?',
-        a: 'Our AI tutor provides personalized explanations, answers your questions, and offers encouragement. It remembers your learning style and adapts its teaching approach. Think of it as a patient, always-available study buddy!'
+        a: 'Our AI tutor provides personalized explanations, answers your questions, and offers encouragement. It remembers your learning style and adapts its teaching approach. Think of it as a patient, always-available learning companion!'
       }
     ]
   },
@@ -329,7 +329,7 @@ export default function FAQPage() {
                 Still have questions?
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Can't find what you're looking for? Our friendly support team is here to help!
+                Looking for something specific? Our friendly support team is here to help!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/contact">

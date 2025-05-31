@@ -171,7 +171,7 @@ export default function HomePage() {
                       transition={{ type: "spring", stiffness: 300 }}
                     >
                       <span className="mr-3 text-2xl group-hover:scale-110 transition-transform">🧠</span>
-                      <span>Use "Brain Fog Mode" if things feel overwhelming</span>
+                      <span>Use "Gentle Pace" mode when you need a slower approach</span>
                     </motion.li>
                     <motion.li 
                       className="flex items-start group"

@@ -10,7 +10,7 @@ interface MoodSelectorProps {
 }
 
 const moods: { value: Mood; label: string }[] = [
-  { value: '😴', label: 'Tired' },
+  { value: '😴', label: 'Low Energy' },
   { value: '😐', label: 'Neutral' },
   { value: '🙂', label: 'Good' },
   { value: '😄', label: 'Happy' },

@@ -54,7 +54,7 @@ const milestones = [
   {
     date: '2023',
     title: 'The Idea Sparks',
-    description: 'Sarah struggles with traditional learning apps and envisions something better'
+    description: 'Sarah explores alternative learning approaches and envisions something better'
   },
   {
     date: '2024',

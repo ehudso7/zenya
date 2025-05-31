@@ -161,16 +161,16 @@ export default function LearnPage() {
     }, 3000)
   }
 
-  const handleExplainLikeImFive = async () => {
+  const handleSimplifyThis = async () => {
     setIsTyping(true)
     try {
       const response = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: "Can you explain that in the simplest way possible? Like I'm 5 years old.",
+          message: "Can you explain that in simpler terms with everyday examples?",
           mood: user?.mood || null,
-          context: `User needs simpler explanation for: ${currentLesson?.title}`
+          context: `User needs clearer explanation for: ${currentLesson?.title}`
         }),
       })
       
@@ -193,16 +193,16 @@ export default function LearnPage() {
     }
   }
 
-  const handleIDontGetIt = async () => {
+  const handleTryAnotherWay = async () => {
     setIsTyping(true)
     try {
       const response = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: "I don't understand this. Can you try explaining it differently?",
+          message: "Could you approach this from a different angle?",
           mood: user?.mood || null,
-          context: `User struggling with: ${currentLesson?.title}`
+          context: `User exploring different approach for: ${currentLesson?.title}`
         }),
       })
       
@@ -323,20 +323,20 @@ export default function LearnPage() {
                 <Button
                   size="sm"
                   variant="secondary"
-                  onClick={handleExplainLikeImFive}
+                  onClick={handleSimplifyThis}
                   className="flex items-center gap-1 glass-subtle hover:scale-105 transition-all"
                 >
                   <Sparkles className="w-4 h-4 text-yellow-500" />
-                  Explain Like I'm 5
+                  Simplify This
                 </Button>
                 <Button
                   size="sm"
                   variant="secondary"
-                  onClick={handleIDontGetIt}
+                  onClick={handleTryAnotherWay}
                   className="flex items-center gap-1 glass-subtle hover:scale-105 transition-all"
                 >
                   <HelpCircle className="w-4 h-4 text-blue-500" />
-                  I Don't Get It
+                  Try Another Way
                 </Button>
                 <Button
                   size="sm"
@@ -344,7 +344,7 @@ export default function LearnPage() {
                   className="flex items-center gap-1 hover:bg-purple-100/20 dark:hover:bg-purple-900/20 hover:scale-105 transition-all"
                 >
                   <Brain className="w-4 h-4 text-purple-500" />
-                  Brain Fog Mode
+                  Gentle Pace
                 </Button>
               </div>
               <form

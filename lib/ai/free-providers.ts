@@ -81,10 +81,10 @@ export function getFallbackResponse(message: string, mood: Mood | null): AIRespo
     }
   }
   
-  // Confusion
+  // Need for clarity
   if (lowercaseMessage.includes('confused') || lowercaseMessage.includes("don't understand")) {
     return {
-      message: "No worries at all! This can be tricky. Think of it like learning to ride a bike - wobbly at first, but it gets easier. Should we try a different approach?",
+      message: "No worries at all! Let's explore this from a different angle. Think of it like learning to ride a bike - each attempt builds your skills. Should we try a different approach?",
       tone: 'calm',
     }
   }

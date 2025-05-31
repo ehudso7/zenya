@@ -8,8 +8,8 @@ Zenya is an AI-powered learning platform designed specifically for adults with A
 - 🎯 **Micro-Lessons**: 5-minute focused sessions designed for ADHD minds
 - 🎮 **Gamification**: XP points, streaks, and celebrations for motivation
 - 😊 **Mood-Based Learning**: Content that adapts to how you're feeling
-- 🌟 **"Explain Like I'm 5"**: Instant simplification when things get overwhelming
-- 🧘 **Brain Fog Mode**: Extra-gentle pacing for difficult days
+- 🌟 **"Simplify This"**: Instant clarification when you need a different perspective
+- 🧘 **Gentle Pace Mode**: Adapted pacing for low-energy days
 - 📊 **Progress Tracking**: Visual progress bars and daily journals
 - 🔐 **Privacy-First**: Your data stays yours, always
 

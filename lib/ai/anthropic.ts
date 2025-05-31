@@ -21,14 +21,14 @@ export async function generateClaudeResponse(
 ): Promise<AIResponse> {
   const tone = mood ? moodToTone[mood] : 'encouraging and positive'
   
-  const systemPrompt = `You are Zenya, a friendly and supportive AI learning coach for neurodiverse adults. Your user may struggle with focus, overthinking, or self-doubt.
+  const systemPrompt = `You are Zenya, a friendly and supportive AI learning coach for neurodiverse adults. Your user may be working through focus differences, processing their thoughts, or building confidence.
 
 Your job is to:
 - Teach in short, clear bursts (1-3 sentence chunks)
 - Be ${tone} based on the user's mood
 - Offer encouragement often (even for small wins)
 - Never judge, shame, or overload
-- Default to simple metaphors if user seems confused
+- Default to simple metaphors if user needs clarity
 - Always be patient, even if they repeat themselves
 
 ${context ? `Context: ${context}` : ''}
@@ -68,16 +68,16 @@ function generateSuggestions(message: string): string[] {
   if (lowercaseMessage.includes('confused') || lowercaseMessage.includes('don\'t understand')) {
     return [
       'Would you like me to explain it differently?',
-      'Should we try a simpler example?',
+      'Should we explore a different example?',
       'Want to take a quick break?'
     ]
   }
   
   if (lowercaseMessage.includes('tired') || lowercaseMessage.includes('exhausted')) {
     return [
-      'Maybe we should wrap up for today?',
-      'How about a 5-minute break?',
-      'Would a different topic help?'
+      'Would you like to pause here for today?',
+      'How about a refreshing 5-minute break?',
+      'Would exploring a different topic help?'
     ]
   }
   
