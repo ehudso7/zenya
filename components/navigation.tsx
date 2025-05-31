@@ -1,12 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Home, Info, Mail, HelpCircle, FileText, Shield, Settings, LogOut, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { toast } from 'react-hot-toast'
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
@@ -22,7 +24,30 @@ const legalItems = [
 
 export function Navigation() {
   const pathname = usePathname()
+  const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    checkUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    toast.success('Logged out successfully')
+    router.push('/landing')
+  }
 
   return (
     <nav className="sticky top-0 z-50 glass border-b border-white/10">
@@ -59,11 +84,19 @@ export function Navigation() {
             
             <div className="h-6 w-px bg-gray-300 dark:bg-gray-700" />
             
-            <Link href="/landing">
-              <Button variant="glass" size="sm">
-                Explore Features
+            {user ? (
+              <Button variant="glass" size="sm" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-1.5" />
+                Logout
               </Button>
-            </Link>
+            ) : (
+              <Link href="/auth">
+                <Button variant="glass" size="sm">
+                  <User className="w-4 h-4 mr-1.5" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -114,11 +147,27 @@ export function Navigation() {
               ))}
               
               <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700">
-                <Link href="/landing" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="glass" size="sm" className="w-full">
-                    Explore Features
+                {user ? (
+                  <Button 
+                    variant="glass" 
+                    size="sm" 
+                    className="w-full" 
+                    onClick={() => {
+                      handleLogout()
+                      setIsMobileMenuOpen(false)
+                    }}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
                   </Button>
-                </Link>
+                ) : (
+                  <Link href="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="glass" size="sm" className="w-full">
+                      <User className="w-4 h-4 mr-2" />
+                      Sign In
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>

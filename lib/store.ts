@@ -7,6 +7,7 @@ interface AppState {
   user: User | null
   setUser: (user: User | null) => void
   updateMood: (mood: Mood) => void
+  clearUser: () => void
   
   // Lesson state
   currentLesson: Lesson | null
@@ -40,6 +41,13 @@ export const useStore = create<AppState>()(
       updateMood: (mood) => set((state) => ({
         user: state.user ? { ...state.user, mood } : null
       })),
+      clearUser: () => set({ 
+        user: null,
+        currentLesson: null,
+        lessonProgress: 0,
+        messages: [],
+        dailyXP: 0
+      }),
       
       // Lesson state
       currentLesson: null,

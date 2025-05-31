@@ -135,12 +135,19 @@ export default function LandingPage() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4, type: "spring" }}
             >
-              <a href="#waitlist">
-                <Button size="lg" className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300">
-                  Join the Waitlist
-                  <ArrowRight className="ml-2 w-5 h-5 animate-pulse" />
-                </Button>
-              </a>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/auth">
+                  <Button size="lg" className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300">
+                    Get Started Free
+                    <ArrowRight className="ml-2 w-5 h-5 animate-pulse" />
+                  </Button>
+                </Link>
+                <Link href="/auth">
+                  <Button size="lg" variant="glass" className="text-lg px-10 py-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
+                    Sign In
+                  </Button>
+                </Link>
+              </div>
             </motion.div>
           </motion.div>
         </div>

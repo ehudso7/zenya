@@ -1,23 +1,41 @@
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
-  // Check if user has visited before (simple cookie check)
-  const hasVisited = request.cookies.has('has-visited')
+export async function middleware(request: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req: request, res })
   
-  // If on root path and first time visitor, redirect to landing
-  if (request.nextUrl.pathname === '/' && !hasVisited) {
-    const response = NextResponse.redirect(new URL('/landing', request.url))
-    // Set cookie to remember they've visited
-    response.cookies.set('has-visited', 'true', {
-      maxAge: 60 * 60 * 24 * 365, // 1 year
-    })
-    return response
+  // Refresh session if expired
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
+  const isPublicPage = ['/landing', '/about', '/faq', '/contact', '/privacy', '/terms'].includes(request.nextUrl.pathname)
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api')
+  
+  // If user is not logged in and trying to access protected pages
+  if (!session && !isAuthPage && !isPublicPage && !isApiRoute) {
+    // Redirect to landing page
+    return NextResponse.redirect(new URL('/landing', request.url))
   }
   
-  return NextResponse.next()
+  // If user is logged in and on landing page, redirect to dashboard
+  if (session && request.nextUrl.pathname === '/landing') {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+  
+  return res
 }
 
 export const config = {
-  matcher: '/',
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
