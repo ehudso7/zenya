@@ -57,4 +57,5 @@ export interface AIResponse {
   message: string
   tone: 'encouraging' | 'calm' | 'energetic' | 'supportive'
   suggestions?: string[]
+  provider?: string
 }
