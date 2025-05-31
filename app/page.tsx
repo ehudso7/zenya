@@ -18,6 +18,19 @@ export default function HomePage() {
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null)
   const [greeting] = useState(getGreeting())
 
+  // Trigger a sample error for Sentry testing
+  useEffect(() => {
+    // This will throw an error because myUndefinedFunction doesn't exist
+    try {
+      // @ts-ignore - Intentionally calling undefined function for Sentry test
+      myUndefinedFunction();
+    } catch (error) {
+      console.error('Sentry test error caught:', error);
+      // Re-throw to let Sentry capture it
+      throw error;
+    }
+  }, [])
+
   const handleMoodSelect = (mood: Mood) => {
     setSelectedMood(mood)
     updateMood(mood)
