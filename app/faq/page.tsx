@@ -219,7 +219,7 @@ export default function FAQPage() {
           >
             <Button
               size="sm"
-              variant={!selectedCategory ? "default" : "outline"}
+              variant={!selectedCategory ? "primary" : "glass"}
               onClick={() => setSelectedCategory(null)}
               className={!selectedCategory ? "btn-premium" : "glass-subtle hover:bg-white/20 dark:hover:bg-gray-800/20"}
             >
@@ -229,7 +229,7 @@ export default function FAQPage() {
               <Button
                 key={category.title}
                 size="sm"
-                variant={selectedCategory === category.title ? "default" : "outline"}
+                variant={selectedCategory === category.title ? "primary" : "glass"}
                 onClick={() => setSelectedCategory(category.title)}
                 className={selectedCategory === category.title ? "btn-premium" : "glass-subtle hover:bg-white/20 dark:hover:bg-gray-800/20"}
               >
@@ -338,7 +338,7 @@ export default function FAQPage() {
                     <Sparkles className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>
-                <Button variant="outline" className="glass-subtle hover:bg-white/20 dark:hover:bg-gray-800/20">
+                <Button variant="glass" className="hover:bg-white/20 dark:hover:bg-gray-800/20">
                   <Users className="mr-2 w-4 h-4" />
                   Join Community
                 </Button>

@@ -15,7 +15,7 @@ const termsSections = [
   {
     icon: Shield,
     title: 'User Protection',
-    description: 'Your rights and safety are our priority. We're committed to fair practices.'
+    description: 'Your rights and safety are our priority. We\'re committed to fair practices.'
   },
   {
     icon: Scale,

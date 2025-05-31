@@ -62,8 +62,7 @@ export function Celebration({ show }: CelebrationProps) {
                 }}
               />
             )
-          }
-          ))}
+          })}
           {/* Premium celebration modal */}
           <motion.div
             className="absolute inset-0 flex items-center justify-center"

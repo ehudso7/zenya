@@ -13,19 +13,19 @@ const contactReasons = [
   {
     icon: HelpCircle,
     title: 'General Questions',
-    description: 'Curious about Zenya? We'd love to hear from you!',
+    description: 'Curious about Zenya? We\'d love to hear from you!',
     email: 'hello@zenyaai.com'
   },
   {
     icon: Heart,
     title: 'Partnership Opportunities',
-    description: 'Interested in working together? Let's chat!',
+    description: 'Interested in working together? Let\'s chat!',
     email: 'partnerships@zenyaai.com'
   },
   {
     icon: Users,
     title: 'Press & Media',
-    description: 'Writing about Zenya? We're here to help.',
+    description: 'Writing about Zenya? We\'re here to help.',
     email: 'press@zenyaai.com'
   },
   {
@@ -58,7 +58,7 @@ export default function ContactPage() {
     // Simulate form submission
     try {
       await new Promise(resolve => setTimeout(resolve, 2000))
-      toast.success('Message sent! We'll get back to you soon 🎉')
+      toast.success('Message sent! We\'ll get back to you soon 🎉')
       setFormData({ name: '', email: '', subject: '', message: '' })
     } catch (error) {
       toast.error('Failed to send message. Please try again.')
@@ -115,7 +115,7 @@ export default function ContactPage() {
               <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">Get in Touch</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              We'd love to hear from you! Whether you have a question, feedback, or just want to say hi.
+              We\'d love to hear from you! Whether you have a question, feedback, or just want to say hi.
             </p>
           </motion.div>
 
@@ -286,7 +286,7 @@ export default function ContactPage() {
                 Check out our frequently asked questions for instant help.
               </p>
               <Link href="/faq">
-                <Button variant="outline" className="glass-subtle hover:bg-white/20 dark:hover:bg-gray-800/20">
+                <Button variant="glass" className="hover:bg-white/20 dark:hover:bg-gray-800/20">
                   View FAQ
                   <HelpCircle className="ml-2 w-4 h-4" />
                 </Button>

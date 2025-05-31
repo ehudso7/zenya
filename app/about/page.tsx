@@ -304,7 +304,7 @@ export default function AboutPage() {
                   </Button>
                 </Link>
                 <Link href="/contact">
-                  <Button size="lg" variant="outline" className="glass-subtle hover:bg-white/20 dark:hover:bg-gray-800/20">
+                  <Button size="lg" variant="glass" className="hover:bg-white/20 dark:hover:bg-gray-800/20">
                     Get in Touch
                     <Heart className="ml-2 w-5 h-5" />
                   </Button>
