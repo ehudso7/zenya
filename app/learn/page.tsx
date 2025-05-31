@@ -85,11 +85,45 @@ export default function LearnPage() {
     setInput('')
     setIsTyping(true)
 
-    // Simulate AI response delay
-    setTimeout(() => {
+    // Call the AI API
+    try {
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: input,
+          mood: user?.mood || null,
+          context: `Current lesson: ${currentLesson.title}. Step ${currentStep + 1} of ${currentLesson.content.length}.`
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response')
+      }
+
+      const data = await response.json()
+      
+      // Add AI response
+      addMessage({
+        id: generateId(),
+        role: 'assistant',
+        content: data.message,
+        timestamp: new Date().toISOString()
+      })
+
+      // Progress lesson after AI responds
+      setTimeout(() => {
+        progressLesson()
+      }, 500)
+    } catch (error) {
+      console.error('AI API error:', error)
+      // Fallback to lesson content if API fails
       progressLesson()
+    } finally {
       setIsTyping(false)
-    }, 1000)
+    }
   }
 
   const progressLesson = () => {
@@ -127,22 +161,68 @@ export default function LearnPage() {
     }, 3000)
   }
 
-  const handleExplainLikeImFive = () => {
-    addMessage({
-      id: generateId(),
-      role: 'assistant',
-      content: "Let me break that down super simply! Think of it like building blocks - we take one tiny piece at a time and stack them up. No rush, just one block at a time! 🧱",
-      timestamp: new Date().toISOString()
-    })
+  const handleExplainLikeImFive = async () => {
+    setIsTyping(true)
+    try {
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: "Can you explain that in the simplest way possible? Like I'm 5 years old.",
+          mood: user?.mood || null,
+          context: `User needs simpler explanation for: ${currentLesson?.title}`
+        }),
+      })
+      
+      const data = await response.json()
+      addMessage({
+        id: generateId(),
+        role: 'assistant',
+        content: data.message,
+        timestamp: new Date().toISOString()
+      })
+    } catch (error) {
+      addMessage({
+        id: generateId(),
+        role: 'assistant',
+        content: "Let me break that down super simply! Think of it like building blocks - we take one tiny piece at a time and stack them up. No rush, just one block at a time! 🧱",
+        timestamp: new Date().toISOString()
+      })
+    } finally {
+      setIsTyping(false)
+    }
   }
 
-  const handleIDontGetIt = () => {
-    addMessage({
-      id: generateId(),
-      role: 'assistant',
-      content: "No worries at all! Let's try a different angle. Sometimes our brains just need a different door to walk through. How about we use a real-life example you can relate to? 🚪",
-      timestamp: new Date().toISOString()
-    })
+  const handleIDontGetIt = async () => {
+    setIsTyping(true)
+    try {
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: "I don't understand this. Can you try explaining it differently?",
+          mood: user?.mood || null,
+          context: `User struggling with: ${currentLesson?.title}`
+        }),
+      })
+      
+      const data = await response.json()
+      addMessage({
+        id: generateId(),
+        role: 'assistant',
+        content: data.message,
+        timestamp: new Date().toISOString()
+      })
+    } catch (error) {
+      addMessage({
+        id: generateId(),
+        role: 'assistant',
+        content: "No worries at all! Let's try a different angle. Sometimes our brains just need a different door to walk through. How about we use a real-life example you can relate to? 🚪",
+        timestamp: new Date().toISOString()
+      })
+    } finally {
+      setIsTyping(false)
+    }
   }
 
   return (
