@@ -13,6 +13,7 @@ import { useStore } from '@/lib/store'
 import { lessons } from '@/lib/lessons'
 import { generateId, shuffleArray } from '@/lib/utils'
 import type { Lesson, ChatMessage } from '@/types'
+import AppNavigation from '@/components/app-navigation'
 
 export default function LearnPage() {
   const router = useRouter()
@@ -227,6 +228,7 @@ export default function LearnPage() {
 
   return (
     <div className="min-h-screen gradient-mesh">
+      <AppNavigation />
       <div className="container mx-auto px-4 py-4 max-w-4xl relative">
         {/* Header */}
         <motion.header 
