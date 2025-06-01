@@ -6,9 +6,6 @@ const nextConfig = {
   images: {
     domains: ['localhost', 'zenyaai.com'],
   },
-  experimental: {
-    instrumentationHook: true,
-  },
 }
 
 export default withSentryConfig(nextConfig, {
