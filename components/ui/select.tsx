@@ -33,10 +33,27 @@ export function Select({ children, value, onValueChange, defaultValue }: SelectP
     setOpen(false)
   }
 
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
+  const enhancedChildren = React.Children.map(children, child => {
+    if (React.isValidElement(child)) {
+      if (child.type === SelectTrigger) {
+        const { ref: originalRef, ...otherProps } = (child.props as any) || {};
+        return React.cloneElement(child, { ...otherProps, ref: triggerRef });
+      }
+      if (child.type === SelectContent) {
+        const { ref: originalRef, ...otherProps } = (child.props as any) || {};
+        return React.cloneElement(child, { ...otherProps, ref: contentRef });
+      }
+    }
+    return child;
+  });
+
   return (
     <SelectContext.Provider value={{ value: currentValue, onValueChange: handleValueChange, open, setOpen }}>
       <div className="relative">
-        {children}
+        {enhancedChildren}
       </div>
     </SelectContext.Provider>
   )
