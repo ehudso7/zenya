@@ -53,7 +53,8 @@ export async function apiClient<T = any>(
         )
       }
 
-      return isJson ? await response.json() : await response.text()
+      const data = isJson ? await response.json() : await response.text()
+      return data as T
     } catch (error) {
       lastError = error as Error
 

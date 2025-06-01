@@ -95,8 +95,8 @@ export default function LearnPage() {
             </CardHeader>
             <CardContent>
               <MoodSelector 
-                currentMood={user?.mood}
-                onMoodChange={updateMood}
+                value={user?.mood || null}
+                onChange={updateMood}
               />
               {user?.mood && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">

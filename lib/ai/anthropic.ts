@@ -1,10 +1,18 @@
-import Anthropic from '@anthropic-ai/sdk'
 import type { Mood, AIResponse } from '@/types'
 
-// Alternative AI provider using Anthropic Claude
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-})
+// Optional Anthropic import - only if API key is provided
+let anthropic: any = null
+
+try {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const Anthropic = require('@anthropic-ai/sdk')
+    anthropic = new Anthropic.default({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    })
+  }
+} catch (error) {
+  console.log('Anthropic SDK not available, using fallback')
+}
 
 const moodToTone = {
   '😴': 'calm and gentle',
@@ -35,6 +43,18 @@ ${context ? `Context: ${context}` : ''}
 
 Respond in a way that makes the user feel safe, confident, and understood.`
 
+  // If Anthropic is not available, return a fallback response
+  if (!anthropic) {
+    return {
+      message: 'I am here to help! Let me process that for you. ' + 
+               (message.toLowerCase().includes('hello') 
+                 ? 'Hello! Great to see you here. What would you like to learn today?'
+                 : 'That is a great question! Let me help you understand it step by step.'),
+      tone: tone.includes('calm') ? 'calm' : tone.includes('energetic') ? 'energetic' : 'supportive',
+      suggestions: generateSuggestions(message),
+    }
+  }
+
   try {
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307', // Cheaper model, still great quality
@@ -46,7 +66,7 @@ Respond in a way that makes the user feel safe, confident, and understood.`
 
     const responseContent = response.content[0]?.type === 'text' 
       ? response.content[0].text 
-      : 'I\'m here to help! Could you try asking that again?'
+      : 'I am here to help! Could you try asking that again?'
 
     return {
       message: responseContent,
@@ -56,7 +76,7 @@ Respond in a way that makes the user feel safe, confident, and understood.`
   } catch (error) {
     console.error('Claude API error:', error)
     return {
-      message: 'I\'m having a little trouble connecting right now. Let\'s try again in a moment!',
+      message: 'I am having a little trouble connecting right now. Let us try again in a moment!',
       tone: 'supportive',
     }
   }
@@ -65,7 +85,7 @@ Respond in a way that makes the user feel safe, confident, and understood.`
 function generateSuggestions(message: string): string[] {
   const lowercaseMessage = message.toLowerCase()
   
-  if (lowercaseMessage.includes('confused') || lowercaseMessage.includes('don\'t understand')) {
+  if (lowercaseMessage.includes('confused') || lowercaseMessage.includes('do not understand')) {
     return [
       'Would you like me to explain it differently?',
       'Should we explore a different example?',
