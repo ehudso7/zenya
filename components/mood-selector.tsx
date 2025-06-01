@@ -29,14 +29,15 @@ export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
               'mood-button relative flex flex-col items-center gap-2 p-6 min-w-[100px]',
               'bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm',
               'border border-gray-200/50 dark:border-gray-700/50',
-              'hover:bg-white/70 dark:hover:bg-gray-800/70',
+              'md:hover:bg-white/70 dark:md:hover:bg-gray-800/70',
+              'active:bg-white/80 dark:active:bg-gray-800/80',
+              'touch-manipulation',
               'focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2',
               value === mood.value && 'selected'
             )}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <span className="text-4xl" role="img" aria-label={mood.label}>
