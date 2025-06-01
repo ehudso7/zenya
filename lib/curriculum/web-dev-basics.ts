@@ -29,13 +29,13 @@ export const webDevBasicsCurriculum: Curriculum = {
             'Feel confident about starting your web journey'
           ],
           content: {
-            introduction: "Let's start with something you already know - every website you've ever visited is built with HTML. Think of HTML as the skeleton of a website - it gives structure to everything you see!",
+            introduction: "Let us start with something you already know - every website you have ever visited is built with HTML. Think of HTML as the skeleton of a website - it gives structure to everything you see!",
             sections: [
               {
                 id: 'what-is-html',
                 type: 'text',
                 title: 'HTML in Real Life',
-                content: "HTML stands for HyperText Markup Language. Don't let the fancy name scare you! It's just a way to tell browsers (like Chrome or Safari) what to display. Think of it like giving directions to a friend - you're telling the browser exactly what goes where."
+                content: "HTML stands for HyperText Markup Language. Do not let the fancy name scare you! It is just a way to tell browsers (like Chrome or Safari) what to display. Think of it like giving directions to a friend - you are telling the browser exactly what goes where."
               },
               {
                 id: 'html-example',
@@ -58,7 +58,7 @@ That's it! You just learned HTML!`
                 interactionType: 'code'
               }
             ],
-            summary: 'HTML is the foundation of every website. It tells browsers what content to display and how to structure it. You've just taken your first step into web development!',
+            summary: 'HTML is the foundation of every website. It tells browsers what content to display and how to structure it. You have just taken your first step into web development!',
             keyTakeaways: [
               'HTML structures web content',
               'It uses simple tags like <h1> and <p>',
@@ -71,7 +71,7 @@ That's it! You just learned HTML!`
               id: 'html-quiz-1',
               type: 'quiz',
               title: 'Quick Check',
-              instructions: 'Let\'s make sure you\'ve got the basics!',
+              instructions: 'Let us make sure you have got the basics!',
               questions: [
                 {
                   id: 'q1',
@@ -94,7 +94,7 @@ That's it! You just learned HTML!`
           id: 'first-webpage',
           moduleId: 'html-basics',
           title: 'Creating Your First Webpage',
-          description: 'Let\'s build something real!',
+          description: 'Let us build something real!',
           order: 2,
           estimatedMinutes: 20,
           objectives: [
@@ -103,7 +103,7 @@ That's it! You just learned HTML!`
             'Feel proud of your first creation!'
           ],
           content: {
-            introduction: "Ready to create your very first webpage? In just 20 minutes, you'll have something you built yourself running in your browser!",
+            introduction: "Ready to create your very first webpage? In just 20 minutes, you will have something you built yourself running in your browser!",
             sections: [
               {
                 id: 'html-structure',
@@ -132,7 +132,7 @@ Think of it like a letter:
 </head>
 <body>
     <h1>Welcome to My Website!</h1>
-    <p>I'm learning HTML and it's actually fun!</p>
+    <p>I am learning HTML and it is actually fun!</p>
 </body>
 </html>`
               },
@@ -140,7 +140,7 @@ Think of it like a letter:
                 id: 'build-together',
                 type: 'interactive',
                 title: 'Build It Together',
-                content: 'Let\'s create your personal webpage step by step. We\'ll add your name, a fun fact about you, and your favorite color!',
+                content: 'Let us create your personal webpage step by step. We will add your name, a fun fact about you, and your favorite color!',
                 interactionType: 'code'
               }
             ],
@@ -187,8 +187,8 @@ Think of it like a letter:
               }
             ],
             feedback: {
-              pass: 'Excellent work! You\'re ready to move on to more HTML elements!',
-              fail: 'No worries! Let\'s review the basics once more. Every expert was once a beginner!'
+              pass: 'Excellent work! You are ready to move on to more HTML elements!',
+              fail: 'No worries! Let us review the basics once more. Every expert was once a beginner!'
             }
           }
         }
@@ -244,7 +244,7 @@ This CSS rule:
 2. Makes them blue
 3. Makes them 48 pixels tall
 
-It's like saying: "Hey, all main headings, wear blue and be this tall!"`
+It is like saying: "Hey, all main headings, wear blue and be this tall!"`
               },
               {
                 id: 'try-css',
