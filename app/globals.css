@@ -276,6 +276,11 @@
   background-image: linear-gradient(to bottom right, rgb(30 58 138 / 0.2), rgb(49 46 129 / 0.2));
 }
 
+/* Tap Highlight */
+.tap-highlight-transparent {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Focus States */
 *:focus {
   outline: none;

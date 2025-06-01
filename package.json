@@ -33,7 +33,7 @@
     "zustand": "^5.0.5"
   },
   "optionalDependencies": {
-    "@anthropic-ai/sdk": "^0.24.0"
+    "@anthropic-ai/sdk": "^0.24.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",

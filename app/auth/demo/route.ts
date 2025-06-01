@@ -7,16 +7,19 @@ export async function GET() {
     const supabase = createRouteHandlerClient({ cookies })
     
     // Create a demo user session (for testing purposes)
+    const demoEmail = process.env.DEMO_USER_EMAIL || 'demo@zenyaai.com'
+    const demoPassword = process.env.DEMO_USER_PASSWORD || 'demo-password-2025'
+    
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: 'demo@zenyaai.com',
-      password: 'demo-password-2025',
+      email: demoEmail,
+      password: demoPassword,
     })
 
     if (error) {
       // If demo user doesn't exist, create it
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: 'demo@zenyaai.com',
-        password: 'demo-password-2025',
+        email: demoEmail,
+        password: demoPassword,
         options: {
           data: {
             name: 'Demo User',
@@ -30,8 +33,8 @@ export async function GET() {
 
       // Sign in the newly created demo user
       const { data: newSignIn, error: newSignInError } = await supabase.auth.signInWithPassword({
-        email: 'demo@zenyaai.com',
-        password: 'demo-password-2025',
+        email: demoEmail,
+        password: demoPassword,
       })
 
       if (newSignInError) {
@@ -42,7 +45,10 @@ export async function GET() {
     // Redirect to home page after successful demo login
     return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_APP_URL!))
   } catch (error) {
-    console.error('Demo login error:', error)
+    // Log error for monitoring
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Demo login error:', error)
+    }
     return NextResponse.redirect(new URL('/auth?error=demo-failed', process.env.NEXT_PUBLIC_APP_URL!))
   }
 }

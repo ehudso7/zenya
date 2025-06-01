@@ -20,13 +20,19 @@ export async function GET() {
       .single()
 
     if (error) {
-      console.error('Error fetching profile:', error)
+      // Log error for monitoring
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching profile:', error)
+      }
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
     }
 
     return NextResponse.json({ profile })
   } catch (error) {
-    console.error('Profile GET error:', error)
+    // Log error for monitoring
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Profile GET error:', error)
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -60,13 +66,19 @@ export async function PUT(request: Request) {
       .single()
 
     if (error) {
-      console.error('Error updating profile:', error)
+      // Log error for monitoring
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error updating profile:', error)
+      }
       return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
     }
 
     return NextResponse.json({ profile })
   } catch (error) {
-    console.error('Profile PUT error:', error)
+    // Log error for monitoring
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Profile PUT error:', error)
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

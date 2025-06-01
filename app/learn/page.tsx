@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { 
@@ -9,57 +10,93 @@ import {
   Play,
   BarChart,
   Brain,
-  Code,
-  Palette,
-  Database
+  Calculator,
+  Globe,
+  Beaker,
+  BookOpenCheck,
+  Compass
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import AppNavigation from '@/components/app-navigation'
 import MoodSelector from '@/components/mood-selector'
 import { useStore } from '@/lib/store'
+import { toast } from 'react-hot-toast'
 
-const curricula = [
-  {
-    id: 'web-dev-basics',
-    title: 'Web Development Fundamentals',
-    description: 'Learn HTML, CSS, and JavaScript basics with ADHD-friendly micro-lessons',
-    icon: Code,
-    modules: 6,
-    hours: 20,
-    level: 'Beginner',
-    color: 'from-blue-500 to-indigo-600'
-  },
-  {
-    id: 'design-basics',
-    title: 'Design Principles',
-    description: 'Master the fundamentals of visual design and user experience',
-    icon: Palette,
-    modules: 4,
-    hours: 15,
-    level: 'Beginner',
-    color: 'from-purple-500 to-pink-600',
-    comingSoon: true
-  },
-  {
-    id: 'data-basics',
-    title: 'Data & Analytics',
-    description: 'Introduction to data analysis and visualization',
-    icon: Database,
-    modules: 5,
-    hours: 18,
-    level: 'Intermediate',
-    color: 'from-green-500 to-teal-600',
-    comingSoon: true
-  }
-]
+const iconMap: { [key: string]: any } = {
+  'math-basics': Calculator,
+  'web-dev-101': Globe,
+  'english-grammar': BookOpenCheck,
+  'science-explorers': Beaker,
+  'history-adventures': Compass
+}
+
+const colorMap: { [key: string]: string } = {
+  'math-basics': 'from-blue-500 to-indigo-600',
+  'web-dev-101': 'from-purple-500 to-pink-600',
+  'english-grammar': 'from-green-500 to-teal-600',
+  'science-explorers': 'from-orange-500 to-red-600',
+  'history-adventures': 'from-amber-500 to-yellow-600'
+}
+
+type Curriculum = {
+  id: string
+  title: string
+  description: string
+  slug: string
+  difficulty_level: string
+  estimated_hours: number
+  is_active: boolean
+}
 
 export default function LearnPage() {
   const router = useRouter()
   const { user, updateMood } = useStore()
+  const [curricula, setCurricula] = useState<Curriculum[]>([])
+  const [loading, setLoading] = useState(true)
+  const [userStats, setUserStats] = useState({ lessonsCompleted: 0 })
 
-  const handleStartCurriculum = (curriculumId: string) => {
-    router.push(`/learn/${curriculumId}`)
+  useEffect(() => {
+    fetchCurricula()
+    if (user) {
+      fetchUserStats()
+    }
+  }, [user])
+
+  const fetchCurricula = async () => {
+    try {
+      const response = await fetch('/api/curriculums')
+      const data = await response.json()
+      
+      if (response.ok) {
+        setCurricula(data.curriculums || [])
+      } else {
+        toast.error('Failed to load curriculums')
+      }
+    } catch (error) {
+      toast.error('Failed to load curriculums')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await fetch('/api/profile')
+      const data = await response.json()
+      
+      if (response.ok && data.profile) {
+        setUserStats({
+          lessonsCompleted: data.profile.lessons_completed || 0
+        })
+      }
+    } catch (error) {
+      // Silent fail for stats
+    }
+  }
+
+  const handleStartCurriculum = (curriculumSlug: string) => {
+    router.push(`/learn/${curriculumSlug}`)
   }
 
   return (
@@ -116,20 +153,23 @@ export default function LearnPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + index * 0.1 }}
             >
-              <Card className={`glass h-full ${curriculum.comingSoon ? 'opacity-60' : ''}`}>
+              <Card className="glass h-full hover:shadow-xl transition-shadow duration-300">
                 <CardHeader>
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${curriculum.color} flex items-center justify-center mb-4`}>
-                    <curriculum.icon className="w-6 h-6 text-white" />
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorMap[curriculum.slug] || 'from-gray-500 to-gray-600'} flex items-center justify-center mb-4`}>
+                    {iconMap[curriculum.slug] ? (
+                      <>{(() => {
+                        const Icon = iconMap[curriculum.slug]
+                        return <Icon className="w-6 h-6 text-white" />
+                      })()}</>
+                    ) : (
+                      <BookOpen className="w-6 h-6 text-white" />
+                    )}
                   </div>
                   <CardTitle className="text-xl">{curriculum.title}</CardTitle>
                   <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <span className="flex items-center gap-1">
-                      <BookOpen className="w-4 h-4" />
-                      {curriculum.modules} modules
-                    </span>
-                    <span className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
-                      {curriculum.hours} hours
+                      {curriculum.estimated_hours} hours
                     </span>
                   </div>
                 </CardHeader>
@@ -139,24 +179,17 @@ export default function LearnPage() {
                   </p>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
-                      {curriculum.level}
+                    <span className="text-sm font-medium px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full capitalize">
+                      {curriculum.difficulty_level}
                     </span>
                     
                     <Button
-                      onClick={() => handleStartCurriculum(curriculum.id)}
-                      disabled={curriculum.comingSoon}
-                      className={curriculum.comingSoon ? '' : 'btn-primary'}
+                      onClick={() => handleStartCurriculum(curriculum.slug)}
+                      className="btn-primary"
                       size="sm"
                     >
-                      {curriculum.comingSoon ? (
-                        'Coming Soon'
-                      ) : (
-                        <>
-                          <Play className="w-4 h-4 mr-2" />
-                          Start Learning
-                        </>
-                      )}
+                      <Play className="w-4 h-4 mr-2" />
+                      Start Learning
                     </Button>
                   </div>
                 </CardContent>
