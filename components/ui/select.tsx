@@ -88,10 +88,10 @@ export function Select({ children, value, onValueChange, defaultValue }: SelectP
             // Using displayName to identify components for ref passing
             const childType = child.type as any;
             if (childType.displayName === "SelectTrigger") {
-              return React.cloneElement(child as React.ReactElement<SelectTriggerProps>, { ref: triggerRef });
+              return React.cloneElement(child as React.ReactElement<SelectTriggerProps>, { ...child.props, ref: triggerRef });
             }
             if (childType.displayName === "SelectContent") {
-              return React.cloneElement(child as React.ReactElement<SelectContentProps>, { ref: contentRef });
+              return React.cloneElement(child as React.ReactElement<SelectContentProps>, { ...child.props, ref: contentRef });
             }
           }
           return child;
