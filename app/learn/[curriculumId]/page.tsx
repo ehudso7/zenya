@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
@@ -23,10 +23,11 @@ import { webDevBasicsCurriculum } from '@/lib/curriculum/web-dev-basics'
 import type { Lesson, Module, Activity } from '@/types/curriculum'
 
 interface Props {
-  params: { curriculumId: string }
+  params: Promise<{ curriculumId: string }>
 }
 
 export default function CurriculumPage({ params }: Props) {
+  const resolvedParams = use(params)
   const router = useRouter()
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0)
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0)

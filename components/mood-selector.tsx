@@ -17,7 +17,7 @@ const moods: { value: Mood; label: string }[] = [
   { value: '🔥', label: 'Energized' },
 ]
 
-export function MoodSelector({ value, onChange }: MoodSelectorProps) {
+export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
   return (
     <div className="flex flex-col items-center space-y-6">
       <div className="flex flex-wrap justify-center gap-4">
