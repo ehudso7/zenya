@@ -34,11 +34,27 @@ export async function middleware(request: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession()
   
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
-  const isPublicPage = ['/landing', '/about', '/faq', '/contact', '/privacy', '/terms'].includes(request.nextUrl.pathname)
+  const isPublicPage = [
+    '/landing', 
+    '/about', 
+    '/faq', 
+    '/contact', 
+    '/privacy', 
+    '/terms',
+    '/',
+  ].includes(request.nextUrl.pathname)
   const isApiRoute = request.nextUrl.pathname.startsWith('/api')
+  const isPublicApiRoute = [
+    '/api/waitlist',
+    '/api/curriculums'
+  ].includes(request.nextUrl.pathname)
   
   // If user is not logged in and trying to access protected pages
-  if (!session && !isAuthPage && !isPublicPage && !isApiRoute) {
+  if (!session && !isAuthPage && !isPublicPage && !isPublicApiRoute) {
+    if (isApiRoute) {
+      // Return 401 for protected API routes
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     // Redirect to landing page
     return NextResponse.redirect(new URL('/landing', request.url))
   }

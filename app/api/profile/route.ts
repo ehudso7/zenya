@@ -20,6 +20,31 @@ export async function GET() {
       .single()
 
     if (error) {
+      // If profile doesn't exist, create it
+      if (error.code === 'PGRST116') {
+        const { data: newProfile, error: createError } = await supabase
+          .from('users')
+          .insert({
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select('*, user_preferences(*)')
+          .single()
+        
+        if (createError) {
+          // Log error for monitoring
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error creating profile:', createError)
+          }
+          return NextResponse.json({ error: 'Failed to create profile' }, { status: 500 })
+        }
+        
+        return NextResponse.json({ profile: newProfile })
+      }
+      
       // Log error for monitoring
       if (process.env.NODE_ENV === 'development') {
         console.error('Error fetching profile:', error)

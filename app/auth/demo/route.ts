@@ -7,8 +7,8 @@ export async function GET() {
     const supabase = createRouteHandlerClient({ cookies })
     
     // Create a demo user session (for testing purposes)
-    const demoEmail = process.env.DEMO_USER_EMAIL || 'demo@zenyaai.com'
-    const demoPassword = process.env.DEMO_USER_PASSWORD || 'demo-password-2025'
+    const demoEmail = 'demo@zenyaai.com'
+    const demoPassword = 'demo-password-2025'
     
     const { data, error } = await supabase.auth.signInWithPassword({
       email: demoEmail,

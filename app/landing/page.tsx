@@ -138,13 +138,13 @@ export default function LandingPage() {
               transition={{ duration: 0.5, delay: 0.4, type: "spring" }}
             >
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/auth/register" className="w-full sm:w-auto">
+                <Link href="/auth/signin-password" className="w-full sm:w-auto">
                   <Button size="lg" className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl w-full">
                     Get Started Free
                     <ArrowRight className="ml-2 w-5 h-5 animate-pulse" />
                   </Button>
                 </Link>
-                <Link href="/auth/signin" className="w-full sm:w-auto">
+                <Link href="/auth/signin-password" className="w-full sm:w-auto">
                   <Button size="lg" variant="glass" className="text-lg px-10 py-6 rounded-2xl shadow-xl w-full">
                     Sign In
                   </Button>
