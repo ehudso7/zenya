@@ -426,3 +426,78 @@ html {
   background-color: rgb(96 165 250 / 0.2);
   color: #dbeafe;
 }
+
+/* Mobile Touch Target Improvements */
+@media (max-width: 768px) {
+  /* Ensure all interactive elements are large enough for touch */
+  button, a, [role="button"], .btn-premium, .btn-primary, .btn-secondary {
+    min-height: 44px;
+    min-width: 44px;
+    @apply touch-manipulation;
+  }
+  
+  /* Prevent iOS zoom on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
+  
+  /* Better spacing between interactive elements */
+  .space-y-2 > * + * {
+    margin-top: 0.75rem;
+  }
+  
+  .space-y-4 > * + * {
+    margin-top: 1.25rem;
+  }
+  
+  /* Larger tap targets for cards */
+  .card-hover, .feature-card, .mood-button {
+    @apply cursor-pointer active:scale-[0.98];
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Navigation improvements */
+  .nav-link {
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Better glass effect on mobile */
+  .glass {
+    background-color: rgb(255 255 255 / 0.85);
+  }
+  
+  .dark .glass {
+    background-color: rgb(17 24 39 / 0.85);
+  }
+  
+  /* Improve button visibility */
+  .btn-premium, .btn-primary {
+    @apply shadow-lg;
+  }
+}
+
+/* Prevent double-tap zoom on all devices */
+* {
+  touch-action: manipulation;
+}
+
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Prevent callout on long press */
+  * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+  }
+  
+  /* Allow text selection where needed */
+  input, textarea, [contenteditable] {
+    -webkit-user-select: text;
+  }
+  
+  /* Fix momentum scrolling */
+  .overflow-auto, .overflow-y-auto, .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}

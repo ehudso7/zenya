@@ -1,393 +1,198 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { toast } from 'react-hot-toast'
-import { ChevronLeft, Send, Brain, Sparkles, HelpCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { 
+  BookOpen, 
+  Clock, 
+  Trophy, 
+  Play,
+  BarChart,
+  Brain,
+  Code,
+  Palette,
+  Database
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Progress } from '@/components/ui/progress'
-import { useStore } from '@/lib/store'
-import { lessons } from '@/lib/lessons'
-import { generateId, shuffleArray } from '@/lib/utils'
-import type { Lesson, ChatMessage } from '@/types'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import AppNavigation from '@/components/app-navigation'
+import MoodSelector from '@/components/mood-selector'
+import { useStore } from '@/lib/store'
+
+const curricula = [
+  {
+    id: 'web-dev-basics',
+    title: 'Web Development Fundamentals',
+    description: 'Learn HTML, CSS, and JavaScript basics with ADHD-friendly micro-lessons',
+    icon: Code,
+    modules: 6,
+    hours: 20,
+    level: 'Beginner',
+    color: 'from-blue-500 to-indigo-600'
+  },
+  {
+    id: 'design-basics',
+    title: 'Design Principles',
+    description: 'Master the fundamentals of visual design and user experience',
+    icon: Palette,
+    modules: 4,
+    hours: 15,
+    level: 'Beginner',
+    color: 'from-purple-500 to-pink-600',
+    comingSoon: true
+  },
+  {
+    id: 'data-basics',
+    title: 'Data & Analytics',
+    description: 'Introduction to data analysis and visualization',
+    icon: Database,
+    modules: 5,
+    hours: 18,
+    level: 'Intermediate',
+    color: 'from-green-500 to-teal-600',
+    comingSoon: true
+  }
+]
 
 export default function LearnPage() {
   const router = useRouter()
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { 
-    user, 
-    currentLesson, 
-    setCurrentLesson, 
-    lessonProgress,
-    setLessonProgress,
-    messages,
-    addMessage,
-    clearMessages,
-    addXP,
-    setShowCelebration
-  } = useStore()
+  const { user, updateMood } = useStore()
 
-  const [input, setInput] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
-  const [currentStep, setCurrentStep] = useState(0)
-
-  useEffect(() => {
-    // Load a random lesson on mount
-    if (!currentLesson) {
-      const randomLesson = shuffleArray(lessons)[0]
-      setCurrentLesson(randomLesson)
-    }
-    // Clear previous messages
-    clearMessages()
-  }, [])
-
-  useEffect(() => {
-    // Start the lesson flow
-    if (currentLesson && messages.length === 0) {
-      startLesson()
-    }
-  }, [currentLesson])
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  const startLesson = () => {
-    if (!currentLesson) return
-    
-    const firstStep = currentLesson.content[0]
-    addMessage({
-      id: generateId(),
-      role: 'assistant',
-      content: firstStep.content,
-      timestamp: new Date().toISOString()
-    })
-    setCurrentStep(0)
-  }
-
-  const handleSendMessage = async () => {
-    if (!input.trim() || !currentLesson) return
-
-    const userMessage: ChatMessage = {
-      id: generateId(),
-      role: 'user',
-      content: input,
-      timestamp: new Date().toISOString()
-    }
-    addMessage(userMessage)
-    setInput('')
-    setIsTyping(true)
-
-    // Call the AI API
-    try {
-      const response = await fetch('/api/ai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: input,
-          mood: user?.mood || null,
-          context: `Current lesson: ${currentLesson.title}. Step ${currentStep + 1} of ${currentLesson.content.length}.`
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to get AI response')
-      }
-
-      const data = await response.json()
-      
-      // Add AI response
-      addMessage({
-        id: generateId(),
-        role: 'assistant',
-        content: data.message,
-        timestamp: new Date().toISOString()
-      })
-
-      // Progress lesson after AI responds
-      setTimeout(() => {
-        progressLesson()
-      }, 500)
-    } catch (error) {
-      console.error('AI API error:', error)
-      // Fallback to lesson content if API fails
-      progressLesson()
-    } finally {
-      setIsTyping(false)
-    }
-  }
-
-  const progressLesson = () => {
-    if (!currentLesson) return
-
-    const nextStep = currentStep + 1
-    if (nextStep < currentLesson.content.length) {
-      const step = currentLesson.content[nextStep]
-      addMessage({
-        id: generateId(),
-        role: 'assistant',
-        content: step.content,
-        timestamp: new Date().toISOString()
-      })
-      setCurrentStep(nextStep)
-      
-      // Update progress
-      const progress = Math.round((nextStep / currentLesson.content.length) * 100)
-      setLessonProgress(progress)
-      
-      // Check if lesson is complete
-      if (step.type === 'reflection') {
-        completeLesson()
-      }
-    }
-  }
-
-  const completeLesson = () => {
-    addXP(15)
-    setShowCelebration(true)
-    toast.success('Lesson complete! +15 XP earned! 🎉')
-    
-    setTimeout(() => {
-      setShowCelebration(false)
-    }, 3000)
-  }
-
-  const handleSimplifyThis = async () => {
-    setIsTyping(true)
-    try {
-      const response = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: "Can you explain that in simpler terms with everyday examples?",
-          mood: user?.mood || null,
-          context: `User needs clearer explanation for: ${currentLesson?.title}`
-        }),
-      })
-      
-      const data = await response.json()
-      addMessage({
-        id: generateId(),
-        role: 'assistant',
-        content: data.message,
-        timestamp: new Date().toISOString()
-      })
-    } catch (error) {
-      addMessage({
-        id: generateId(),
-        role: 'assistant',
-        content: "Let me break that down super simply! Think of it like building blocks - we take one tiny piece at a time and stack them up. No rush, just one block at a time! 🧱",
-        timestamp: new Date().toISOString()
-      })
-    } finally {
-      setIsTyping(false)
-    }
-  }
-
-  const handleTryAnotherWay = async () => {
-    setIsTyping(true)
-    try {
-      const response = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: "Could you approach this from a different angle?",
-          mood: user?.mood || null,
-          context: `User exploring different approach for: ${currentLesson?.title}`
-        }),
-      })
-      
-      const data = await response.json()
-      addMessage({
-        id: generateId(),
-        role: 'assistant',
-        content: data.message,
-        timestamp: new Date().toISOString()
-      })
-    } catch (error) {
-      addMessage({
-        id: generateId(),
-        role: 'assistant',
-        content: "No worries at all! Let's try a different angle. Sometimes our brains just need a different door to walk through. How about we use a real-life example you can relate to? 🚪",
-        timestamp: new Date().toISOString()
-      })
-    } finally {
-      setIsTyping(false)
-    }
+  const handleStartCurriculum = (curriculumId: string) => {
+    router.push(`/learn/${curriculumId}`)
   }
 
   return (
     <div className="min-h-screen gradient-mesh">
       <AppNavigation />
-      <div className="container mx-auto px-4 py-4 max-w-4xl relative">
+      
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
-        <motion.header 
-          className="flex items-center justify-between mb-6 glass-subtle rounded-2xl p-4"
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          className="mb-8"
         >
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 hover:bg-white/20 dark:hover:bg-gray-800/20"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back
-          </Button>
-          <div className="text-center">
-            <h1 className="text-lg font-semibold text-gradient">{currentLesson?.title || 'Loading...'}</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {user?.mood && `Feeling ${user.mood}`}
-            </p>
-          </div>
-          <div className="w-20" /> {/* Spacer for alignment */}
-        </motion.header>
-
-        {/* Progress Bar */}
-        <motion.div 
-          className="mb-6"
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-        >
-          <div className="relative">
-            <Progress value={lessonProgress} max={100} size="sm" className="h-3" />
-            <div className="absolute inset-0 h-3 rounded-full overflow-hidden">
-              <div className="progress-fill h-full" style={{ width: `${lessonProgress}%` }} />
-            </div>
-          </div>
+          <h1 className="text-4xl font-bold mb-4">Start Learning</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400">
+            Choose a curriculum and begin your personalized learning journey
+          </p>
         </motion.div>
 
-        {/* Chat Interface */}
+        {/* Mood Selector */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8"
         >
-          <Card variant="glass" className="mb-6 h-[500px] overflow-hidden shadow-premium" hover={false}>
-            <CardContent className="p-0 h-full flex flex-col">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              <AnimatePresence>
-                {messages.map((message) => (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className={`flex ${
-                      message.role === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[80%] ${
-                        message.role === 'user'
-                          ? 'chat-bubble chat-bubble-user animate-slide-in'
-                          : 'chat-bubble chat-bubble-ai animate-slide-in'
-                      }`}
-                    >
-                      {message.content}
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex justify-start"
-                >
-                  <div className="chat-bubble chat-bubble-ai">
-                    <div className="flex gap-1">
-                      <span className="loading-dot" />
-                      <span className="loading-dot" />
-                      <span className="loading-dot" />
-                    </div>
-                  </div>
-                </motion.div>
+          <Card className="glass">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="w-5 h-5" />
+                How are you feeling today?
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MoodSelector 
+                currentMood={user?.mood}
+                onMoodChange={updateMood}
+              />
+              {user?.mood && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
+                  Great! We'll adjust the pace and content to match your {user.mood} mood.
+                </p>
               )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Area */}
-            <div className="border-t border-gray-200/20 dark:border-gray-700/20 p-4 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
-              <div className="flex gap-2 mb-2">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={handleSimplifyThis}
-                  className="flex items-center gap-1 glass-subtle hover:scale-105 transition-all"
-                >
-                  <Sparkles className="w-4 h-4 text-yellow-500" />
-                  Simplify This
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={handleTryAnotherWay}
-                  className="flex items-center gap-1 glass-subtle hover:scale-105 transition-all"
-                >
-                  <HelpCircle className="w-4 h-4 text-blue-500" />
-                  Try Another Way
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="flex items-center gap-1 hover:bg-purple-100/20 dark:hover:bg-purple-900/20 hover:scale-105 transition-all"
-                >
-                  <Brain className="w-4 h-4 text-purple-500" />
-                  Gentle Pace
-                </Button>
-              </div>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  handleSendMessage()
-                }}
-                className="flex gap-2"
-              >
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your answer or ask a question..."
-                  disabled={isTyping}
-                />
-                <Button type="submit" disabled={!input.trim() || isTyping} className="btn-premium">
-                  <Send className="w-4 h-4" />
-                </Button>
-              </form>
-            </div>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Today's Journal */}
+        {/* Curricula Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {curricula.map((curriculum, index) => (
+            <motion.div
+              key={curriculum.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + index * 0.1 }}
+            >
+              <Card className={`glass h-full ${curriculum.comingSoon ? 'opacity-60' : ''}`}>
+                <CardHeader>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${curriculum.color} flex items-center justify-center mb-4`}>
+                    <curriculum.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <CardTitle className="text-xl">{curriculum.title}</CardTitle>
+                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <BookOpen className="w-4 h-4" />
+                      {curriculum.modules} modules
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {curriculum.hours} hours
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {curriculum.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
+                      {curriculum.level}
+                    </span>
+                    
+                    <Button
+                      onClick={() => handleStartCurriculum(curriculum.id)}
+                      disabled={curriculum.comingSoon}
+                      className={curriculum.comingSoon ? '' : 'btn-primary'}
+                      size="sm"
+                    >
+                      {curriculum.comingSoon ? (
+                        'Coming Soon'
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4 mr-2" />
+                          Start Learning
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Quick Stats */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-12 grid md:grid-cols-3 gap-6"
         >
-          <Card variant="glass-subtle" className="shadow-sm hover:shadow-premium transition-all">
-            <CardContent className="py-6">
-              <h3 className="font-semibold mb-3 text-gradient flex items-center gap-2">
-                <span className="text-2xl">📝</span>
-                Today's Reflection
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 italic leading-relaxed">
-                {lessonProgress > 50
-                  ? "You're making great progress! Keep going, you've got this! 🌟"
-                  : "Every step forward is a victory. Take your time! 🌱"}
-              </p>
+          <Card className="glass">
+            <CardContent className="p-6 text-center">
+              <Trophy className="w-8 h-8 text-yellow-500 mx-auto mb-3" />
+              <p className="text-2xl font-bold">{user?.current_xp || 0} XP</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total Points</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="glass">
+            <CardContent className="p-6 text-center">
+              <BarChart className="w-8 h-8 text-green-500 mx-auto mb-3" />
+              <p className="text-2xl font-bold">{user?.streak_count || 0} Days</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Current Streak</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="glass">
+            <CardContent className="p-6 text-center">
+              <BookOpen className="w-8 h-8 text-blue-500 mx-auto mb-3" />
+              <p className="text-2xl font-bold">0</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Lessons Completed</p>
             </CardContent>
           </Card>
         </motion.div>

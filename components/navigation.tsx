@@ -90,12 +90,19 @@ export function Navigation() {
                 Logout
               </Button>
             ) : (
-              <Link href="/auth">
-                <Button variant="glass" size="sm">
-                  <User className="w-4 h-4 mr-1.5" />
-                  Sign In
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href="/auth/signin">
+                  <Button variant="ghost" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/auth/register">
+                  <Button variant="glass" size="sm">
+                    <User className="w-4 h-4 mr-1.5" />
+                    Get Started
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
 
@@ -161,12 +168,19 @@ export function Navigation() {
                     Logout
                   </Button>
                 ) : (
-                  <Link href="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="glass" size="sm" className="w-full">
-                      <User className="w-4 h-4 mr-2" />
-                      Sign In
-                    </Button>
-                  </Link>
+                  <div className="space-y-2">
+                    <Link href="/auth/signin" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="ghost" size="sm" className="w-full">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/auth/register" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="glass" size="sm" className="w-full">
+                        <User className="w-4 h-4 mr-2" />
+                        Get Started
+                      </Button>
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>
