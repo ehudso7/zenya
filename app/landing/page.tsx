@@ -154,7 +154,7 @@ export default function LandingPage() {
         
         {/* Premium Decorative elements */}
         <motion.div 
-          className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none"
           animate={{ 
             x: [0, 100, 0],
             y: [0, -100, 0],
@@ -162,7 +162,7 @@ export default function LandingPage() {
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute top-0 right-20 w-96 h-96 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          className="absolute top-0 right-20 w-96 h-96 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none"
           animate={{ 
             x: [0, -100, 0],
             y: [0, 100, 0],
@@ -170,7 +170,7 @@ export default function LandingPage() {
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute -bottom-8 left-20 w-96 h-96 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          className="absolute -bottom-8 left-20 w-96 h-96 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none"
           animate={{ 
             x: [0, 50, 0],
             y: [0, -50, 0],

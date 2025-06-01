@@ -74,7 +74,7 @@ export default function ContactPage() {
       
       {/* Animated Blobs */}
       <motion.div 
-        className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+        className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none"
         animate={{ 
           x: [0, -100, 0],
           y: [0, 100, 0],
@@ -82,7 +82,7 @@ export default function ContactPage() {
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div 
-        className="absolute bottom-20 left-10 w-96 h-96 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+        className="absolute bottom-20 left-10 w-96 h-96 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none"
         animate={{ 
           x: [0, 100, 0],
           y: [0, -100, 0],
