@@ -277,10 +277,6 @@
 }
 
 /* Focus States */
-*:focus {
-  outline: none;
-}
-
 *:focus-visible {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -458,7 +454,7 @@ html {
   
   /* Prevent iOS zoom on input focus */
   input, textarea, select {
-    font-size: 16px !important;
+    font-size: 16px;
     min-height: 44px;
   }
   
@@ -508,12 +504,6 @@ html {
   /* Prevent callout on long press */
   * {
     -webkit-touch-callout: none;
-    -webkit-user-select: none;
-  }
-  
-  /* Allow text selection where needed */
-  input, textarea, [contenteditable] {
-    -webkit-user-select: text;
   }
   
   /* Fix momentum scrolling */
