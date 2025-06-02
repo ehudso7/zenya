@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { ArrowRight, Brain, Sparkles, Target, Heart, Zap, CheckCircle } from 'lucide-react'
@@ -52,6 +53,7 @@ const testimonials = [
 ]
 
 export default function LandingPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -138,17 +140,22 @@ export default function LandingPage() {
               transition={{ duration: 0.5, delay: 0.4, type: "spring" }}
             >
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/auth/signin-password" className="w-full sm:w-auto">
-                  <Button size="lg" className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl w-full">
-                    Get Started Free
-                    <ArrowRight className="ml-2 w-5 h-5 animate-pulse" />
-                  </Button>
-                </Link>
-                <Link href="/auth/signin-password" className="w-full sm:w-auto">
-                  <Button size="lg" variant="glass" className="text-lg px-10 py-6 rounded-2xl shadow-xl w-full">
-                    Sign In
-                  </Button>
-                </Link>
+                <Button 
+                  size="lg" 
+                  className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl w-full sm:w-auto"
+                  onClick={() => router.push('/auth/signin-password')}
+                >
+                  Get Started Free
+                  <ArrowRight className="ml-2 w-5 h-5 animate-pulse" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="glass" 
+                  className="text-lg px-10 py-6 rounded-2xl shadow-xl w-full sm:w-auto"
+                  onClick={() => router.push('/auth/signin-password')}
+                >
+                  Sign In
+                </Button>
               </div>
             </motion.div>
           </motion.div>

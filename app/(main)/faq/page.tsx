@@ -2,6 +2,7 @@
 
 import { ArrowLeft, ChevronDown, Search, Sparkles, Brain, CreditCard, Shield, Clock, Users, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -120,6 +121,7 @@ const faqCategories = [
 ]
 
 export default function FAQPage() {
+  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [openItems, setOpenItems] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -332,12 +334,13 @@ export default function FAQPage() {
                 Looking for something specific? Our friendly support team is here to help!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/contact">
-                  <Button className="btn-premium">
-                    Contact Support
-                    <Sparkles className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
+                <Button 
+                  className="btn-premium"
+                  onClick={() => router.push('/contact')}
+                >
+                  Contact Support
+                  <Sparkles className="ml-2 w-4 h-4" />
+                </Button>
                 <Button variant="glass" className="hover:bg-white/20 dark:hover:bg-gray-800/20">
                   <Users className="mr-2 w-4 h-4" />
                   Join Community

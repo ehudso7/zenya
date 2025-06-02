@@ -91,17 +91,21 @@ export function Navigation() {
               </Button>
             ) : (
               <div className="flex items-center gap-2">
-                <Link href="/auth/signin-password">
-                  <Button variant="ghost" size="sm">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/auth/signin-password">
-                  <Button variant="glass" size="sm">
-                    <User className="w-4 h-4 mr-1.5" />
-                    Get Started
-                  </Button>
-                </Link>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => router.push('/auth/signin-password')}
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  variant="glass" 
+                  size="sm"
+                  onClick={() => router.push('/auth/signin-password')}
+                >
+                  <User className="w-4 h-4 mr-1.5" />
+                  Get Started
+                </Button>
               </div>
             )}
           </div>
@@ -169,17 +173,29 @@ export function Navigation() {
                   </Button>
                 ) : (
                   <div className="space-y-2">
-                    <Link href="/auth/signin-password" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="ghost" size="sm" className="w-full">
-                        Sign In
-                      </Button>
-                    </Link>
-                    <Link href="/auth/signin-password" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="glass" size="sm" className="w-full">
-                        <User className="w-4 h-4 mr-2" />
-                        Get Started
-                      </Button>
-                    </Link>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => {
+                        router.push('/auth/signin-password')
+                        setIsMobileMenuOpen(false)
+                      }}
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      variant="glass" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => {
+                        router.push('/auth/signin-password')
+                        setIsMobileMenuOpen(false)
+                      }}
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      Get Started
+                    </Button>
                   </div>
                 )}
               </div>

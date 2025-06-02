@@ -11,11 +11,11 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, glow = false, ...props }, ref) => {
     const variants = {
-      primary: 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 active:shadow-md active:scale-[0.98] md:hover:-translate-y-0.5',
+      primary: 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 active:shadow-md active:scale-[0.98]',
       secondary: 'bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/90 dark:hover:bg-gray-800/90 active:bg-white/60 dark:active:bg-gray-800/60',
       ghost: 'bg-transparent hover:bg-gray-100/50 dark:hover:bg-gray-800/50 active:bg-gray-100/70 dark:active:bg-gray-800/70',
       danger: 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 active:shadow-md active:scale-[0.98]',
-      premium: 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-premium hover:shadow-2xl active:shadow-lg active:scale-[0.98] md:hover:-translate-y-1 relative overflow-hidden',
+      premium: 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-premium hover:shadow-2xl active:shadow-lg active:scale-[0.98] overflow-hidden',
       glass: 'bg-white/20 dark:bg-gray-900/20 backdrop-blur-lg border border-white/30 dark:border-gray-700/30 hover:bg-white/30 dark:hover:bg-gray-900/30 active:bg-white/40 dark:active:bg-gray-900/40',
     }
 
@@ -30,14 +30,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          'inline-flex items-center justify-center rounded-xl font-medium',
+          'relative inline-flex items-center justify-center rounded-xl font-medium',
           'transition-all duration-150 ease-out',
           'focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2',
-          'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',
-          'transform-gpu will-change-transform',
-          'touch-manipulation select-none',
+          'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:pointer-events-none',
+          'transform-gpu',
+          'select-none cursor-pointer',
           'tap-highlight-transparent',
-          'cursor-pointer',
+          'active:transition-none',
           variants[variant],
           sizes[size],
           glow && 'animate-pulse-slow',
@@ -71,7 +71,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {children}
         {variant === 'premium' && (
           <span className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-700 md:block hidden" />
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shimmer" />
           </span>
         )}
       </button>
