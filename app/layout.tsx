@@ -3,13 +3,8 @@ import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Providers } from '@/components/providers'
 import Script from 'next/script'
-import dynamic from 'next/dynamic'
+import CookieConsent from '@/components/cookie-consent'
 import './globals.css'
-
-// Dynamically import cookie consent to avoid SSR issues
-const CookieConsent = dynamic(() => import('@/components/cookie-consent'), {
-  ssr: false,
-})
 
 const inter = Inter({ 
   subsets: ['latin'],
