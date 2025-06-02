@@ -203,3 +203,65 @@ firestore-debug.log
 # Supabase local development
 /supabase/.branches/
 /supabase/.temp/
+
+# ===== SECURITY: Explicitly excluded sensitive files =====
+# Added by cleanup-sensitive-files.sh script
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Database scripts with sensitive data
+scripts/create-demo-user.sql
+scripts/*-demo-*.sql
+scripts/*-test-*.sql
+
+# Internal documentation
+CLAUDE.md
+AUTH_FIX_INSTRUCTIONS.md
+FILES_TO_REMOVE_FROM_GITHUB.md
+
+# Credentials and secrets
+**/secrets.json
+**/credentials.json
+**/*.key
+**/*.pem
+**/*.pfx
+**/*.p12
+
+# Database dumps and backups
+*.sql.backup
+*.dump
+*.sql.gz
+
+# User data
+user-data/
+user-uploads/
+user-sessions/
+
+# AI Models and training data
+models/
+training-data/
+*.model
+*.weights
+*.checkpoint
+
+# Analytics and metrics
+analytics-reports/
+user-metrics/
+performance-logs/
+
+# Business sensitive
+contracts/
+legal/
+financial-data/
+business-plans/
+
+# Local development
+local-scripts/
+dev-tools/
+.local/
+
+# === END SECURITY ADDITIONS ===
