@@ -35,13 +35,13 @@ export async function middleware(request: NextRequest) {
   
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
   const isPublicPage = [
+    '/',
     '/landing', 
     '/about', 
     '/faq', 
     '/contact', 
     '/privacy', 
     '/terms',
-    '/',
   ].includes(request.nextUrl.pathname)
   const isApiRoute = request.nextUrl.pathname.startsWith('/api')
   const isPublicApiRoute = [
@@ -59,9 +59,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/landing', request.url))
   }
   
-  // If user is logged in and on landing page, redirect to dashboard
+  // If user is logged in and on landing page, redirect to learn page
   if (session && request.nextUrl.pathname === '/landing') {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(new URL('/learn', request.url))
   }
   
   return res
