@@ -17,6 +17,7 @@ export default function SignInPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
   const [emailConfirmationRequired, setEmailConfirmationRequired] = useState(false)
+  const [lastSignupEmail, setLastSignupEmail] = useState('')
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -137,11 +138,11 @@ export default function SignInPasswordPage() {
           // Email confirmation is required
           console.log('Email confirmation required')
           setEmailConfirmationRequired(true)
+          setLastSignupEmail(email)
           toast.success('Account created! Please check your email to confirm your account before signing in.', {
             duration: 6000,
           })
-          // Reset form
-          setEmail('')
+          // Reset form but keep email for resend functionality
           setPassword('')
         }
       } else {
@@ -154,6 +155,46 @@ export default function SignInPasswordPage() {
     } finally {
       setIsLoading(false)
       setIsSignUp(false)
+    }
+  }
+
+  const resendConfirmationEmail = async () => {
+    if (!lastSignupEmail) {
+      toast.error('Please create an account first')
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      console.log('Resending confirmation email to:', lastSignupEmail)
+      
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: lastSignupEmail,
+      })
+      
+      if (error) {
+        console.error('Resend error:', error)
+        throw error
+      }
+      
+      toast.success('Confirmation email resent! Please check your inbox and spam folder.', {
+        duration: 5000,
+      })
+    } catch (error: any) {
+      console.error('Failed to resend email:', error)
+      
+      // Check for rate limit error
+      if (error.message?.includes('rate limit') || error.message?.includes('too many')) {
+        toast.error('Email rate limit reached. Please wait an hour before trying again.', {
+          duration: 6000,
+        })
+      } else {
+        toast.error(error.message || 'Failed to resend email. Please try again later.')
+      }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -187,11 +228,30 @@ export default function SignInPasswordPage() {
               >
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-blue-900 dark:text-blue-100">Check your email!</p>
-                    <p className="text-blue-700 dark:text-blue-300 mt-1">
-                      We've sent a confirmation link to your email. Please click it to activate your account before signing in.
+                  <div className="flex-1">
+                    <p className="font-semibold text-blue-900 dark:text-blue-100 text-sm">Check your email!</p>
+                    <p className="text-blue-700 dark:text-blue-300 mt-1 text-sm">
+                      We've sent a confirmation link to <strong>{lastSignupEmail}</strong>. Please click it to activate your account.
                     </p>
+                    <p className="text-blue-600 dark:text-blue-400 mt-2 text-xs">
+                      Also check your spam/junk folder. Email may take a few minutes to arrive.
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={resendConfirmationEmail}
+                      disabled={isLoading}
+                      className="mt-3 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader className="mr-2 h-3 w-3 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        'Resend confirmation email'
+                      )}
+                    </Button>
                   </div>
                 </div>
               </motion.div>
