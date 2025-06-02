@@ -151,10 +151,11 @@ export default function LandingPage() {
                 <Button 
                   size="lg" 
                   variant="glass" 
-                  className="text-lg px-10 py-6 rounded-2xl shadow-xl w-full sm:w-auto"
+                  className="text-lg px-10 py-6 rounded-2xl shadow-xl w-full sm:w-auto group relative overflow-hidden"
                   onClick={() => router.push('/auth/signin-password')}
                 >
-                  Sign In
+                  <span className="relative z-10">Sign In</span>
+                  <span className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 </Button>
               </div>
             </motion.div>
@@ -370,11 +371,21 @@ export default function LandingPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.8 }}
                 >
-                  <Button size="sm" variant="secondary" className="glass-subtle hover:scale-105 transition-all">
+                  <Button 
+                    size="sm" 
+                    variant="secondary" 
+                    className="glass-subtle hover:scale-105 hover:shadow-lg transition-all"
+                    onClick={() => toast.success('Simplify mode would break down complex concepts!')}
+                  >
                     <Sparkles className="w-4 h-4 mr-1 text-yellow-500" />
                     Simplify This
                   </Button>
-                  <Button size="sm" variant="secondary" className="glass-subtle hover:scale-105 transition-all">
+                  <Button 
+                    size="sm" 
+                    variant="secondary" 
+                    className="glass-subtle hover:scale-105 hover:shadow-lg transition-all"
+                    onClick={() => toast.success('Gentle pace mode would slow down the lesson!')}
+                  >
                     <Zap className="w-4 h-4 mr-1 text-purple-500" />
                     Gentle Pace
                   </Button>
