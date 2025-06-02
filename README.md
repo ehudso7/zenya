@@ -48,6 +48,8 @@ npm install
 cp .env.local.example .env.local
 ```
 
+4. Review the [Local Files Guide](./LOCAL_FILES_GUIDE.md) to understand which files should remain local and not be committed to the repository.
+
 Edit `.env.local` with your actual values:
 - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anon key
