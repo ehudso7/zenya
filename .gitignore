@@ -265,3 +265,7 @@ dev-tools/
 .local/
 
 # === END SECURITY ADDITIONS ===
+
+# Internal documentation
+docs/internal/
+*.local.md

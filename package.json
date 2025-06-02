@@ -1,8 +1,26 @@
 {
-  "name": "zenya",
+  "name": "zenya-ai",
   "version": "1.0.0",
-  "description": "This is a markdown file for the Zenya project.",
-  "main": "index.js",
+  "description": "AI-powered learning platform for neurodiverse adults",
+  "private": true,
+  "homepage": "https://zenyaai.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ehudso7/zenya.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ehudso7/zenya/issues"
+  },
+  "author": {
+    "name": "Zenya AI",
+    "email": "support@zenyaai.com",
+    "url": "https://zenyaai.com"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,11 +28,20 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "test": "npm run type-check && npm run lint",
-    "prepare-deploy": "npm run test && npm run build"
+    "prepare-deploy": "npm run test && npm run build",
+    "format": "prettier --write ."
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "ai",
+    "learning",
+    "education",
+    "adhd",
+    "neurodiversity",
+    "tutoring",
+    "adaptive-learning",
+    "pwa",
+    "nextjs"
+  ],
   "dependencies": {
     "@sentry/nextjs": "^9.24.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
