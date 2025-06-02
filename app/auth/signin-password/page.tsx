@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Mail, Lock, Loader, ArrowLeft, LogIn } from 'lucide-react'
+import { Mail, Lock, Loader, ArrowLeft, LogIn, UserPlus, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,6 +15,8 @@ export default function SignInPasswordPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isSignUp, setIsSignUp] = useState(false)
+  const [emailConfirmationRequired, setEmailConfirmationRequired] = useState(false)
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -29,28 +31,43 @@ export default function SignInPasswordPage() {
     setIsLoading(true)
 
     try {
+      console.log('Attempting sign in for:', email)
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
+      console.log('Sign in response:', { data, error })
 
-      toast.success('Signed in successfully!')
-      
-      // Check if user profile exists
-      const { data: profile } = await supabase
-        .from('users')
-        .select('onboarding_completed')
-        .eq('id', data.user.id)
-        .single()
+      if (error) {
+        console.error('Sign in error:', error)
+        throw error
+      }
 
-      if (profile?.onboarding_completed) {
-        router.push('/learn')
-      } else {
-        router.push('/profile')
+      if (data.user) {
+        console.log('Sign in successful, user ID:', data.user.id)
+        toast.success('Signed in successfully!')
+        
+        // Check if user profile exists
+        const { data: profile, error: profileError } = await supabase
+          .from('users')
+          .select('onboarding_completed')
+          .eq('id', data.user.id)
+          .single()
+
+        console.log('Profile check:', { profile, profileError })
+
+        if (profile?.onboarding_completed) {
+          console.log('Redirecting to /learn')
+          router.push('/learn')
+        } else {
+          console.log('Redirecting to /profile')
+          router.push('/profile')
+        }
       }
     } catch (error: any) {
+      console.error('Full sign in error:', error)
       toast.error(error.message || 'Invalid email or password')
     } finally {
       setIsLoading(false)
@@ -71,6 +88,8 @@ export default function SignInPasswordPage() {
     setIsLoading(true)
 
     try {
+      console.log('Starting signup process for:', email)
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -79,25 +98,62 @@ export default function SignInPasswordPage() {
         }
       })
 
-      if (error) throw error
+      console.log('Signup response:', { data, error })
+
+      if (error) {
+        console.error('Signup error:', error)
+        throw error
+      }
 
       if (data.user) {
-        toast.success('Account created! Signing you in...')
+        console.log('User created successfully:', data.user.id)
         
-        // Sign in immediately after signup
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
+        // Check if the user email is confirmed (if email confirmation is disabled, this will be true)
+        if (data.user.email_confirmed_at) {
+          console.log('Email already confirmed, attempting sign in...')
+          toast.success('Account created! Signing you in...')
+          
+          // Wait a bit before signing in to ensure the user is created
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          
+          // Sign in immediately after signup
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          })
 
-        if (!signInError) {
-          router.push('/profile')
+          console.log('Sign in response:', { signInData, signInError })
+
+          if (!signInError && signInData.user) {
+            console.log('Sign in successful, redirecting to profile...')
+            // Force a router refresh to ensure auth state is updated
+            router.refresh()
+            router.push('/profile')
+          } else if (signInError) {
+            console.error('Sign in error after signup:', signInError)
+            toast.error('Account created but failed to sign in. Please try signing in manually.')
+          }
+        } else {
+          // Email confirmation is required
+          console.log('Email confirmation required')
+          setEmailConfirmationRequired(true)
+          toast.success('Account created! Please check your email to confirm your account before signing in.', {
+            duration: 6000,
+          })
+          // Reset form
+          setEmail('')
+          setPassword('')
         }
+      } else {
+        console.log('No user data returned from signup')
+        toast.error('Failed to create account. Please try again.')
       }
     } catch (error: any) {
+      console.error('Full error object:', error)
       toast.error(error.message || 'Failed to create account')
     } finally {
       setIsLoading(false)
+      setIsSignUp(false)
     }
   }
 
@@ -123,6 +179,24 @@ export default function SignInPasswordPage() {
             </p>
           </CardHeader>
           <CardContent>
+            {emailConfirmationRequired && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg"
+              >
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-blue-900 dark:text-blue-100">Check your email!</p>
+                    <p className="text-blue-700 dark:text-blue-300 mt-1">
+                      We've sent a confirmation link to your email. Please click it to activate your account before signing in.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+            
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-2">
                 <div className="relative">
@@ -143,11 +217,12 @@ export default function SignInPasswordPage() {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     type="password"
-                    placeholder="Password"
+                    placeholder="Password (min 6 characters)"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10"
                     required
+                    minLength={6}
                   />
                 </div>
               </div>
@@ -157,7 +232,7 @@ export default function SignInPasswordPage() {
                 className="w-full btn-premium"
                 disabled={isLoading}
               >
-                {isLoading ? (
+                {isLoading && !isSignUp ? (
                   <>
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
                     Signing in...
@@ -174,10 +249,23 @@ export default function SignInPasswordPage() {
                 type="button"
                 variant="secondary"
                 className="w-full"
-                onClick={handleSignUp}
+                onClick={() => {
+                  setIsSignUp(true)
+                  handleSignUp()
+                }}
                 disabled={isLoading}
               >
-                Create New Account
+                {isLoading && isSignUp ? (
+                  <>
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Create New Account
+                  </>
+                )}
               </Button>
             </form>
 
