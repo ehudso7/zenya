@@ -3,7 +3,13 @@ import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Providers } from '@/components/providers'
 import Script from 'next/script'
+import dynamic from 'next/dynamic'
 import './globals.css'
+
+// Dynamically import cookie consent to avoid SSR issues
+const CookieConsent = dynamic(() => import('@/components/cookie-consent'), {
+  ssr: false,
+})
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -74,10 +80,11 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-full bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900`}>
         <Providers>
           {children}
+          <CookieConsent />
         </Providers>
         <Analytics />
         
-        {/* Google Analytics */}
+        {/* Google Analytics with GDPR consent */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-1SHGT2BP2J"
           strategy="afterInteractive"
@@ -87,6 +94,15 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
+            
+            // Default consent mode
+            gtag('consent', 'default', {
+              'analytics_storage': 'denied',
+              'ad_storage': 'denied',
+              'ad_user_data': 'denied',
+              'ad_personalization': 'denied'
+            });
+            
             gtag('config', 'G-1SHGT2BP2J');
           `}
         </Script>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { User, Settings, Camera, Save, Loader } from 'lucide-react'
+import { User, Settings, Camera, Save, Loader, Download, Trash2, Shield, Cookie } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -291,6 +291,96 @@ export default function ProfilePage() {
                       setFormData({ ...formData, pushNotifications: checked })
                     }
                   />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Privacy & Data */}
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  Privacy & Data
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <p className="text-sm text-blue-900 dark:text-blue-100 mb-3">
+                    Your data belongs to you. Download or delete your data anytime.
+                  </p>
+                  <div className="space-y-3">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="w-full sm:w-auto"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/user/export')
+                          if (response.ok) {
+                            const blob = await response.blob()
+                            const url = window.URL.createObjectURL(blob)
+                            const a = document.createElement('a')
+                            a.href = url
+                            a.download = `zenya-data-export-${Date.now()}.json`
+                            a.click()
+                            window.URL.revokeObjectURL(url)
+                            toast.success('Your data has been downloaded')
+                          } else {
+                            toast.error('Failed to export data')
+                          }
+                        } catch (error) {
+                          toast.error('Error exporting data')
+                        }
+                      }}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export My Data
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-2 text-red-600 dark:text-red-400">Danger Zone</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    Permanently delete your account and all associated data. This action cannot be undone.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    className="w-full sm:w-auto"
+                    onClick={() => {
+                      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                        if (confirm('This will permanently delete all your data including progress, achievements, and settings. Type "DELETE" to confirm.')) {
+                          // Implement deletion
+                          fetch('/api/user/delete', { method: 'DELETE' })
+                            .then(() => {
+                              toast.success('Account deleted successfully')
+                              router.push('/')
+                            })
+                            .catch(() => toast.error('Failed to delete account'))
+                        }
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete Account
+                  </Button>
+                </div>
+
+                <div className="border-t pt-4">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full sm:w-auto"
+                    onClick={() => {
+                      // Trigger cookie consent banner
+                      localStorage.removeItem('cookiePreferences')
+                      window.location.reload()
+                    }}
+                  >
+                    <Cookie className="w-4 h-4 mr-2" />
+                    Manage Cookie Preferences
+                  </Button>
                 </div>
               </CardContent>
             </Card>
