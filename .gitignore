@@ -38,6 +38,7 @@ yarn-error.log*
 .env.development
 .env.test
 .env.staging
+.env.production
 
 # vercel
 .vercel
@@ -115,6 +116,8 @@ temp/
 *.sqlite3
 /db-backups/
 /database-dumps/
+scripts/create-demo-user.sql
+scripts/*-demo-*.sql
 
 # Local Development
 /local-scripts/
