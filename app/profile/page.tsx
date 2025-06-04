@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { User, Settings, Camera, Save, Loader, Download, Trash2, Shield, Cookie } from 'lucide-react'
@@ -45,11 +45,9 @@ export default function ProfilePage() {
     pushNotifications: false
   })
 
-  useEffect(() => {
-    fetchProfile()
-  }, [])
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
+    if (!user) return
+    
     setIsLoading(true)
     try {
       const response = await fetch('/api/profile')
@@ -80,7 +78,11 @@ export default function ProfilePage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [router, user])
+
+  useEffect(() => {
+    fetchProfile()
+  }, [fetchProfile])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -132,7 +134,7 @@ export default function ProfilePage() {
     <div className="min-h-screen gradient-mesh">
       <AppNavigation />
       
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <main id="main-content" className="container mx-auto px-4 py-8 max-w-4xl" role="main">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -140,7 +142,7 @@ export default function ProfilePage() {
         >
           <h1 className="text-3xl font-bold mb-8">Your Profile</h1>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" aria-label="Profile settings form">
             {/* Basic Information */}
             <Card className="glass">
               <CardHeader>
@@ -328,7 +330,7 @@ export default function ProfilePage() {
                           } else {
                             toast.error('Failed to export data')
                           }
-                        } catch (error) {
+                        } catch (_error) {
                           toast.error('Error exporting data')
                         }
                       }}
@@ -362,7 +364,7 @@ export default function ProfilePage() {
                       }
                     }}
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <Trash2 className="w-4 h-4 mr-2" aria-hidden="true" />
                     Delete Account
                   </Button>
                 </div>
@@ -378,7 +380,7 @@ export default function ProfilePage() {
                       window.location.reload()
                     }}
                   >
-                    <Cookie className="w-4 h-4 mr-2" />
+                    <Cookie className="w-4 h-4 mr-2" aria-hidden="true" />
                     Manage Cookie Preferences
                   </Button>
                 </div>
@@ -397,15 +399,16 @@ export default function ProfilePage() {
                 type="submit"
                 disabled={isSaving}
                 className="btn-premium"
+                aria-busy={isSaving}
               >
                 {isSaving ? (
                   <>
-                    <Loader className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
+                    <Loader className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                    <span aria-live="polite">Saving...</span>
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4 mr-2" />
+                    <Save className="w-4 h-4 mr-2" aria-hidden="true" />
                     Save Changes
                   </>
                 )}
@@ -413,7 +416,7 @@ export default function ProfilePage() {
             </div>
           </form>
         </motion.div>
-      </div>
+      </main>
     </div>
   )
 }

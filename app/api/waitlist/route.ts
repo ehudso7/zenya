@@ -1,18 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { withRateLimit } from '@/lib/api-middleware'
+import { waitlistSchema } from '@/lib/validations'
+import { validateRequest } from '@/lib/validation-middleware'
 
 export async function POST(request: NextRequest) {
-  try {
-    const { email, source } = await request.json()
+  return withRateLimit(request, async (req) => {
+    try {
+      // Validate request body
+      const { data, error: validationError } = await validateRequest(req, waitlistSchema)
+      
+      if (validationError) {
+        return validationError
+      }
 
-    if (!email || !email.includes('@')) {
-      return NextResponse.json(
-        { error: 'Valid email is required' },
-        { status: 400 }
-      )
-    }
+      const { email, reason } = data!
+      const source = reason || 'landing'
 
-    const supabase = await createServerSupabaseClient()
+      const supabase = await createServerSupabaseClient()
 
     // Check if email already exists
     const { data: existing } = await supabase
@@ -31,7 +36,7 @@ export async function POST(request: NextRequest) {
     // Add to waitlist
     const { error } = await supabase
       .from('waitlist')
-      .insert({ email, source: source || 'landing' })
+      .insert({ email, source })
 
     if (error) {
       // Log error for monitoring
@@ -50,9 +55,10 @@ export async function POST(request: NextRequest) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Waitlist API error:', error)
     }
-    return NextResponse.json(
-      { error: 'Server error' },
-      { status: 500 }
-    )
-  }
+      return NextResponse.json(
+        { error: 'Server error' },
+        { status: 500 }
+      )
+    }
+  }, 'waitlist')
 }

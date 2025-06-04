@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState } from 'react'
 import type { Mood } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -18,13 +18,21 @@ const moods: { value: Mood; label: string }[] = [
 ]
 
 export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
+  const [isAnimating, setIsAnimating] = useState(false)
+  
+  const handleMoodSelect = (mood: Mood) => {
+    setIsAnimating(true)
+    onChange(mood)
+    setTimeout(() => setIsAnimating(false), 300)
+  }
+  
   return (
     <div className="flex flex-col items-center space-y-6">
       <div className="flex flex-wrap justify-center gap-4">
         {moods.map((mood, index) => (
-          <motion.button
+          <button
             key={mood.value}
-            onClick={() => onChange(mood.value)}
+            onClick={() => handleMoodSelect(mood.value)}
             className={cn(
               'mood-button relative flex flex-col items-center gap-2 p-6 min-w-[100px]',
               'bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm',
@@ -33,12 +41,20 @@ export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
               'active:bg-white/80 dark:active:bg-gray-800/80',
               'touch-manipulation',
               'focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2',
-              value === mood.value && 'selected'
+              'transition-all duration-300 ease-out',
+              'transform hover:scale-105 active:scale-95',
+              value === mood.value && [
+                'ring-2 ring-blue-400',
+                'bg-gradient-to-br from-blue-50/50 to-indigo-50/50',
+                'dark:from-blue-900/20 dark:to-indigo-900/20',
+                isAnimating && 'animate-pulse'
+              ]
             )}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            whileTap={{ scale: 0.95 }}
+            style={{
+              animationDelay: `${index * 100}ms`,
+              opacity: 0,
+              animation: 'fadeInUp 0.5s ease-out forwards'
+            }}
           >
             <span className="text-4xl" role="img" aria-label={mood.label}>
               {mood.value}
@@ -46,16 +62,22 @@ export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {mood.label}
             </span>
-            {value === mood.value && (
-              <motion.div
-                className="absolute inset-0 rounded-2xl ring-2 ring-blue-400 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/20 dark:to-indigo-900/20"
-                layoutId="mood-selector"
-                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-              />
-            )}
-          </motion.button>
+          </button>
         ))}
       </div>
+      
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   )
 }

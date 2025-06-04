@@ -1,9 +1,13 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
+import { withRateLimit } from '@/lib/api-middleware'
+import { profileUpdateSchema } from '@/lib/validations'
+import { validateRequest } from '@/lib/validation-middleware'
 
-export async function GET() {
-  try {
+export async function GET(request: NextRequest) {
+  return withRateLimit(request, async () => {
+    try {
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
     
@@ -53,17 +57,19 @@ export async function GET() {
     }
 
     return NextResponse.json({ profile })
-  } catch (error) {
-    // Log error for monitoring
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Profile GET error:', error)
+    } catch (error) {
+      // Log error for monitoring
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Profile GET error:', error)
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
+  }, 'api')
 }
 
-export async function PUT(request: Request) {
-  try {
+export async function PUT(request: NextRequest) {
+  return withRateLimit(request, async (req) => {
+    try {
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
     
@@ -73,17 +79,24 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
-    const { name, bio, learning_style, timezone, notification_preferences } = body
+    // Validate request body
+    const { data, error: validationError } = await validateRequest(req, profileUpdateSchema)
+    
+    if (validationError) {
+      return validationError
+    }
+
+    const { display_name, bio, learning_style, timezone, notification_preferences, preferred_topics } = data!
 
     const { data: profile, error } = await supabase
       .from('users')
       .update({
-        name,
+        name: display_name,
         bio,
         learning_style,
         timezone,
         notification_preferences,
+        preferred_topics,
         onboarding_completed: true
       })
       .eq('id', session.user.id)
@@ -99,11 +112,12 @@ export async function PUT(request: Request) {
     }
 
     return NextResponse.json({ profile })
-  } catch (error) {
-    // Log error for monitoring
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Profile PUT error:', error)
+    } catch (error) {
+      // Log error for monitoring
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Profile PUT error:', error)
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
+  }, 'api')
 }

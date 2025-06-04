@@ -55,13 +55,32 @@ export default function ContactPage() {
 
     setIsSubmitting(true)
     
-    // Simulate form submission
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          subject: formData.subject || 'General Inquiry'
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message')
+      }
+
       toast.success('Message sent! We\'ll get back to you soon 🎉')
       setFormData({ name: '', email: '', subject: '', message: '' })
     } catch (error) {
-      toast.error('Failed to send message. Please try again.')
+      if (error instanceof Error) {
+        toast.error(error.message || 'Failed to send message. Please try again.')
+      } else {
+        toast.error('Failed to send message. Please try again.')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -190,8 +209,12 @@ export default function ContactPage() {
                       isLoading={isSubmitting}
                       disabled={isSubmitting}
                     >
-                      Send Message
-                      <Send className="ml-2 w-5 h-5" />
+                      {isSubmitting ? 'Sending...' : (
+                        <>
+                          Send Message
+                          <Send className="ml-2 w-5 h-5" />
+                        </>
+                      )}
                     </Button>
                   </form>
                 </CardContent>

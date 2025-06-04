@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { 
   BookOpen, 
   Clock, 
@@ -19,11 +19,28 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import AppNavigation from '@/components/app-navigation'
-import MoodSelector from '@/components/mood-selector'
 import { useStore } from '@/lib/store'
 import { toast } from 'react-hot-toast'
 
-const iconMap: { [key: string]: any } = {
+// Dynamic imports for heavy components
+const MoodSelector = dynamic(() => import('@/components/mood-selector'), {
+  loading: () => (
+    <div className="flex gap-4 justify-center">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+      ))}
+    </div>
+  ),
+  ssr: false
+})
+
+// Dynamic import for framer-motion
+const MotionDiv = dynamic(
+  () => import('framer-motion').then(mod => mod.motion.div),
+  { ssr: false }
+)
+
+const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
   'math-basics': Calculator,
   'web-dev-101': Globe,
   'english-grammar': BookOpenCheck,
@@ -53,7 +70,7 @@ export default function LearnPage() {
   const router = useRouter()
   const { user, updateMood } = useStore()
   const [curricula, setCurricula] = useState<Curriculum[]>([])
-  const [loading, setLoading] = useState(true)
+  const [_loading, setLoading] = useState(true)
   const [userStats, setUserStats] = useState({ lessonsCompleted: 0 })
 
   useEffect(() => {
@@ -73,7 +90,7 @@ export default function LearnPage() {
       } else {
         toast.error('Failed to load curriculums')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to load curriculums')
     } finally {
       setLoading(false)
@@ -90,7 +107,7 @@ export default function LearnPage() {
           lessonsCompleted: data.profile.lessons_completed || 0
         })
       }
-    } catch (error) {
+    } catch (_error) {
       // Silent fail for stats
     }
   }
@@ -99,13 +116,68 @@ export default function LearnPage() {
     router.push(`/learn/${curriculumSlug}`)
   }
 
+  if (_loading) {
+    return (
+      <div className="min-h-screen gradient-mesh">
+        <AppNavigation />
+        
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          {/* Loading Header */}
+          <div className="mb-8 animate-pulse">
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+          </div>
+
+          {/* Loading Mood Selector */}
+          <div className="mb-8">
+            <Card className="glass">
+              <CardHeader>
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-4 justify-center">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Loading Curricula Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="glass h-full animate-pulse">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4"></div>
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
+                    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen gradient-mesh">
       <AppNavigation />
       
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <main id="main-content" className="container mx-auto px-4 py-8 max-w-6xl" role="main">
         {/* Header */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
@@ -114,10 +186,10 @@ export default function LearnPage() {
           <p className="text-xl text-gray-600 dark:text-gray-400">
             Choose a curriculum and begin your personalized learning journey
           </p>
-        </motion.div>
+        </MotionDiv>
 
         {/* Mood Selector */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -142,12 +214,28 @@ export default function LearnPage() {
               )}
             </CardContent>
           </Card>
-        </motion.div>
+        </MotionDiv>
 
         {/* Curricula Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {curricula.map((curriculum, index) => (
-            <motion.div
+        {curricula.length === 0 ? (
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-center py-12"
+          >
+            <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+              No Curricula Available
+            </h2>
+            <p className="text-gray-500 dark:text-gray-500 max-w-md mx-auto">
+              We're working on creating amazing learning content for you. Check back soon!
+            </p>
+          </MotionDiv>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {curricula.map((curriculum, index) => (
+            <MotionDiv
               key={curriculum.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -194,12 +282,13 @@ export default function LearnPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </MotionDiv>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* Quick Stats */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
@@ -224,12 +313,12 @@ export default function LearnPage() {
           <Card className="glass">
             <CardContent className="p-6 text-center">
               <BookOpen className="w-8 h-8 text-blue-500 mx-auto mb-3" />
-              <p className="text-2xl font-bold">0</p>
+              <p className="text-2xl font-bold">{userStats.lessonsCompleted}</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Lessons Completed</p>
             </CardContent>
           </Card>
-        </motion.div>
-      </div>
+        </MotionDiv>
+      </main>
     </div>
   )
 }

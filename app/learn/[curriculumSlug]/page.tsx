@@ -1,16 +1,14 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, use, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { 
   ArrowLeft, 
-  ArrowRight, 
   Play, 
   CheckCircle, 
   Clock, 
   Target,
-  BookOpen,
   Trophy,
   AlertCircle,
   Sparkles,
@@ -22,6 +20,22 @@ import { Progress } from '@/components/ui/progress'
 import AppNavigation from '@/components/app-navigation'
 import { toast } from 'react-hot-toast'
 import { useStore } from '@/lib/store'
+
+// Dynamic imports for heavy components
+const MotionDiv = dynamic(
+  () => import('framer-motion').then(mod => mod.motion.div),
+  { ssr: false }
+)
+
+const AnimatePresence = dynamic(
+  () => import('framer-motion').then(mod => mod.AnimatePresence),
+  { ssr: false }
+)
+
+const Celebration = dynamic(
+  () => import('@/components/celebration').then(mod => ({ default: mod.Celebration })),
+  { ssr: false }
+)
 
 interface Props {
   params: Promise<{ curriculumSlug: string }>
@@ -57,27 +71,24 @@ export default function CurriculumLessonsPage({ params }: Props) {
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0)
   const [lessonStarted, setLessonStarted] = useState(false)
-  const [lessonContent, setLessonContent] = useState<any>(null)
+  const [lessonContent, setLessonContent] = useState<Lesson | null>(null)
   const [loading, setLoading] = useState(true)
   const [completing, setCompleting] = useState(false)
   const [startTime, setStartTime] = useState<number>(0)
+  const [showCelebration, setShowCelebration] = useState(false)
 
   const currentLesson = lessons[currentLessonIndex]
   const completedLessons = lessons.filter(l => l.user_progress?.status === 'completed').length
   const progress = lessons.length > 0 ? (completedLessons / lessons.length) * 100 : 0
 
-  useEffect(() => {
-    fetchLessons()
-  }, [resolvedParams.curriculumSlug])
-
-  const fetchLessons = async () => {
+  const fetchLessons = useCallback(async () => {
     try {
       // First get curriculum info
       const currResponse = await fetch('/api/curriculums')
       const currData = await currResponse.json()
       
       if (currResponse.ok) {
-        const curr = currData.curriculums?.find((c: any) => c.slug === resolvedParams.curriculumSlug)
+        const curr = currData.curriculums?.find((c: Curriculum) => c.slug === resolvedParams.curriculumSlug)
         if (curr) {
           setCurriculum(curr)
           
@@ -103,13 +114,17 @@ export default function CurriculumLessonsPage({ params }: Props) {
           router.push('/learn')
         }
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to load curriculum')
       router.push('/learn')
     } finally {
       setLoading(false)
     }
-  }
+  }, [resolvedParams.curriculumSlug, router])
+
+  useEffect(() => {
+    fetchLessons()
+  }, [fetchLessons])
 
   const handleStartLesson = async () => {
     if (!currentLesson) return
@@ -128,7 +143,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
       } else {
         toast.error('Failed to load lesson content')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to start lesson')
     }
   }
@@ -155,9 +170,13 @@ export default function CurriculumLessonsPage({ params }: Props) {
       if (response.ok) {
         toast.success(`🎉 +${data.xp_earned} XP earned!`)
         
+        // Show celebration animation
+        setShowCelebration(true)
+        setTimeout(() => setShowCelebration(false), 4000)
+        
         // Show achievements if any
         if (data.achievements?.length > 0) {
-          data.achievements.forEach((achievement: any) => {
+          data.achievements.forEach((achievement: { achievement_name: string }) => {
             toast.success(`🏆 Achievement unlocked: ${achievement.achievement_name}!`, {
               duration: 5000
             })
@@ -185,7 +204,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
       } else {
         toast.error('Failed to complete lesson')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save progress')
     } finally {
       setCompleting(false)
@@ -265,7 +284,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
@@ -291,11 +310,11 @@ export default function CurriculumLessonsPage({ params }: Props) {
               </span>
             </div>
           </div>
-        </motion.div>
+        </MotionDiv>
 
         {/* Lesson Card */}
         {!lessonStarted ? (
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
           >
@@ -376,10 +395,10 @@ export default function CurriculumLessonsPage({ params }: Props) {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </MotionDiv>
         ) : (
           <AnimatePresence mode="wait">
-            <motion.div
+            <MotionDiv
               key="lesson-content"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -447,10 +466,13 @@ export default function CurriculumLessonsPage({ params }: Props) {
                   </ul>
                 </CardContent>
               </Card>
-            </motion.div>
+            </MotionDiv>
           </AnimatePresence>
         )}
       </div>
+      
+      {/* Celebration Animation */}
+      <Celebration show={showCelebration} />
     </div>
   )
 }

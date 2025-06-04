@@ -1,9 +1,11 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
+import { withRateLimit } from '@/lib/api-middleware'
 
-export async function GET() {
-  try {
+export async function GET(request: NextRequest) {
+  return withRateLimit(request, async () => {
+    try {
     const supabase = createRouteHandlerClient({ cookies })
     
     // Check authentication
@@ -15,7 +17,7 @@ export async function GET() {
 
     // Fetch all user data
     const userId = session.user.id
-    const userData: any = {
+    const userData: Record<string, unknown> = {
       exportDate: new Date().toISOString(),
       user: {
         id: userId,
@@ -78,11 +80,12 @@ export async function GET() {
         'Content-Disposition': `attachment; filename="${filename}"`,
       },
     })
-  } catch (error) {
-    console.error('Error exporting user data:', error)
-    return NextResponse.json(
-      { error: 'Failed to export user data' },
-      { status: 500 }
-    )
-  }
+    } catch (_error) {
+      console.error('Error exporting user data:', _error)
+      return NextResponse.json(
+        { error: 'Failed to export user data' },
+        { status: 500 }
+      )
+    }
+  }, 'api')
 }

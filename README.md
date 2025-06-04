@@ -29,6 +29,14 @@ Zenya is an innovative AI-powered learning platform specifically designed for ad
 - **📊 Progress Tracking** - Visual progress tracking and achievements
 - **🔒 Privacy-First** - Your data stays secure and private
 
+## 🔒 Domain Security Notice
+
+**IMPORTANT**: This application is domain-locked and will only run on:
+- Production: https://zenyaai.com
+- Development: localhost:3000
+
+Attempts to deploy to other domains will be blocked by security measures. See [DOMAIN_LOCK.md](DOMAIN_LOCK.md) for details.
+
 ## 🚀 Getting Started
 
 ### Prerequisites

@@ -47,8 +47,8 @@ export default function ConfirmPage() {
 
       toast.success('New magic link sent! Check your email.')
       setResendCooldown(60) // 60 second cooldown
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to resend email')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to resend email')
     } finally {
       setIsResending(false)
     }

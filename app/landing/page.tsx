@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
@@ -52,10 +52,40 @@ const testimonials = [
   }
 ]
 
+interface ChatMessage {
+  role: 'zenya' | 'user'
+  content: string
+  timestamp?: Date
+}
+
 export default function LandingPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [hasSimplified, setHasSimplified] = useState(false)
+  const [hasGentlePace, setHasGentlePace] = useState(false)
+  const chatBoxRef = useRef<HTMLDivElement>(null)
+  const [demoMessages, setDemoMessages] = useState<ChatMessage[]>([
+    {
+      role: 'zenya',
+      content: "Hi! Today's quick win is about fractions. 🍕\n\nImagine a pizza cut into 4 slices. If you eat 1 slice, you've eaten 1/4 of the pizza!"
+    },
+    {
+      role: 'user',
+      content: 'So 2 slices would be 2/4?'
+    },
+    {
+      role: 'zenya',
+      content: "Exactly! And here's a cool trick: 2/4 is the same as 1/2. You've got half the pizza! 🎉"
+    }
+  ])
+
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight
+    }
+  }, [demoMessages])
 
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,7 +114,7 @@ export default function LandingPage() {
       } else {
         toast.error(data.error || 'Something went wrong')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to join waitlist. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -97,8 +127,9 @@ export default function LandingPage() {
       {/* Premium Background */}
       <div className="fixed inset-0 gradient-mesh z-0" />
       
+      <main id="main-content" role="main">
       {/* Hero Section */}
-      <section className="relative overflow-hidden z-10">
+      <section className="relative overflow-hidden z-10" aria-labelledby="hero-heading">
         <div className="container mx-auto px-4 py-20 max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -107,6 +138,7 @@ export default function LandingPage() {
             className="text-center space-y-6"
           >
             <motion.h1 
+              id="hero-heading"
               className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight"
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -318,52 +350,30 @@ export default function LandingPage() {
             </h2>
             <Card variant="glass" className="max-w-2xl mx-auto shadow-premium hover:shadow-2xl transition-all duration-300">
               <CardContent className="p-8">
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 text-left space-y-4 shadow-inner">
-                  <motion.div 
-                    className="flex items-start gap-3"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex-shrink-0 shadow-lg animate-pulse-slow" />
-                    <div>
-                      <p className="font-semibold mb-1 text-gradient">Zenya</p>
-                      <p className="text-gray-700 dark:text-gray-300">
-                        Hi! Today's quick win is about fractions. 🍕
-                      </p>
-                      <p className="text-gray-700 dark:text-gray-300 mt-2">
-                        Imagine a pizza cut into 4 slices. If you eat 1 slice, you've eaten 1/4 of the pizza!
-                      </p>
-                    </div>
-                  </motion.div>
-                  <motion.div 
-                    className="flex items-start gap-3"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                  >
-                    <div className="w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex-shrink-0 shadow-md" />
-                    <div>
-                      <p className="font-semibold mb-1">You</p>
-                      <p className="text-gray-700 dark:text-gray-300">
-                        So 2 slices would be 2/4?
-                      </p>
-                    </div>
-                  </motion.div>
-                  <motion.div 
-                    className="flex items-start gap-3"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.6 }}
-                  >
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex-shrink-0 shadow-lg animate-pulse-slow" />
-                    <div>
-                      <p className="font-semibold mb-1 text-gradient">Zenya</p>
-                      <p className="text-gray-700 dark:text-gray-300">
-                        Exactly! And here's a cool trick: 2/4 is the same as 1/2. You've got half the pizza! 🎉
-                      </p>
-                    </div>
-                  </motion.div>
+                <div ref={chatBoxRef} className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 text-left space-y-4 shadow-inner max-h-96 overflow-y-auto scroll-smooth">
+                  {demoMessages.map((message, index) => (
+                    <motion.div 
+                      key={index}
+                      className="flex items-start gap-3"
+                      initial={{ opacity: 0, x: message.role === 'zenya' ? -20 : 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: index < 3 ? index * 0.3 : 0.1 }}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex-shrink-0 shadow-lg ${
+                        message.role === 'zenya' 
+                          ? 'bg-gradient-to-br from-blue-500 to-indigo-600 animate-pulse-slow' 
+                          : 'bg-gradient-to-br from-gray-400 to-gray-500'
+                      }`} />
+                      <div>
+                        <p className={`font-semibold mb-1 ${message.role === 'zenya' ? 'text-gradient' : ''}`}>
+                          {message.role === 'zenya' ? 'Zenya' : 'You'}
+                        </p>
+                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                          {message.content}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
                 <motion.div 
                   className="mt-6 flex gap-3 justify-center"
@@ -375,7 +385,21 @@ export default function LandingPage() {
                     size="sm" 
                     variant="secondary" 
                     className="glass-subtle hover:scale-105 hover:shadow-lg transition-all"
-                    onClick={() => toast.success('Simplify mode would break down complex concepts!')}
+                    onClick={() => {
+                      if (!hasSimplified) {
+                        setDemoMessages(prev => [...prev, {
+                          role: 'zenya',
+                          content: "Let me break that down even simpler! 🌟\n\nThink of fractions like sharing. If you have 4 cookies and eat 2, you ate half of them. That's why 2/4 = 1/2. It's just two ways of saying 'half'!"
+                        }])
+                        setHasSimplified(true)
+                        toast.success('Concept simplified!')
+                      } else {
+                        toast('Already showing simplified version', {
+                          icon: 'ℹ️',
+                        })
+                      }
+                    }}
+                    disabled={hasSimplified}
                   >
                     <Sparkles className="w-4 h-4 mr-1 text-yellow-500" />
                     Simplify This
@@ -384,7 +408,21 @@ export default function LandingPage() {
                     size="sm" 
                     variant="secondary" 
                     className="glass-subtle hover:scale-105 hover:shadow-lg transition-all"
-                    onClick={() => toast.success('Gentle pace mode would slow down the lesson!')}
+                    onClick={() => {
+                      if (!hasGentlePace) {
+                        setDemoMessages(prev => [...prev, {
+                          role: 'zenya',
+                          content: "Let's slow down a bit... 🌈\n\nFractions = parts of a whole\n• 1/4 = one part out of four\n• 2/4 = two parts out of four\n• 2/4 = 1/2 (both mean half)\n\nTake your time to absorb this. There's no rush! 💙"
+                        }])
+                        setHasGentlePace(true)
+                        toast.success('Switching to gentle pace!')
+                      } else {
+                        toast('Already in gentle pace mode', {
+                          icon: 'ℹ️',
+                        })
+                      }
+                    }}
+                    disabled={hasGentlePace}
                   >
                     <Zap className="w-4 h-4 mr-1 text-purple-500" />
                     Gentle Pace
@@ -490,7 +528,7 @@ export default function LandingPage() {
                 disabled={isSubmitting}
                 className="bg-white text-indigo-600 hover:bg-white/90 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
               >
-                Join Waitlist
+                {isSubmitting ? 'Joining...' : 'Join Waitlist'}
               </Button>
             </motion.form>
             <motion.div 
@@ -545,6 +583,7 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </footer>
+      </main>
     </div>
   )
 }

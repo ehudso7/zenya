@@ -1,8 +1,27 @@
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { isAuthorizedDomain, getDomainError, getAuthorizedOrigins } from '@/lib/domain-verification'
 
 export async function middleware(request: NextRequest) {
+  // Domain verification - ensure app only runs on authorized domains
+  const hostname = request.headers.get('host') || request.headers.get('x-forwarded-host')
+  
+  if (!isAuthorizedDomain(hostname)) {
+    return new NextResponse(
+      JSON.stringify({
+        error: 'Unauthorized Domain',
+        message: getDomainError(),
+      }),
+      {
+        status: 403,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req: request, res })
   
@@ -29,6 +48,38 @@ export async function middleware(request: NextRequest) {
   ].join('; ')
   
   res.headers.set('Content-Security-Policy', csp)
+  
+  // Add CORS headers for API routes
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const origin = request.headers.get('origin')
+    const authorizedOrigins = getAuthorizedOrigins()
+    
+    if (origin && authorizedOrigins.includes(origin)) {
+      res.headers.set('Access-Control-Allow-Origin', origin)
+      res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+      res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+      res.headers.set('Access-Control-Allow-Credentials', 'true')
+    } else if (origin) {
+      // Reject requests from unauthorized origins
+      return new NextResponse(
+        JSON.stringify({
+          error: 'CORS Policy Violation',
+          message: 'This API can only be accessed from zenyaai.com',
+        }),
+        {
+          status: 403,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+    
+    // Handle preflight requests
+    if (request.method === 'OPTIONS') {
+      return new NextResponse(null, { status: 200, headers: res.headers })
+    }
+  }
   
   // Refresh session if expired
   const { data: { session } } = await supabase.auth.getSession()

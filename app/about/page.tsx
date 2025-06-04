@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Heart, Sparkles, Users, Target, Zap, Brain, Award, Rocket } from 'lucide-react'
+import { ArrowLeft, Heart, Sparkles, Users, Target, Brain, Rocket } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'

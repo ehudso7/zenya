@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Providers } from '@/components/providers'
 import Script from 'next/script'
 import CookieConsent from '@/components/cookie-consent'
+import DomainGuard from '@/components/domain-guard'
 import './globals.css'
 
 const inter = Inter({ 
@@ -73,11 +75,28 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full ${inter.variable}`}>
       <body className={`${inter.className} min-h-full bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900`}>
-        <Providers>
-          {children}
-          <CookieConsent />
-        </Providers>
+        {/* Skip Navigation Links */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:outline-none"
+        >
+          Skip to main content
+        </a>
+        <a 
+          href="#navigation" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-48 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:outline-none"
+        >
+          Skip to navigation
+        </a>
+        
+        <DomainGuard>
+          <Providers>
+            {children}
+            <CookieConsent />
+          </Providers>
+        </DomainGuard>
         <Analytics />
+        <SpeedInsights />
         
         {/* Google Analytics with GDPR consent */}
         <Script
