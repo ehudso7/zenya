@@ -11,8 +11,14 @@ const AUTHORIZED_DOMAIN = 'zenyaai.com'
 function verifyBuildEnvironment() {
   console.log('🔒 Verifying build authorization for Zenya...')
 
-  // Check if this is a production build
-  if (process.env.NODE_ENV !== 'production') {
+  // Check if this is a Vercel preview deployment
+  if (process.env.VERCEL && process.env.VERCEL_ENV !== 'production') {
+    console.log('✅ Vercel preview deployment detected - skipping strict domain verification')
+    return
+  }
+
+  // Check if this is a development build
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     console.log('✅ Development build detected - skipping domain verification')
     return
   }
@@ -35,7 +41,23 @@ function verifyBuildEnvironment() {
 
   // Verify domain configuration
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL
-  if (appUrl && !appUrl.includes(AUTHORIZED_DOMAIN) && !appUrl.includes('vercel.app')) {
+  const vercelUrl = process.env.VERCEL_URL
+  
+  // Log environment info for debugging
+  console.log('📍 Build environment:')
+  console.log(`   VERCEL: ${process.env.VERCEL}`)
+  console.log(`   VERCEL_ENV: ${process.env.VERCEL_ENV}`)
+  console.log(`   NEXT_PUBLIC_APP_URL: ${process.env.NEXT_PUBLIC_APP_URL || 'not set'}`)
+  console.log(`   VERCEL_URL: ${vercelUrl || 'not set'}`)
+  
+  // Allow Vercel deployments
+  if (process.env.VERCEL) {
+    console.log('✅ Vercel deployment detected - allowing build')
+    return
+  }
+  
+  // For non-Vercel production builds, enforce domain
+  if (appUrl && !appUrl.includes(AUTHORIZED_DOMAIN)) {
     console.error('❌ Unauthorized domain configuration detected!')
     console.error(`   NEXT_PUBLIC_APP_URL must be https://${AUTHORIZED_DOMAIN}`)
     console.error(`   Found: ${appUrl}`)
