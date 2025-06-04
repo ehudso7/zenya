@@ -1,0 +1,133 @@
+{
+  "common": {
+    "appName": "Zenya",
+    "tagline": "AI Learning for Neurodiverse Minds",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "noResults": "No results found"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset Password",
+    "confirmEmail": "Confirm Email",
+    "continueWith": "Continue with {provider}",
+    "orContinueWith": "Or continue with",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "termsAgreement": "By signing up, you agree to our",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "navigation": {
+    "home": "Home",
+    "learn": "Learn",
+    "profile": "Profile",
+    "settings": "Settings",
+    "help": "Help",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "landing": {
+    "hero": {
+      "title": "AI Learning Designed for Your Mind",
+      "subtitle": "Personalized lessons that adapt to your ADHD, energy levels, and learning style. Learn at your own pace with our AI tutor.",
+      "cta": "Start Learning Free",
+      "ctaSecondary": "Learn More"
+    },
+    "features": {
+      "title": "Built for How You Learn",
+      "adaptive": {
+        "title": "Adaptive AI Tutor",
+        "description": "Our AI understands your learning patterns and adjusts content complexity and pacing in real-time."
+      },
+      "microLessons": {
+        "title": "5-Minute Micro-Lessons",
+        "description": "Bite-sized lessons designed to match ADHD attention spans. Learn without overwhelm."
+      },
+      "gamification": {
+        "title": "Gamified Progress",
+        "description": "Earn XP, maintain streaks, and unlock achievements. Learning feels like playing."
+      },
+      "accessibility": {
+        "title": "Accessibility First",
+        "description": "High contrast modes, adjustable text, and screen reader support. Learning for everyone."
+      }
+    }
+  },
+  "learn": {
+    "choosePathTitle": "Choose Your Learning Path",
+    "continueWhere": "Continue where you left off",
+    "lessonsCompleted": "{count} lessons completed",
+    "minutesLearned": "{count} minutes learned",
+    "currentStreak": "{count} day streak",
+    "selectMood": "How are you feeling today?",
+    "moods": {
+      "energetic": "Energetic",
+      "focused": "Focused",
+      "relaxed": "Relaxed",
+      "tired": "Tired"
+    },
+    "lessonComplete": "Lesson Complete!",
+    "greatJob": "Great job!",
+    "nextLesson": "Next Lesson",
+    "simplify": "Simplify",
+    "explainMore": "Explain More",
+    "example": "Show Example",
+    "practice": "Practice",
+    "hint": "Hint"
+  },
+  "profile": {
+    "title": "Your Profile",
+    "stats": "Statistics",
+    "achievements": "Achievements",
+    "settings": "Settings",
+    "subscription": "Subscription",
+    "totalXP": "Total XP",
+    "level": "Level",
+    "joinedDate": "Joined {date}",
+    "completedLessons": "Completed Lessons",
+    "learningTime": "Learning Time",
+    "longestStreak": "Longest Streak"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "You need to sign in to access this page",
+    "notFound": "Page not found",
+    "serverError": "Server error. Please try again later.",
+    "validationError": "Please check your input",
+    "fieldRequired": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "accessibility": {
+    "skipToContent": "Skip to content",
+    "mainNavigation": "Main navigation",
+    "userMenu": "User menu",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "systemMode": "System mode",
+    "language": "Language",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu"
+  }
+}

@@ -1,0 +1,43 @@
+# Snyk (https://snyk.io) policy file
+version: v1.25.0
+
+# Ignore specific vulnerabilities
+ignore:
+  # Example: Ignore a specific vulnerability by ID
+  # SNYK-JS-LODASH-567746:
+  #   - '*':
+  #       reason: This is used in a safe context
+  #       expires: '2024-12-31T23:59:59.999Z'
+
+# Patches to apply
+patch: {}
+
+# Language settings
+language-settings:
+  javascript:
+    enableLsp: true
+    
+# Severity threshold
+severity-threshold: high
+
+# Fail on specific severity levels
+fail-on: CVSS-8
+
+# Monitor settings
+monitor:
+  # Monitor production dependencies
+  prune-repeated-dependencies: true
+  
+# Exclude files from scanning
+exclude:
+  global:
+    - '**/*.test.ts'
+    - '**/*.spec.ts'
+    - '**/test/**'
+    - '**/tests/**'
+    - '**/e2e/**'
+    - '**/__tests__/**'
+    - '**/node_modules/**'
+    - '**/dist/**'
+    - '**/build/**'
+    - '**/.next/**'
