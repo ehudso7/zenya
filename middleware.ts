@@ -7,7 +7,28 @@ export async function middleware(request: NextRequest) {
   // Domain verification - ensure app only runs on authorized domains
   const hostname = request.headers.get('host') || request.headers.get('x-forwarded-host')
   
-  if (!isAuthorizedDomain(hostname)) {
+  // Special handling for Vercel deployments
+  if (process.env.VERCEL) {
+    console.log(`[Middleware] Vercel deployment detected. Host: ${hostname}`);
+    // Allow all Vercel deployments during preview/development
+    if (process.env.VERCEL_ENV !== 'production' && hostname?.includes('.vercel.app')) {
+      console.log('[Middleware] Allowing Vercel preview deployment');
+      // Continue without domain check
+    } else if (!isAuthorizedDomain(hostname)) {
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Unauthorized Domain',
+          message: getDomainError(),
+        }),
+        {
+          status: 403,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+  } else if (!isAuthorizedDomain(hostname)) {
     return new NextResponse(
       JSON.stringify({
         error: 'Unauthorized Domain',
