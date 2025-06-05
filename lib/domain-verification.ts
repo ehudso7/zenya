@@ -88,7 +88,7 @@ export function verifyBuildConfiguration(): void {
           `Production builds must use https://zenyaai.com`
         );
       }
-    } catch (error) {
+    } catch (_error) {
       if (error instanceof Error) {
         throw error;
       }

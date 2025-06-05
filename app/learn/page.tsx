@@ -82,7 +82,7 @@ export default function LearnPage() {
         if (user && !abortController.signal.aborted) {
           await fetchUserStats(abortController.signal)
         }
-      } catch (error) {
+      } catch (_error) {
         if (error instanceof Error && error.name !== 'AbortError') {
           // Error handled by individual fetch functions
         }
@@ -106,7 +106,7 @@ export default function LearnPage() {
       } else {
         toast.error('Failed to load curriculums')
       }
-    } catch (error) {
+    } catch (_error) {
       if (error instanceof Error && error.name === 'AbortError') {
         // Request was aborted, don't show error
         return
@@ -127,7 +127,7 @@ export default function LearnPage() {
           lessonsCompleted: data.profile.lessons_completed || 0
         })
       }
-    } catch (error) {
+    } catch (_error) {
       if (error instanceof Error && error.name === 'AbortError') {
         // Request was aborted, silent fail
         return

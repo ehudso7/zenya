@@ -117,7 +117,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
           router.push('/learn')
         }
       }
-    } catch (error) {
+    } catch (_error) {
       if (error instanceof Error && error.name === 'AbortError') {
         // Request was aborted, don't show error
         return

@@ -140,7 +140,7 @@ export function createApiMetricsMiddleware() {
       metrics.trackApiCall(endpoint, duration, response.status)
       
       return response
-    } catch (error) {
+    } catch (_error) {
       const duration = Date.now() - start
       metrics.trackApiCall(endpoint, duration, 500)
       throw error
@@ -164,7 +164,7 @@ export function trace<T extends (...args: any[]) => Promise<any>>(
       const result = await fn(...args)
       metrics.timing(`function.${name}`, Date.now() - start, ['status:success'])
       return result
-    } catch (error) {
+    } catch (_error) {
       metrics.timing(`function.${name}`, Date.now() - start, ['status:error'])
       throw error
     }

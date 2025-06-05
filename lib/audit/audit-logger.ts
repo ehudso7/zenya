@@ -194,7 +194,7 @@ export class AuditLogger {
       }
 
       metrics.increment('audit.flush.success', logsToFlush.length)
-    } catch (error) {
+    } catch (_error) {
       // On failure, add logs back to buffer
       this.buffer.unshift(...logsToFlush)
       
@@ -327,7 +327,7 @@ export function auditMiddleware(
         })
 
         return response
-      } catch (error) {
+      } catch (_error) {
         const duration = Date.now() - startTime
 
         // Log failed request

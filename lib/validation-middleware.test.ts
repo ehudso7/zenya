@@ -1,23 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { validateRequest } from './validation-middleware'
-
-// Mock Next.js server components
-jest.mock('next/server', () => ({
-  NextRequest: jest.fn(),
-  NextResponse: {
-    json: jest.fn((data, init) => ({
-      status: init?.status || 200,
-      headers: new Map(Object.entries(init?.headers || {})),
-      json: async () => data,
-    })),
-  },
-}))
 
 describe('validateRequest', () => {
   const mockRequest = (body: any) => {
     return {
       json: jest.fn().mockResolvedValue(body),
-    }
+    } as unknown as NextRequest
   }
 
   const testSchema = z.object({
@@ -134,7 +123,7 @@ describe('validateRequest', () => {
     it('should handle JSON parsing errors', async () => {
       const request = {
         json: jest.fn().mockRejectedValue(new Error('Invalid JSON')),
-      }
+      } as unknown as NextRequest
 
       const result = await validateRequest(request, testSchema)
 
@@ -147,7 +136,7 @@ describe('validateRequest', () => {
     it('should handle empty body', async () => {
       const request = {
         json: jest.fn().mockResolvedValue(null),
-      }
+      } as unknown as NextRequest
 
       const result = await validateRequest(request, testSchema)
 

@@ -43,7 +43,7 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
         const response = await fetch('/api/ai/status', { signal: abortController.signal })
         const data = await response.json()
         setAiStatus(data.status)
-      } catch (error) {
+      } catch (_error) {
         if (error instanceof Error && error.name === 'AbortError') {
           // Request was aborted, don't update state
           return

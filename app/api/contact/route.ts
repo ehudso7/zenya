@@ -13,21 +13,11 @@ export async function POST(request: NextRequest) {
         return validationError
       }
 
-      const { name, email, subject, message } = data!
+      const { name: _name, email: _email, subject: _subject, message: _message } = data!
 
       // Store contact form submission
-      const timestamp = new Date().toISOString()
-      const contactData = {
-        name,
-        email,
-        subject,
-        message,
-        timestamp,
-        status: 'pending'
-      }
-
       // In production, this would be sent to an email service
-      // For now, we store it
+      // For now, we'll just acknowledge receipt
 
       // Email service integration point
       // When ready, integrate with services like SendGrid, AWS SES, Postmark, or Resend
@@ -46,7 +36,7 @@ export async function POST(request: NextRequest) {
         success: true,
         message: 'Thank you for contacting us! We\'ll get back to you soon.'
       })
-    } catch (error) {
+    } catch (_error) {
       // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Failed to send message' },

@@ -11,7 +11,7 @@ try {
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
     })
   }
-} catch (error) {
+} catch (_error) {
   // Rate limiting disabled: Redis configuration missing
 }
 
@@ -97,7 +97,7 @@ export async function checkRateLimit(
     const { success, limit, remaining, reset } = await limiter.limit(identifier)
     
     return { success, limit, remaining, reset }
-  } catch (error) {
+  } catch (_error) {
     // Rate limit check failed - fail open
     // Allow request if rate limit check fails
     return { success: true, limit: 100, remaining: 100, reset: Date.now() }

@@ -4,9 +4,6 @@ import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http'
-import { registerInstrumentations } from '@opentelemetry/instrumentation'
-import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
-import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import * as api from '@opentelemetry/api'
 
@@ -110,7 +107,7 @@ export function withSpan<T extends (...args: any[]) => any>(
         span.setStatus({ code: api.SpanStatusCode.OK })
         span.end()
         return result
-      } catch (error) {
+      } catch (_error) {
         span.setStatus({
           code: api.SpanStatusCode.ERROR,
           message: error instanceof Error ? error.message : 'Unknown error',
@@ -232,7 +229,7 @@ export function withTracing(
         })
         
         return response
-      } catch (error) {
+      } catch (_error) {
         span.setStatus({
           code: api.SpanStatusCode.ERROR,
           message: error instanceof Error ? error.message : 'Unknown error',

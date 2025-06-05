@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ profile })
-    } catch (error) {
+    } catch (_error) {
       // Error will be monitored by error tracking service
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
@@ -100,7 +100,7 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json({ profile })
-    } catch (error) {
+    } catch (_error) {
       // Error will be monitored by error tracking service
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }

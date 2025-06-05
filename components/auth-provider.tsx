@@ -22,7 +22,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isInitialized.current = true
 
     // Function to fetch and sync user profile
-    const syncUserProfile = async (userId: string) => {
+    const syncUserProfile = async (_userId: string) => {
       try {
         const response = await fetch('/api/profile', {
           headers: {
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           // User is not authenticated
           setUser(null)
         }
-      } catch (error) {
+      } catch (_error) {
         // Silent fail - profile sync will retry
       }
     }
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } else {
           setUser(null)
         }
-      } catch (error) {
+      } catch (_error) {
         // Silent fail on session check
         setUser(null)
       }
@@ -152,7 +152,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
               })
             }
           }
-        } catch (error) {
+        } catch (_error) {
           // Silently fail - this is just a background sync
         }
       }

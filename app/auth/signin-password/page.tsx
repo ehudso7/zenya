@@ -73,7 +73,7 @@ export default function SignInPasswordPage() {
           router.push('/profile')
         }
       }
-    } catch (error) {
+    } catch (_error) {
       const errorMessage = error instanceof Error ? error.message : 'Invalid email or password'
       setErrors({ form: errorMessage })
       toast.error(errorMessage)
@@ -153,7 +153,7 @@ export default function SignInPasswordPage() {
       } else {
         toast.error('Failed to create account. Please try again.')
       }
-    } catch (error) {
+    } catch (_error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create account'
       setErrors({ form: errorMessage })
       toast.error(errorMessage)
@@ -184,7 +184,7 @@ export default function SignInPasswordPage() {
       toast.success('Confirmation email resent! Please check your inbox and spam folder.', {
         duration: 5000,
       })
-    } catch (error) {
+    } catch (_error) {
       
       // Check for rate limit error
       if (error instanceof Error && (error.message?.includes('rate limit') || error.message?.includes('too many'))) {

@@ -72,7 +72,7 @@ export default function ProfilePage() {
         emailNotifications: data.profile.notification_preferences?.email || false,
         pushNotifications: data.profile.notification_preferences?.push || false
       })
-    } catch (error) {
+    } catch (_error) {
       if (error instanceof Error && error.name === 'AbortError') {
         // Request was aborted, don't show error
         return
@@ -123,7 +123,7 @@ export default function ProfilePage() {
       if (!profile?.onboarding_completed) {
         router.push('/learn')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update profile')
     } finally {
       setIsSaving(false)

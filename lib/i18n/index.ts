@@ -1,5 +1,4 @@
 import { i18nConfig, type Locale } from '@/i18n.config'
-import type { AbstractIntlMessages } from 'next-intl'
 
 // Dictionary type for translations
 export type Dictionary = {
@@ -141,7 +140,7 @@ export async function getDictionary(locale: Locale): Promise<Dictionary> {
   try {
     const dictionary = await import(`@/locales/${locale}.json`)
     return dictionary.default
-  } catch (error) {
+  } catch (_error) {
     // Failed to load dictionary for locale - fallback to English
     const dictionary = await import(`@/locales/en.json`)
     return dictionary.default

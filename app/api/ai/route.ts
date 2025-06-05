@@ -89,7 +89,7 @@ async function generateOpenAIResponse(
       tone: tone as AIResponse['tone'],
       suggestions: generateSuggestions(message),
     }
-  } catch (error) {
+  } catch (_error) {
     throw error
   }
 }
@@ -129,7 +129,7 @@ async function generateAnthropicResponse(
       tone: normalizeTone(tone),
       suggestions: generateSuggestions(message),
     }
-  } catch (error) {
+  } catch (_error) {
     throw error
   }
 }
@@ -161,7 +161,7 @@ async function generateHuggingFaceResponse(
       tone: mood ? getToneFromMood(mood) : 'supportive',
       suggestions: generateSuggestions(message),
     }
-  } catch (error) {
+  } catch (_error) {
     throw error
   }
 }
@@ -198,7 +198,7 @@ async function generateCohereResponse(
       tone: mood ? getToneFromMood(mood) : 'supportive',
       suggestions: generateSuggestions(message),
     }
-  } catch (error) {
+  } catch (_error) {
     throw error
   }
 }
@@ -288,7 +288,7 @@ async function generateSmartResponse(
       }
       
       return { ...response, provider: selectedProvider.name }
-    } catch (error) {
+    } catch (_error) {
       // Provider failed, will try fallback
       // Continue to fallback
     }
@@ -299,7 +299,7 @@ async function generateSmartResponse(
 }
 
 // Get provider statistics
-function getProviderStats() {
+function _getProviderStats() {
   resetDailyLimits()
   const stats: Record<string, any> = {}
   
@@ -348,7 +348,7 @@ export async function POST(request: NextRequest) {
       // Provider stats tracked internally
 
       return NextResponse.json(response)
-    } catch (error) {
+    } catch (_error) {
       // Error will be monitored by error tracking service
       
       return NextResponse.json(

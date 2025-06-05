@@ -6,7 +6,6 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const error = requestUrl.searchParams.get('error')
-  const errorDescription = requestUrl.searchParams.get('error_description')
 
   // Handle OAuth errors from Supabase
   if (error) {
@@ -47,7 +46,7 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${requestUrl.origin}/profile`)
       }
     }
-  } catch (error) {
+  } catch (_error) {
     // Error will be monitored by error tracking service
     return NextResponse.redirect(`${requestUrl.origin}/auth/error?error=server-error`)
   }

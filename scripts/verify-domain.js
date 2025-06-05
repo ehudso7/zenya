@@ -35,7 +35,7 @@ function verifyBuildEnvironment() {
       process.exit(1)
     }
     console.log('✅ Repository verification passed')
-  } catch (error) {
+  } catch (_error) {
     console.warn('⚠️  Could not verify repository (may be in CI environment)')
   }
 

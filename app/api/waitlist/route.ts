@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (_error) {
     // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Server error' },

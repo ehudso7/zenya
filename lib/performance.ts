@@ -20,7 +20,7 @@ class PerformanceMonitor {
       const duration = performance.now() - start
       this.recordMetric(name, duration, 'ms')
       return result
-    } catch (error) {
+    } catch (_error) {
       const duration = performance.now() - start
       this.recordMetric(`${name}_error`, duration, 'ms')
       throw error
@@ -35,7 +35,7 @@ class PerformanceMonitor {
       const duration = performance.now() - start
       this.recordMetric(name, duration, 'ms')
       return result
-    } catch (error) {
+    } catch (_error) {
       const duration = performance.now() - start
       this.recordMetric(`${name}_error`, duration, 'ms')
       throw error

@@ -67,7 +67,7 @@ export async function withRateLimit(
     }
     
     return newResponse
-  } catch (error) {
+  } catch (_error) {
     // Error will be monitored by error tracking service
     return NextResponse.json(
       { error: 'Internal server error' },

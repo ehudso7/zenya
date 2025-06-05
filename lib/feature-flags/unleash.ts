@@ -1,5 +1,6 @@
 import { UnleashClient, IToggle } from 'unleash-proxy-client'
 import { Context as UnleashContext } from 'unleash-proxy-client'
+import React from 'react'
 
 // Feature flag names as constants for type safety
 export const FEATURES = {
@@ -231,7 +232,7 @@ export async function getServerFeatureFlags(
     })
     
     return flags as Record<FeatureName, boolean>
-  } catch (error) {
+  } catch (_error) {
     // Error fetching server feature flags
     return {} as Record<FeatureName, boolean>
   }

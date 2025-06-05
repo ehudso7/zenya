@@ -9,7 +9,7 @@ export async function validateRequest<T>(
     const body = await request.json()
     const data = schema.parse(body)
     return { data, error: null }
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof ZodError) {
       return {
         data: null,
@@ -45,7 +45,7 @@ export async function validateQueryParams<T>(
     const params = Object.fromEntries(searchParams.entries())
     const data = schema.parse(params)
     return { data, error: null }
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof ZodError) {
       return {
         data: null,
