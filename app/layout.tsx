@@ -6,6 +6,7 @@ import { Providers } from '@/components/providers'
 import Script from 'next/script'
 import CookieConsent from '@/components/cookie-consent'
 import DomainGuard from '@/components/domain-guard'
+import { AppInitializer } from '@/components/app-initializer'
 import './globals.css'
 
 const inter = Inter({ 
@@ -91,7 +92,9 @@ export default function RootLayout({
         
         <DomainGuard>
           <Providers>
-            {children}
+            <AppInitializer>
+              {children}
+            </AppInitializer>
             <CookieConsent />
           </Providers>
         </DomainGuard>

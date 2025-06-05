@@ -36,17 +36,27 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
 
   // Check AI status on mount
   useEffect(() => {
+    const abortController = new AbortController()
+    
     const checkAiStatus = async () => {
       try {
-        const response = await fetch('/api/ai/status')
+        const response = await fetch('/api/ai/status', { signal: abortController.signal })
         const data = await response.json()
         setAiStatus(data.status)
       } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          // Request was aborted, don't update state
+          return
+        }
         setAiStatus('offline')
       }
     }
     
     checkAiStatus()
+    
+    return () => {
+      abortController.abort()
+    }
   }, [])
 
   // Scroll to bottom when messages change
@@ -223,12 +233,15 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="flex gap-3"
+            aria-live="polite"
+            aria-busy="true"
           >
             <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
             </div>
             <div className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2">
-              <Loader2 className="w-4 h-4 animate-spin text-gray-600 dark:text-gray-400" />
+              <Loader2 className="w-4 h-4 animate-spin text-gray-600 dark:text-gray-400" aria-hidden="true" />
+              <span className="sr-only">AI is thinking...</span>
             </div>
           </motion.div>
         )}
@@ -280,7 +293,10 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
             aria-label="Send message"
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                <span className="sr-only">Sending message</span>
+              </>
             ) : (
               <Send className="w-4 h-4" />
             )}

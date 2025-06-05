@@ -94,8 +94,13 @@ function AuthErrorContent() {
 function LoadingCard() {
   return (
     <Card className="glass shadow-premium">
-      <CardContent className="p-12 flex items-center justify-center">
-        <Loader className="w-8 h-8 animate-spin text-gray-400" />
+      <CardContent 
+        className="p-12 flex items-center justify-center"
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <Loader className="w-8 h-8 animate-spin text-gray-400" aria-hidden="true" />
+        <span className="sr-only">Loading error information</span>
       </CardContent>
     </Card>
   )

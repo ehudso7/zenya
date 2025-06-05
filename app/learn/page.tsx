@@ -74,15 +74,31 @@ export default function LearnPage() {
   const [userStats, setUserStats] = useState({ lessonsCompleted: 0 })
 
   useEffect(() => {
-    fetchCurricula()
-    if (user) {
-      fetchUserStats()
+    const abortController = new AbortController()
+    
+    const loadData = async () => {
+      try {
+        await fetchCurricula(abortController.signal)
+        if (user && !abortController.signal.aborted) {
+          await fetchUserStats(abortController.signal)
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error('Error loading data:', error)
+        }
+      }
+    }
+    
+    loadData()
+    
+    return () => {
+      abortController.abort()
     }
   }, [user])
 
-  const fetchCurricula = async () => {
+  const fetchCurricula = async (signal?: AbortSignal) => {
     try {
-      const response = await fetch('/api/curriculums')
+      const response = await fetch('/api/curriculums', { signal })
       const data = await response.json()
       
       if (response.ok) {
@@ -90,16 +106,20 @@ export default function LearnPage() {
       } else {
         toast.error('Failed to load curriculums')
       }
-    } catch (_error) {
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        // Request was aborted, don't show error
+        return
+      }
       toast.error('Failed to load curriculums')
     } finally {
       setLoading(false)
     }
   }
 
-  const fetchUserStats = async () => {
+  const fetchUserStats = async (signal?: AbortSignal) => {
     try {
-      const response = await fetch('/api/profile')
+      const response = await fetch('/api/profile', { signal })
       const data = await response.json()
       
       if (response.ok && data.profile) {
@@ -107,7 +127,11 @@ export default function LearnPage() {
           lessonsCompleted: data.profile.lessons_completed || 0
         })
       }
-    } catch (_error) {
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        // Request was aborted, silent fail
+        return
+      }
       // Silent fail for stats
     }
   }
@@ -121,23 +145,27 @@ export default function LearnPage() {
       <div className="min-h-screen gradient-mesh">
         <AppNavigation />
         
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div 
+          className="container mx-auto px-4 py-8 max-w-6xl"
+          aria-busy="true"
+          aria-live="polite"
+        >
           {/* Loading Header */}
           <div className="mb-8 animate-pulse">
-            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4" aria-hidden="true"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3" aria-hidden="true"></div>
           </div>
 
           {/* Loading Mood Selector */}
           <div className="mb-8">
             <Card className="glass">
               <CardHeader>
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4" aria-hidden="true"></div>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-4 justify-center">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    <div key={i} className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full" aria-hidden="true"></div>
                   ))}
                 </div>
               </CardContent>
@@ -149,23 +177,24 @@ export default function LearnPage() {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <Card key={i} className="glass h-full animate-pulse">
                 <CardHeader>
-                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4"></div>
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4" aria-hidden="true"></div>
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" aria-hidden="true"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" aria-hidden="true"></div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded" aria-hidden="true"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6" aria-hidden="true"></div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
-                    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-20" aria-hidden="true"></div>
+                    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-32" aria-hidden="true"></div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
+          <span className="sr-only">Loading available courses</span>
         </div>
       </div>
     );

@@ -129,11 +129,13 @@ export default function ConfirmPage() {
                   disabled={isResending || resendCooldown > 0}
                   variant="secondary"
                   className="w-full"
+                  aria-busy={isResending}
                 >
                   {isResending ? (
                     <>
-                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                      Resending...
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                      <span className="sr-only">Sending email</span>
+                      <span aria-live="polite">Resending...</span>
                     </>
                   ) : resendCooldown > 0 ? (
                     `Resend in ${resendCooldown}s`

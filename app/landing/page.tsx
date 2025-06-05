@@ -178,7 +178,7 @@ export default function LandingPage() {
                   onClick={() => router.push('/auth/signin-password')}
                 >
                   Get Started Free
-                  <ArrowRight className="ml-2 w-5 h-5 animate-pulse" />
+                  <ArrowRight className="ml-2 w-5 h-5 animate-pulse" aria-hidden="true" />
                 </Button>
                 <Button 
                   size="lg" 

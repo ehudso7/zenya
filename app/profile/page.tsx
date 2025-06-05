@@ -45,12 +45,12 @@ export default function ProfilePage() {
     pushNotifications: false
   })
 
-  const fetchProfile = useCallback(async () => {
+  const fetchProfile = useCallback(async (signal?: AbortSignal) => {
     if (!user) return
     
     setIsLoading(true)
     try {
-      const response = await fetch('/api/profile')
+      const response = await fetch('/api/profile', { signal })
       
       if (!response.ok) {
         if (response.status === 401) {
@@ -73,6 +73,10 @@ export default function ProfilePage() {
         pushNotifications: data.profile.notification_preferences?.push || false
       })
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        // Request was aborted, don't show error
+        return
+      }
       console.error('Error fetching profile:', error)
       toast.error('Failed to load profile')
     } finally {
@@ -81,7 +85,13 @@ export default function ProfilePage() {
   }, [router, user])
 
   useEffect(() => {
-    fetchProfile()
+    const abortController = new AbortController()
+    
+    fetchProfile(abortController.signal)
+    
+    return () => {
+      abortController.abort()
+    }
   }, [fetchProfile])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -124,8 +134,13 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen gradient-mesh flex items-center justify-center">
-        <Loader className="w-8 h-8 animate-spin" />
+      <div 
+        className="min-h-screen gradient-mesh flex items-center justify-center"
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <Loader className="w-8 h-8 animate-spin" aria-hidden="true" />
+        <span className="sr-only">Loading profile data</span>
       </div>
     )
   }

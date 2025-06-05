@@ -84,10 +84,10 @@ export default function CurriculumLessonsPage({ params }: Props) {
   const completedLessons = lessons.filter(l => l.user_progress?.status === 'completed').length
   const progress = lessons.length > 0 ? (completedLessons / lessons.length) * 100 : 0
 
-  const fetchLessons = useCallback(async () => {
+  const fetchLessons = useCallback(async (signal?: AbortSignal) => {
     try {
       // First get curriculum info
-      const currResponse = await fetch('/api/curriculums')
+      const currResponse = await fetch('/api/curriculums', { signal })
       const currData = await currResponse.json()
       
       if (currResponse.ok) {
@@ -96,7 +96,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
           setCurriculum(curr)
           
           // Then get lessons for this curriculum
-          const lessonsResponse = await fetch(`/api/lessons?curriculumId=${curr.id}`)
+          const lessonsResponse = await fetch(`/api/lessons?curriculumId=${curr.id}`, { signal })
           const lessonsData = await lessonsResponse.json()
           
           if (lessonsResponse.ok) {
@@ -117,7 +117,11 @@ export default function CurriculumLessonsPage({ params }: Props) {
           router.push('/learn')
         }
       }
-    } catch (_error) {
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        // Request was aborted, don't show error
+        return
+      }
       toast.error('Failed to load curriculum')
       router.push('/learn')
     } finally {
@@ -126,7 +130,13 @@ export default function CurriculumLessonsPage({ params }: Props) {
   }, [resolvedParams.curriculumSlug, router])
 
   useEffect(() => {
-    fetchLessons()
+    const abortController = new AbortController()
+    
+    fetchLessons(abortController.signal)
+    
+    return () => {
+      abortController.abort()
+    }
   }, [fetchLessons])
 
   const handleStartLesson = async () => {
@@ -248,19 +258,24 @@ export default function CurriculumLessonsPage({ params }: Props) {
     return (
       <div className="min-h-screen gradient-mesh">
         <AppNavigation />
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div 
+          className="container mx-auto px-4 py-8 max-w-4xl"
+          aria-busy="true"
+          aria-live="polite"
+        >
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-1/4" />
-            <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2" />
+            <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-1/4" aria-hidden="true" />
+            <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2" aria-hidden="true" />
             <Card className="glass">
               <CardContent className="p-8">
                 <div className="space-y-4">
-                  <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4" />
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded" />
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-5/6" />
+                  <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4" aria-hidden="true" />
+                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded" aria-hidden="true" />
+                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-5/6" aria-hidden="true" />
                 </div>
               </CardContent>
             </Card>
+            <span className="sr-only">Loading lesson content, please wait</span>
           </div>
         </div>
       </div>
@@ -450,8 +465,9 @@ export default function CurriculumLessonsPage({ params }: Props) {
                     >
                       {completing ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                          Completing...
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" aria-hidden="true" />
+                          <span className="sr-only">Processing completion</span>
+                          <span aria-live="polite">Completing...</span>
                         </>
                       ) : (
                         <>
