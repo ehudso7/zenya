@@ -56,7 +56,7 @@
     "nextjs"
   ],
   "optionalDependencies": {
-    "lightningcss": "^1.30.0"
+    "@anthropic-ai/sdk": "^0.24.3"
   },
   "dependencies": {
     "@datadog/browser-logs": "^5.0.0",
@@ -83,13 +83,9 @@
     "zod": "^3.25.51",
     "zustand": "^5.0.5"
   },
-  "optionalDependencies": {
-    "@anthropic-ai/sdk": "^0.24.3"
-  },
   "devDependencies": {
     "@playwright/test": "^1.52.0",
     "@supabase/supabase-js": "^2.49.9",
-    "@tailwindcss/postcss": "^4.1.8",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -103,7 +99,7 @@
     "jest-environment-jsdom": "^30.0.0-beta.3",
     "postcss": "^8.5.4",
     "prettier": "^3.1.0",
-    "tailwindcss": "^4.1.8",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3"
   }
 }
