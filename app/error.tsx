@@ -14,7 +14,6 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log the error to Sentry
-    console.error('Error boundary caught:', error)
     Sentry.captureException(error)
   }, [error])
 

@@ -60,7 +60,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(null)
         }
       } catch (error) {
-        console.error('Failed to sync user profile:', error)
+        // Silent fail - profile sync will retry
       }
     }
 
@@ -75,7 +75,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(null)
         }
       } catch (error) {
-        console.error('Failed to check session:', error)
+        // Silent fail on session check
         setUser(null)
       }
     }

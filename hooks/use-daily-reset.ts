@@ -34,7 +34,7 @@ export function useDailyReset() {
         const daysDiff = Math.floor((now.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24))
         if (daysDiff > 1 && user?.learning_streak && user.learning_streak > 0) {
           // Streak broken - this would need an API call to update
-          console.log('Streak broken - update needed')
+          // TODO: Implement streak reset via API
         }
       }
     }

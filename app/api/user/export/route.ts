@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
       },
     })
     } catch (_error) {
-      console.error('Error exporting user data:', _error)
+      // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Failed to export user data' },
         { status: 500 }

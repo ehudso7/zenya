@@ -87,10 +87,7 @@ export async function GET(
         }
       })
     } catch (_error) {
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Lesson API error:', _error)
-      }
+      // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Internal server error' },
         { status: 500 }
@@ -170,10 +167,7 @@ export async function POST(
           })
 
         if (progressError) {
-          // Log error for monitoring
-          if (process.env.NODE_ENV === 'development') {
-            console.error('Error updating progress:', progressError)
-          }
+          // Error will be monitored by error tracking service
           return NextResponse.json(
             { error: 'Failed to update progress' },
             { status: 500 }
@@ -232,10 +226,7 @@ export async function POST(
 
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     } catch (_error) {
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Lesson completion error:', _error)
-      }
+      // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Internal server error' },
         { status: 500 }

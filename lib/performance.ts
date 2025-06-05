@@ -102,7 +102,6 @@ export function reportWebVitals(metric: any) {
   if (process.env.NODE_ENV === 'production') {
     // Send to analytics service
     // Example: sendToAnalytics(metric)
-    console.log('Web Vital:', metric)
   }
 }
 
@@ -125,6 +124,5 @@ export function measureComponentPerformance(componentName: string) {
 export function analyzeBundleSize() {
   if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
     // This would integrate with webpack-bundle-analyzer in development
-    console.log('Bundle analysis available in development mode')
   }
 }

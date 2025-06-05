@@ -77,7 +77,6 @@ export default function ProfilePage() {
         // Request was aborted, don't show error
         return
       }
-      console.error('Error fetching profile:', error)
       toast.error('Failed to load profile')
     } finally {
       setIsLoading(false)
@@ -125,7 +124,6 @@ export default function ProfilePage() {
         router.push('/learn')
       }
     } catch (error) {
-      console.error('Error updating profile:', error)
       toast.error('Failed to update profile')
     } finally {
       setIsSaving(false)

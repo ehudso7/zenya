@@ -142,8 +142,7 @@ export async function getDictionary(locale: Locale): Promise<Dictionary> {
     const dictionary = await import(`@/locales/${locale}.json`)
     return dictionary.default
   } catch (error) {
-    console.error(`Failed to load dictionary for locale ${locale}`, error)
-    // Fallback to English
+    // Failed to load dictionary for locale - fallback to English
     const dictionary = await import(`@/locales/en.json`)
     return dictionary.default
   }

@@ -1,11 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { withRateLimit, withAuth, withTryCatch, createAuthClient } from './api-middleware'
 import * as rateLimitModule from './rate-limit'
 import { createServerClient } from '@supabase/ssr'
 
+// Mock Next.js server components
+jest.mock('next/server', () => ({
+  NextRequest: jest.fn(),
+  NextResponse: {
+    json: jest.fn((data, init) => ({
+      status: init?.status || 200,
+      headers: new Map(Object.entries(init?.headers || {})),
+      json: async () => data,
+    })),
+  },
+}))
+
 // Mock dependencies
 jest.mock('./rate-limit')
 jest.mock('@supabase/ssr')
+
+const { NextRequest, NextResponse } = jest.requireMock('next/server')
 
 describe('API Middleware', () => {
   const mockRequest = (headers: Record<string, string> = {}) => {
@@ -16,7 +29,7 @@ describe('API Middleware', () => {
       cookies: {
         getAll: jest.fn(() => []),
       },
-    } as unknown as NextRequest
+    }
   }
 
   beforeEach(() => {
@@ -246,7 +259,7 @@ describe('API Middleware', () => {
 
       const request = {
         cookies: mockCookieStore,
-      } as unknown as NextRequest
+      }
 
       createAuthClient(request)
 
@@ -270,7 +283,7 @@ describe('API Middleware', () => {
 
       const request = {
         cookies: mockCookieStore,
-      } as unknown as NextRequest
+      }
 
       ;(createServerClient as jest.Mock).mockImplementation((url, key, options) => {
         // Test getAll

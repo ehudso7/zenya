@@ -15,9 +15,9 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
   // Initialize and apply user preferences
   usePreferences()
   
-  // Log initialization for debugging
+  // App initialization complete
   useEffect(() => {
-    console.log('App initializer mounted - daily reset and preferences active')
+    // Daily reset and preferences are now active
   }, [])
   
   return <>{children}</>

@@ -84,7 +84,7 @@ export default function LearnPage() {
         }
       } catch (error) {
         if (error instanceof Error && error.name !== 'AbortError') {
-          console.error('Error loading data:', error)
+          // Error handled by individual fetch functions
         }
       }
     }

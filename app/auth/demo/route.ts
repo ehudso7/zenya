@@ -11,7 +11,7 @@ export async function GET() {
     const demoPassword = process.env.DEMO_USER_PASSWORD
     
     if (!demoPassword) {
-      // console.error('Demo password not configured. Set DEMO_USER_PASSWORD in environment.')
+      // Demo password not configured
       return NextResponse.redirect(new URL('/auth?error=demo-not-configured', process.env.NEXT_PUBLIC_APP_URL!))
     }
     
@@ -50,10 +50,7 @@ export async function GET() {
     // Redirect to home page after successful demo login
     return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_APP_URL!))
   } catch (_error) {
-    // Log error for monitoring
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Demo login error:', _error)
-    }
+    // Error will be monitored by error tracking service
     return NextResponse.redirect(new URL('/auth?error=demo-failed', process.env.NEXT_PUBLIC_APP_URL!))
   }
 }

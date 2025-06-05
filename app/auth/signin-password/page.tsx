@@ -48,22 +48,16 @@ export default function SignInPasswordPage() {
     setIsLoading(true)
 
     try {
-      // console.log('Attempting sign in for:', email)
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      // console.log('Sign in response:', { data, error })
-
       if (error) {
-        // console.error('Sign in error:', error)
         throw error
       }
 
       if (data.user) {
-        // console.log('Sign in successful, user ID:', data.user.id)
         toast.success('Signed in successfully!')
         
         // Check if user profile exists
@@ -73,18 +67,13 @@ export default function SignInPasswordPage() {
           .eq('id', data.user.id)
           .single()
 
-        // console.log('Profile check:', { profile, profileError })
-
         if (profile?.onboarding_completed) {
-          // console.log('Redirecting to /learn')
           router.push('/learn')
         } else {
-          // console.log('Redirecting to /profile')
           router.push('/profile')
         }
       }
     } catch (error) {
-      // console.error('Full sign in error:', error)
       const errorMessage = error instanceof Error ? error.message : 'Invalid email or password'
       setErrors({ form: errorMessage })
       toast.error(errorMessage)
@@ -118,8 +107,6 @@ export default function SignInPasswordPage() {
     setIsLoading(true)
 
     try {
-      // console.log('Starting signup process for:', email)
-      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -128,19 +115,13 @@ export default function SignInPasswordPage() {
         }
       })
 
-      // console.log('Signup response:', { data, error })
-
       if (error) {
-        // console.error('Signup error:', error)
         throw error
       }
 
       if (data.user) {
-        // console.log('User created successfully:', data.user.id)
-        
         // Check if the user email is confirmed (if email confirmation is disabled, this will be true)
         if (data.user.email_confirmed_at) {
-          // console.log('Email already confirmed, attempting sign in...')
           toast.success('Account created! Signing you in...')
           
           // Wait a bit before signing in to ensure the user is created
@@ -152,20 +133,15 @@ export default function SignInPasswordPage() {
             password,
           })
 
-          // console.log('Sign in response:', { signInData, signInError })
-
           if (!signInError && signInData.user) {
-            // console.log('Sign in successful, redirecting to profile...')
             // Force a router refresh to ensure auth state is updated
             router.refresh()
             router.push('/profile')
           } else if (signInError) {
-            // console.error('Sign in error after signup:', signInError)
             toast.error('Account created but failed to sign in. Please try signing in manually.')
           }
         } else {
           // Email confirmation is required
-          // console.log('Email confirmation required')
           setEmailConfirmationRequired(true)
           setLastSignupEmail(email)
           toast.success('Account created! Please check your email to confirm your account before signing in.', {
@@ -175,11 +151,9 @@ export default function SignInPasswordPage() {
           setPassword('')
         }
       } else {
-        // console.log('No user data returned from signup')
         toast.error('Failed to create account. Please try again.')
       }
     } catch (error) {
-      // console.error('Full error object:', error)
       const errorMessage = error instanceof Error ? error.message : 'Failed to create account'
       setErrors({ form: errorMessage })
       toast.error(errorMessage)
@@ -198,15 +172,12 @@ export default function SignInPasswordPage() {
     setIsLoading(true)
     
     try {
-      // console.log('Resending confirmation email to:', lastSignupEmail)
-      
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: lastSignupEmail,
       })
       
       if (error) {
-        // console.error('Resend error:', error)
         throw error
       }
       
@@ -214,7 +185,6 @@ export default function SignInPasswordPage() {
         duration: 5000,
       })
     } catch (error) {
-      // console.error('Failed to resend email:', error)
       
       // Check for rate limit error
       if (error instanceof Error && (error.message?.includes('rate limit') || error.message?.includes('too many'))) {

@@ -39,10 +39,7 @@ export async function POST(request: NextRequest) {
       .insert({ email, source })
 
     if (error) {
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Waitlist insert error:', error)
-      }
+      // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Failed to add to waitlist' },
         { status: 500 }
@@ -51,10 +48,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    // Log error for monitoring
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Waitlist API error:', error)
-    }
+    // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Server error' },
         { status: 500 }

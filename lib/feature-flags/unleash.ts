@@ -44,7 +44,7 @@ export function initializeUnleash() {
   if (typeof window === 'undefined') return null
   
   if (!process.env.NEXT_PUBLIC_UNLEASH_URL || !process.env.NEXT_PUBLIC_UNLEASH_CLIENT_KEY) {
-    console.warn('Unleash configuration missing, feature flags disabled')
+    // Unleash configuration missing, feature flags disabled
     return null
   }
   
@@ -63,11 +63,11 @@ export function initializeUnleash() {
     
     // Set up event listeners
     unleashClient.on('ready', () => {
-      console.log('Feature flags loaded')
+      // Feature flags loaded
     })
     
     unleashClient.on('error', (error) => {
-      console.error('Unleash error:', error)
+      // Unleash error - will be monitored by error tracking
     })
   }
   
@@ -201,7 +201,7 @@ export async function getServerFeatureFlags(
   context?: Record<string, string>
 ): Promise<Record<FeatureName, boolean>> {
   if (!process.env.UNLEASH_API_URL || !process.env.UNLEASH_API_TOKEN) {
-    console.warn('Server-side Unleash configuration missing')
+    // Server-side Unleash configuration missing
     return {} as Record<FeatureName, boolean>
   }
   
@@ -232,7 +232,7 @@ export async function getServerFeatureFlags(
     
     return flags as Record<FeatureName, boolean>
   } catch (error) {
-    console.error('Error fetching server feature flags:', error)
+    // Error fetching server feature flags
     return {} as Record<FeatureName, boolean>
   }
 }

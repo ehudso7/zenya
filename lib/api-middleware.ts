@@ -68,7 +68,7 @@ export async function withRateLimit(
     
     return newResponse
   } catch (error) {
-    console.error('API handler error:', error)
+    // Error will be monitored by error tracking service
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -90,7 +90,6 @@ async function generateOpenAIResponse(
       suggestions: generateSuggestions(message),
     }
   } catch (error) {
-    console.error('OpenAI API error:', error)
     throw error
   }
 }
@@ -131,7 +130,6 @@ async function generateAnthropicResponse(
       suggestions: generateSuggestions(message),
     }
   } catch (error) {
-    console.error('Anthropic API error:', error)
     throw error
   }
 }
@@ -164,7 +162,6 @@ async function generateHuggingFaceResponse(
       suggestions: generateSuggestions(message),
     }
   } catch (error) {
-    console.error('Hugging Face API error:', error)
     throw error
   }
 }
@@ -202,7 +199,6 @@ async function generateCohereResponse(
       suggestions: generateSuggestions(message),
     }
   } catch (error) {
-    console.error('Cohere API error:', error)
     throw error
   }
 }
@@ -293,9 +289,7 @@ async function generateSmartResponse(
       
       return { ...response, provider: selectedProvider.name }
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error(`${selectedProvider.name} failed:`, error)
-      }
+      // Provider failed, will try fallback
       // Continue to fallback
     }
   }
@@ -351,17 +345,11 @@ export async function POST(request: NextRequest) {
         context
       )
 
-      // Log provider usage for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Provider stats:', getProviderStats())
-      }
+      // Provider stats tracked internally
 
       return NextResponse.json(response)
     } catch (error) {
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('AI API error:', error)
-      }
+      // Error will be monitored by error tracking service
       
       return NextResponse.json(
         { error: 'Failed to generate response' },

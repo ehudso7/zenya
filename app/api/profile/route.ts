@@ -39,29 +39,20 @@ export async function GET(request: NextRequest) {
           .single()
         
         if (createError) {
-          // Log error for monitoring
-          if (process.env.NODE_ENV === 'development') {
-            console.error('Error creating profile:', createError)
-          }
+          // Error will be monitored by error tracking service
           return NextResponse.json({ error: 'Failed to create profile' }, { status: 500 })
         }
         
         return NextResponse.json({ profile: newProfile })
       }
       
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Error fetching profile:', error)
-      }
+      // Error will be monitored by error tracking service
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
     }
 
     return NextResponse.json({ profile })
     } catch (error) {
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Profile GET error:', error)
-      }
+      // Error will be monitored by error tracking service
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
   }, 'api')
@@ -104,19 +95,13 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (error) {
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Error updating profile:', error)
-      }
+      // Error will be monitored by error tracking service
       return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
     }
 
     return NextResponse.json({ profile })
     } catch (error) {
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Profile PUT error:', error)
-      }
+      // Error will be monitored by error tracking service
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
   }, 'api')

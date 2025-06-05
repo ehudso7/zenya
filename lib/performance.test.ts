@@ -1,4 +1,4 @@
-import { measurePerformance, debounce, throttle, memoize, lazy } from './performance'
+import { measurePerformance, debounce, throttle, memoize, lazy } from './performance-utils'
 
 describe('Performance Utilities', () => {
   beforeEach(() => {

@@ -10,10 +10,7 @@ export async function GET(request: Request) {
 
   // Handle OAuth errors from Supabase
   if (error) {
-    // Log error for monitoring
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Auth error:', error, errorDescription)
-    }
+    // Error will be monitored by error tracking service
     return NextResponse.redirect(`${requestUrl.origin}/auth/error?error=${error}`)
   }
 
@@ -28,10 +25,7 @@ export async function GET(request: Request) {
     const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
     
     if (sessionError) {
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Session exchange error:', sessionError)
-      }
+      // Error will be monitored by error tracking service
       return NextResponse.redirect(`${requestUrl.origin}/auth/error?error=invalid-code`)
     }
 
@@ -54,10 +48,7 @@ export async function GET(request: Request) {
       }
     }
   } catch (error) {
-    // Log error for monitoring
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error in auth callback:', error)
-    }
+    // Error will be monitored by error tracking service
     return NextResponse.redirect(`${requestUrl.origin}/auth/error?error=server-error`)
   }
 

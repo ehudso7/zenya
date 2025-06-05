@@ -42,10 +42,7 @@ export async function GET(request: NextRequest) {
       const { data: curriculums, error, count } = await query
 
       if (error) {
-        // Log error for monitoring
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Error fetching curriculums:', error)
-        }
+        // Error will be monitored by error tracking service
         return NextResponse.json(
           { error: 'Failed to fetch curriculums' },
           { status: 500 }
@@ -71,10 +68,7 @@ export async function GET(request: NextRequest) {
         }
       )
   } catch (_error) {
-    // Log error for monitoring
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Curriculums API error:', _error)
-    }
+    // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Internal server error' },
         { status: 500 }

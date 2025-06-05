@@ -12,7 +12,7 @@ try {
     })
   }
 } catch (error) {
-  console.warn('Rate limiting disabled: Redis configuration missing')
+  // Rate limiting disabled: Redis configuration missing
 }
 
 // Create a new ratelimiter that allows 10 requests per 10 seconds
@@ -98,8 +98,8 @@ export async function checkRateLimit(
     
     return { success, limit, remaining, reset }
   } catch (error) {
-    console.error('Rate limit check failed:', error)
-    // Fail open - allow request if rate limit check fails
+    // Rate limit check failed - fail open
+    // Allow request if rate limit check fails
     return { success: true, limit: 100, remaining: 100, reset: Date.now() }
   }
 }

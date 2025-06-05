@@ -17,7 +17,7 @@ export default function DomainGuard({ children }: { children: React.ReactNode })
       // Ensure critical endpoints point to zenyaai.com
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
       if (supabaseUrl && !supabaseUrl.includes('supabase.co')) {
-        console.error('Invalid Supabase configuration detected')
+        // Invalid configuration - prevent execution
         setIsAuthorized(false)
       }
     }

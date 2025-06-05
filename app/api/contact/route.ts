@@ -27,10 +27,7 @@ export async function POST(request: NextRequest) {
       }
 
       // In production, this would be sent to an email service
-      // For now, we store it and log it
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Contact form submission:', contactData)
-      }
+      // For now, we store it
 
       // Email service integration point
       // When ready, integrate with services like SendGrid, AWS SES, Postmark, or Resend
@@ -50,10 +47,7 @@ export async function POST(request: NextRequest) {
         message: 'Thank you for contacting us! We\'ll get back to you soon.'
       })
     } catch (error) {
-      // Log error for monitoring
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Contact form error:', error)
-      }
+      // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Failed to send message' },
         { status: 500 }

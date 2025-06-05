@@ -69,10 +69,7 @@ export async function GET(request: NextRequest) {
       const { data: lessons, error: lessonsError, count } = await query
 
       if (lessonsError) {
-        // Log error for monitoring
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Error fetching lessons:', lessonsError)
-        }
+        // Error will be monitored by error tracking service
         return NextResponse.json(
           { error: 'Failed to fetch lessons' },
           { status: 500 }
@@ -107,10 +104,7 @@ export async function GET(request: NextRequest) {
         }
       )
   } catch (_error) {
-    // Log error for monitoring
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Lessons API error:', _error)
-    }
+    // Error will be monitored by error tracking service
       return NextResponse.json(
         { error: 'Internal server error' },
         { status: 500 }

@@ -31,12 +31,7 @@ export function isAuthorizedDomain(hostname: string | null): boolean {
   // Strip port number if present
   const domain = hostname.split(':')[0];
 
-  // Log for debugging in non-production
-  if (process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview') {
-    console.log(`[Domain Check] Checking domain: ${domain}`);
-    console.log(`[Domain Check] Environment: ${process.env.NODE_ENV}`);
-    console.log(`[Domain Check] Vercel Env: ${process.env.VERCEL_ENV}`);
-  }
+  // Domain checking logic follows
 
   // Allow development domains only in development mode
   if (process.env.NODE_ENV === 'development') {
@@ -52,10 +47,7 @@ export function isAuthorizedDomain(hostname: string | null): boolean {
     return authorized.test(domain);
   });
 
-  // Log result in non-production
-  if (process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview') {
-    console.log(`[Domain Check] Result: ${isAuthorized ? 'Authorized' : 'Unauthorized'}`);
-  }
+  // Return authorization result
 
   return isAuthorized;
 }

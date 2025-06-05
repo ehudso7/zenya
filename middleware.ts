@@ -9,10 +9,8 @@ export async function middleware(request: NextRequest) {
   
   // Special handling for Vercel deployments
   if (process.env.VERCEL) {
-    console.log(`[Middleware] Vercel deployment detected. Host: ${hostname}`);
     // Allow all Vercel deployments during preview/development
     if (process.env.VERCEL_ENV !== 'production' && hostname?.includes('.vercel.app')) {
-      console.log('[Middleware] Allowing Vercel preview deployment');
       // Continue without domain check
     } else if (!isAuthorizedDomain(hostname)) {
       return new NextResponse(
