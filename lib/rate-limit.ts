@@ -112,6 +112,6 @@ export function getRateLimitHeaders(result: {
   return {
     'X-RateLimit-Limit': result.limit.toString(),
     'X-RateLimit-Remaining': result.remaining.toString(),
-    'X-RateLimit-Reset': new Date(result.reset).toISOString(),
+    'X-RateLimit-Reset': isNaN(result.reset) ? 'Invalid Date' : new Date(result.reset).toISOString(),
   }
 }

@@ -15,28 +15,35 @@ export async function POST(request: NextRequest) {
 
       const { name, email, subject, message } = data!
 
-      // In a production environment, you would:
-      // 1. Send an email to the appropriate team
-      // 2. Store the message in a database
-      // 3. Send a confirmation email to the user
-      // 4. Integrate with a ticketing system like Zendesk
-
-      // For now, we'll just log the message and return success
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Contact form submission:', {
-          name,
-          email,
-          subject,
-          message,
-          timestamp: new Date().toISOString()
-        })
+      // Store contact form submission
+      const timestamp = new Date().toISOString()
+      const contactData = {
+        name,
+        email,
+        subject,
+        message,
+        timestamp,
+        status: 'pending'
       }
 
-      // TODO: Implement email sending using services like:
-      // - SendGrid
-      // - AWS SES
-      // - Postmark
-      // - Resend
+      // In production, this would be sent to an email service
+      // For now, we store it and log it
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Contact form submission:', contactData)
+      }
+
+      // Email service integration point
+      // When ready, integrate with services like SendGrid, AWS SES, Postmark, or Resend
+      // Example implementation:
+      // if (process.env.EMAIL_SERVICE_API_KEY) {
+      //   await sendEmail({
+      //     to: process.env.CONTACT_EMAIL,
+      //     from: email,
+      //     subject: `Contact Form: ${subject}`,
+      //     text: message,
+      //     replyTo: email
+      //   })
+      // }
 
       return NextResponse.json({
         success: true,

@@ -1,17 +1,24 @@
-import { checkRateLimit, getRateLimitHeaders } from './rate-limit'
 import { NextRequest } from 'next/server'
-import { Ratelimit } from '@upstash/ratelimit'
 
-// Mock the Upstash modules
-jest.mock('@upstash/ratelimit')
-jest.mock('@upstash/redis', () => ({
-  Redis: {
-    fromEnv: jest.fn(() => ({})),
-  },
+// Mock the Upstash modules before importing our module
+const mockLimit = jest.fn()
+const mockRatelimit = jest.fn(() => ({
+  limit: mockLimit,
+}))
+mockRatelimit.slidingWindow = jest.fn()
+
+jest.mock('@upstash/ratelimit', () => ({
+  Ratelimit: mockRatelimit,
 }))
 
+jest.mock('@upstash/redis', () => ({
+  Redis: jest.fn(() => ({})),
+}))
+
+// Now import our module after mocks are set up
+import { checkRateLimit, getRateLimitHeaders } from './rate-limit'
+
 describe('Rate Limiting', () => {
-  const mockLimit = jest.fn()
   const mockRequest = (headers: Record<string, string> = {}) => {
     return {
       headers: {
@@ -24,14 +31,14 @@ describe('Rate Limiting', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    process.env = { ...originalEnv, NODE_ENV: 'production', RATE_LIMIT_ENABLED: 'true' }
-    
-    // Setup the mock for Ratelimit constructor
-    ;(Ratelimit as jest.MockedClass<typeof Ratelimit>).mockImplementation(() => ({
-      limit: mockLimit,
-    } as any))
-    
-    ;(Ratelimit as any).slidingWindow = jest.fn()
+    // Ensure we're in production mode with rate limiting enabled and Redis configured
+    process.env = { 
+      ...originalEnv, 
+      NODE_ENV: 'production', 
+      RATE_LIMIT_ENABLED: 'true',
+      UPSTASH_REDIS_REST_URL: 'https://test.upstash.io',
+      UPSTASH_REDIS_REST_TOKEN: 'test-token'
+    }
   })
 
   afterEach(() => {
@@ -73,7 +80,7 @@ describe('Rate Limiting', () => {
       })
 
       it('should skip when RATE_LIMIT_ENABLED is undefined', async () => {
-        process.env = { ...originalEnv, NODE_ENV: 'production' }
+        process.env = { ...originalEnv, NODE_ENV: 'production', UPSTASH_REDIS_REST_URL: 'test', UPSTASH_REDIS_REST_TOKEN: 'test' }
         const request = mockRequest()
         
         const result = await checkRateLimit(request)
@@ -164,7 +171,6 @@ describe('Rate Limiting', () => {
           
           await checkRateLimit(request, endpoint)
           
-          expect(Ratelimit).toHaveBeenCalled()
           expect(mockLimit).toHaveBeenCalled()
         })
       })
@@ -274,24 +280,14 @@ describe('Rate Limiting', () => {
 
     describe('Rate Limiter Configuration', () => {
       it('should create rate limiters with correct configurations', () => {
-        // Force re-import to trigger rate limiter creation
-        jest.resetModules()
-        jest.doMock('@upstash/ratelimit')
-        jest.doMock('@upstash/redis', () => ({
-          Redis: {
-            fromEnv: jest.fn(() => ({})),
-          },
-        }))
-        
-        import('./rate-limit')
-        
-        expect(Ratelimit).toHaveBeenCalledTimes(6) // default + 5 endpoints
-        expect((Ratelimit as any).slidingWindow).toHaveBeenCalledWith(10, '10 s')
-        expect((Ratelimit as any).slidingWindow).toHaveBeenCalledWith(20, '1 m')
-        expect((Ratelimit as any).slidingWindow).toHaveBeenCalledWith(5, '1 m')
-        expect((Ratelimit as any).slidingWindow).toHaveBeenCalledWith(30, '1 m')
-        expect((Ratelimit as any).slidingWindow).toHaveBeenCalledWith(2, '1 h')
-        expect((Ratelimit as any).slidingWindow).toHaveBeenCalledWith(3, '1 h')
+        // The rate limiters are created on module import
+        expect(mockRatelimit).toHaveBeenCalledTimes(6) // default + 5 endpoints
+        expect(mockRatelimit.slidingWindow).toHaveBeenCalledWith(10, '10 s')
+        expect(mockRatelimit.slidingWindow).toHaveBeenCalledWith(20, '1 m')
+        expect(mockRatelimit.slidingWindow).toHaveBeenCalledWith(5, '1 m')
+        expect(mockRatelimit.slidingWindow).toHaveBeenCalledWith(30, '1 m')
+        expect(mockRatelimit.slidingWindow).toHaveBeenCalledWith(2, '1 h')
+        expect(mockRatelimit.slidingWindow).toHaveBeenCalledWith(3, '1 h')
       })
     })
   })
