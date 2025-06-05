@@ -67,7 +67,7 @@ export function initializeUnleash() {
       // Feature flags loaded
     })
     
-    unleashClient.on('error', (error) => {
+    unleashClient.on('error', (_error) => {
       // Unleash error - will be monitored by error tracking
     })
   }
@@ -198,8 +198,8 @@ export function useFeatureVariant(
 
 // Server-side feature flags
 export async function getServerFeatureFlags(
-  userId?: string,
-  context?: Record<string, string>
+  _userId?: string,
+  _context?: Record<string, string>
 ): Promise<Record<FeatureName, boolean>> {
   if (!process.env.UNLEASH_API_URL || !process.env.UNLEASH_API_TOKEN) {
     // Server-side Unleash configuration missing
