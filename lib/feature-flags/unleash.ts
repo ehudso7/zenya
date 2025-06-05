@@ -1,6 +1,6 @@
 import { UnleashClient, IToggle } from 'unleash-proxy-client'
 import { Context as UnleashContext } from 'unleash-proxy-client'
-import React from 'react'
+import React, { Fragment } from 'react'
 
 // Feature flag names as constants for type safety
 export const FEATURES = {
@@ -261,7 +261,7 @@ interface FeatureFlagProps {
 export function FeatureFlag({ feature, fallback = null, children }: FeatureFlagProps) {
   const isEnabled = useFeatureFlag(feature)
   
-  return isEnabled ? <>{children}</> : <>{fallback}</>
+  return isEnabled ? <Fragment>{children}</Fragment> : <Fragment>{fallback}</Fragment>
 }
 
 // A/B test component wrapper
@@ -274,7 +274,7 @@ interface ABTestProps {
 export function ABTest({ feature, variants, defaultVariant = 'control' }: ABTestProps) {
   const variant = useFeatureVariant(feature, defaultVariant)
   
-  return <>{variants[variant] || variants[defaultVariant] || null}</>
+  return <Fragment>{variants[variant] || variants[defaultVariant] || null}</Fragment>
 }
 
 // Import React for hooks

@@ -2,7 +2,7 @@
 
 export function measurePerformance<T extends (...args: any[]) => any>(
   fn: T,
-  name: string
+  _name: string
 ): T {
   return ((...args: Parameters<T>) => {
     const start = performance.now()
@@ -10,12 +10,12 @@ export function measurePerformance<T extends (...args: any[]) => any>(
     
     if (result instanceof Promise) {
       return result.finally(() => {
-        const duration = performance.now() - start
+        const _duration = performance.now() - start
         // Performance metrics collected by monitoring service
       })
     }
     
-    const duration = performance.now() - start
+    const _duration = performance.now() - start
     // Performance metrics collected by monitoring service
     return result
   }) as T

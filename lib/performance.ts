@@ -98,10 +98,10 @@ class PerformanceMonitor {
 export const performanceMonitor = new PerformanceMonitor()
 
 // Utility to report Web Vitals
-export function reportWebVitals(metric: any) {
+export function reportWebVitals(_metric: any) {
   if (process.env.NODE_ENV === 'production') {
     // Send to analytics service
-    // Example: sendToAnalytics(metric)
+    // Example: sendToAnalytics(_metric)
   }
 }
 
