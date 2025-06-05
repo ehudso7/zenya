@@ -276,6 +276,3 @@ export function ABTest({ feature, variants, defaultVariant = 'control' }: ABTest
   
   return <Fragment>{variants[variant] || variants[defaultVariant] || null}</Fragment>
 }
-
-// Import React for hooks
-import * as React from 'react'
