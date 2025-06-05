@@ -90,7 +90,7 @@ async function generateOpenAIResponse(
       suggestions: generateSuggestions(message),
     }
   } catch (_error) {
-    throw error
+    throw _error
   }
 }
 
@@ -130,7 +130,7 @@ async function generateAnthropicResponse(
       suggestions: generateSuggestions(message),
     }
   } catch (_error) {
-    throw error
+    throw _error
   }
 }
 
@@ -162,7 +162,7 @@ async function generateHuggingFaceResponse(
       suggestions: generateSuggestions(message),
     }
   } catch (_error) {
-    throw error
+    throw _error
   }
 }
 
@@ -199,7 +199,7 @@ async function generateCohereResponse(
       suggestions: generateSuggestions(message),
     }
   } catch (_error) {
-    throw error
+    throw _error
   }
 }
 
