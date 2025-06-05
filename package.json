@@ -55,6 +55,9 @@
     "pwa",
     "nextjs"
   ],
+  "optionalDependencies": {
+    "lightningcss": "^1.30.0"
+  },
   "dependencies": {
     "@datadog/browser-logs": "^5.0.0",
     "@datadog/browser-rum": "^5.0.0",
