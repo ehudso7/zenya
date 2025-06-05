@@ -1,6 +1,32 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { User, Mood, Lesson, ChatMessage } from '@/types'
+import type { Mood, Lesson, ChatMessage } from '@/types'
+
+// Extended User type for the store
+interface StoreUser {
+  id: string
+  email?: string
+  name?: string
+  avatar_url?: string
+  created_at: string
+  last_login?: string | null
+  current_xp: number
+  level?: number
+  streak_count: number
+  learning_streak?: number
+  total_lessons_completed?: number
+  mood: Mood | null
+  learning_preferences?: {
+    difficulty_level?: string
+    learning_style?: string
+    session_duration?: number
+    daily_goal?: number
+    topics_of_interest?: string[]
+    time_zone?: string
+    mood?: string
+  }
+  profile_completed?: boolean
+}
 
 interface LessonSession {
   lessonId: string
@@ -13,8 +39,8 @@ interface LessonSession {
 
 interface AppState {
   // User state
-  user: User | null
-  setUser: (user: User | null) => void
+  user: StoreUser | null
+  setUser: (user: StoreUser | null) => void
   updateMood: (mood: Mood) => void
   clearUser: () => void
   

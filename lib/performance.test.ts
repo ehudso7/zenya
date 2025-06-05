@@ -289,7 +289,12 @@ describe('Performance Utilities', () => {
   describe('Performance measurement in production', () => {
     it('should not log in production mode', () => {
       const originalEnv = process.env.NODE_ENV
-      process.env.NODE_ENV = 'production'
+      // Use Object.defineProperty to temporarily override NODE_ENV
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+        configurable: true
+      })
       
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
       const mockFn = jest.fn(() => 'result')
@@ -300,7 +305,12 @@ describe('Performance Utilities', () => {
       expect(consoleSpy).not.toHaveBeenCalled()
       
       consoleSpy.mockRestore()
-      process.env.NODE_ENV = originalEnv
+      // Restore original value
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: originalEnv,
+        writable: true,
+        configurable: true
+      })
     })
   })
 })

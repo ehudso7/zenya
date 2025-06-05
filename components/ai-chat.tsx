@@ -32,7 +32,7 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
   const abortControllerRef = useRef<AbortController | null>(null)
   
   const { user } = useStore()
-  const userMood = user?.learning_preferences?.mood || 'focused'
+  const userMood = user?.mood || 'focused'
 
   // Check AI status on mount
   useEffect(() => {
@@ -44,7 +44,7 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
         const data = await response.json()
         setAiStatus(data.status)
       } catch (_error) {
-        if (error instanceof Error && error.name === 'AbortError') {
+        if (_error instanceof Error && _error.name === 'AbortError') {
           // Request was aborted, don't update state
           return
         }

@@ -41,8 +41,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
               created_at: profile.created_at,
               current_xp: profile.current_xp || 0,
               level: profile.level || 1,
+              streak_count: profile.streak_count || 0,
               learning_streak: profile.learning_streak || 0,
               total_lessons_completed: profile.total_lessons_completed || 0,
+              mood: profile.mood || null,
               learning_preferences: {
                 difficulty_level: profile.learning_preferences?.difficulty_level || 'beginner',
                 learning_style: profile.learning_preferences?.learning_style || 'visual',

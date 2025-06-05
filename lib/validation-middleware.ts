@@ -10,13 +10,13 @@ export async function validateRequest<T>(
     const data = schema.parse(body)
     return { data, error: null }
   } catch (_error) {
-    if (error instanceof ZodError) {
+    if (_error instanceof ZodError) {
       return {
         data: null,
         error: NextResponse.json(
           {
             error: 'Validation failed',
-            details: error.errors.map(err => ({
+            details: _error.errors.map((err: any) => ({
               field: err.path.join('.'),
               message: err.message,
             })),
@@ -46,13 +46,13 @@ export async function validateQueryParams<T>(
     const data = schema.parse(params)
     return { data, error: null }
   } catch (_error) {
-    if (error instanceof ZodError) {
+    if (_error instanceof ZodError) {
       return {
         data: null,
         error: NextResponse.json(
           {
             error: 'Invalid query parameters',
-            details: error.errors.map(err => ({
+            details: _error.errors.map((err: any) => ({
               field: err.path.join('.'),
               message: err.message,
             })),

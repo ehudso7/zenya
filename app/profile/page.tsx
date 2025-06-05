@@ -73,7 +73,7 @@ export default function ProfilePage() {
         pushNotifications: data.profile.notification_preferences?.push || false
       })
     } catch (_error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (_error instanceof Error && _error.name === 'AbortError') {
         // Request was aborted, don't show error
         return
       }

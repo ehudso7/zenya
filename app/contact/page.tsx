@@ -76,8 +76,8 @@ export default function ContactPage() {
       toast.success('Message sent! We\'ll get back to you soon 🎉')
       setFormData({ name: '', email: '', subject: '', message: '' })
     } catch (_error) {
-      if (error instanceof Error) {
-        toast.error(error.message || 'Failed to send message. Please try again.')
+      if (_error instanceof Error) {
+        toast.error(_error.message || 'Failed to send message. Please try again.')
       } else {
         toast.error('Failed to send message. Please try again.')
       }

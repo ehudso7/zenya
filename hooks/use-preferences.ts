@@ -69,13 +69,20 @@ export function usePreferences() {
 /**
  * Hook to get and update specific preferences
  */
-export function usePreference<K extends keyof ReturnType<typeof useStore>['preferences']>(
+type PreferencesType = {
+  soundEnabled: boolean
+  animationsEnabled: boolean
+  fontSize: 'small' | 'medium' | 'large'
+  theme: 'light' | 'dark' | 'system'
+}
+
+export function usePreference<K extends keyof PreferencesType>(
   key: K
-): [ReturnType<typeof useStore>['preferences'][K], (value: ReturnType<typeof useStore>['preferences'][K]) => void] {
+): [PreferencesType[K], (value: PreferencesType[K]) => void] {
   const preferences = useStore(state => state.preferences)
   const updatePreferences = useStore(state => state.updatePreferences)
   
-  const setValue = (value: ReturnType<typeof useStore>['preferences'][K]) => {
+  const setValue = (value: PreferencesType[K]) => {
     updatePreferences({ [key]: value })
   }
   

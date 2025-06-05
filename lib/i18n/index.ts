@@ -160,7 +160,7 @@ export async function getAllDictionaries(): Promise<Record<Locale, Dictionary>> 
 
 // Locale detection
 export function detectLocale(acceptLanguage?: string): Locale {
-  if (!acceptLanguage) return i18nConfig.defaultLocale
+  if (!acceptLanguage) return i18nConfig.defaultLocale as Locale
   
   // Parse Accept-Language header
   const languages = acceptLanguage
@@ -173,11 +173,11 @@ export function detectLocale(acceptLanguage?: string): Locale {
   
   // Find first matching locale
   for (const { code } of languages) {
-    const locale = i18nConfig.locales.find(l => l === code)
+    const locale = i18nConfig.locales.find(l => l === code) as Locale | undefined
     if (locale) return locale
   }
   
-  return i18nConfig.defaultLocale
+  return i18nConfig.defaultLocale as Locale
 }
 
 // Format date according to locale

@@ -10,7 +10,6 @@ if (process.env.DD_AGENT_HOST) {
     runtimeMetrics: true,
     logInjection: true,
     profiling: true,
-    analytics: true,
     tags: {
       'app.name': 'zenya',
       'app.platform': 'nextjs',
@@ -143,7 +142,7 @@ export function createApiMetricsMiddleware() {
     } catch (_error) {
       const duration = Date.now() - start
       metrics.trackApiCall(endpoint, duration, 500)
-      throw error
+      throw _error
     }
   }
 }
@@ -166,7 +165,7 @@ export function trace<T extends (...args: any[]) => Promise<any>>(
       return result
     } catch (_error) {
       metrics.timing(`function.${name}`, Date.now() - start, ['status:error'])
-      throw error
+      throw _error
     }
   }) as T
 }

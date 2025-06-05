@@ -1,5 +1,4 @@
-import { UnleashClient, IToggle } from 'unleash-proxy-client'
-import { Context as UnleashContext } from 'unleash-proxy-client'
+import { UnleashClient, IToggle, IContext as UnleashContext } from 'unleash-proxy-client'
 import React, { Fragment } from 'react'
 
 // Feature flag names as constants for type safety
@@ -67,7 +66,7 @@ export function initializeUnleash() {
       // Feature flags loaded
     })
     
-    unleashClient.on('error', (_error) => {
+    unleashClient.on('error', (_error: any) => {
       // Unleash error - will be monitored by error tracking
     })
   }
@@ -78,6 +77,7 @@ export function initializeUnleash() {
 // Update user context
 export function updateUserContext(userId?: string, properties?: Record<string, string>) {
   const context: UnleashContext = {
+    appName: 'zenya',
     userId: userId || 'anonymous',
     sessionId: getSessionId(),
     properties: {
@@ -99,7 +99,7 @@ export function isFeatureEnabled(
     return defaultValue
   }
   
-  return unleashClient.isEnabled(feature, defaultValue)
+  return unleashClient.isEnabled(feature)
 }
 
 // Get feature variant (for A/B testing)

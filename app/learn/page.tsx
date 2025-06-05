@@ -83,7 +83,7 @@ export default function LearnPage() {
           await fetchUserStats(abortController.signal)
         }
       } catch (_error) {
-        if (error instanceof Error && error.name !== 'AbortError') {
+        if (_error instanceof Error && _error.name !== 'AbortError') {
           // Error handled by individual fetch functions
         }
       }
@@ -107,7 +107,7 @@ export default function LearnPage() {
         toast.error('Failed to load curriculums')
       }
     } catch (_error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (_error instanceof Error && _error.name === 'AbortError') {
         // Request was aborted, don't show error
         return
       }
@@ -128,7 +128,7 @@ export default function LearnPage() {
         })
       }
     } catch (_error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (_error instanceof Error && _error.name === 'AbortError') {
         // Request was aborted, silent fail
         return
       }

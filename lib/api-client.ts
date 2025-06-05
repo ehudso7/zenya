@@ -65,10 +65,10 @@ export async function apiClient<T = any>(
       const data = isJson ? await response.json() : await response.text()
       return data as T
     } catch (_error) {
-      lastError = error as Error
+      lastError = _error as Error
 
       // Don't retry on client errors (4xx)
-      if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
+      if (_error instanceof ApiError && _error.status >= 400 && _error.status < 500) {
         break
       }
 

@@ -118,7 +118,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
         }
       }
     } catch (_error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (_error instanceof Error && _error.name === 'AbortError') {
         // Request was aborted, don't show error
         return
       }
@@ -446,7 +446,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
                   {/* AI Chat Toggle Button */}
                   <div className="mt-6">
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       onClick={() => setShowAiChat(!showAiChat)}
                       className="w-full"
                     >

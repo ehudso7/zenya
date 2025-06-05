@@ -74,7 +74,7 @@ export default function SignInPasswordPage() {
         }
       }
     } catch (_error) {
-      const errorMessage = error instanceof Error ? error.message : 'Invalid email or password'
+      const errorMessage = _error instanceof Error ? _error.message : 'Invalid email or password'
       setErrors({ form: errorMessage })
       toast.error(errorMessage)
     } finally {
@@ -154,7 +154,7 @@ export default function SignInPasswordPage() {
         toast.error('Failed to create account. Please try again.')
       }
     } catch (_error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create account'
+      const errorMessage = _error instanceof Error ? _error.message : 'Failed to create account'
       setErrors({ form: errorMessage })
       toast.error(errorMessage)
     } finally {
@@ -187,12 +187,12 @@ export default function SignInPasswordPage() {
     } catch (_error) {
       
       // Check for rate limit error
-      if (error instanceof Error && (error.message?.includes('rate limit') || error.message?.includes('too many'))) {
+      if (_error instanceof Error && (_error.message?.includes('rate limit') || _error.message?.includes('too many'))) {
         toast.error('Email rate limit reached. Please wait an hour before trying again.', {
           duration: 6000,
         })
       } else {
-        toast.error(error instanceof Error ? error.message : 'Failed to resend email. Please try again later.')
+        toast.error(_error instanceof Error ? _error.message : 'Failed to resend email. Please try again later.')
       }
     } finally {
       setIsLoading(false)

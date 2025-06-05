@@ -171,8 +171,8 @@ export class AuditLogger {
 
   private startFlushInterval(): void {
     this.flushInterval = setInterval(() => {
-      this.flush().catch(error => {
-        serverLogger.error('Failed to flush audit logs', error)
+      this.flush().catch(_error => {
+        serverLogger.error('Failed to flush audit logs', _error)
       })
     }, this.flushIntervalMs)
   }
@@ -198,13 +198,13 @@ export class AuditLogger {
       // On failure, add logs back to buffer
       this.buffer.unshift(...logsToFlush)
       
-      serverLogger.error('Failed to flush audit logs', error, {
+      serverLogger.error('Failed to flush audit logs', _error instanceof Error ? _error : new Error('Unknown error'), {
         log_count: logsToFlush.length,
       })
       
       metrics.increment('audit.flush.failure', logsToFlush.length)
       
-      throw error
+      throw _error
     }
   }
 
@@ -276,8 +276,8 @@ export class AuditLogger {
     }
     
     // Final flush
-    this.flush().catch(error => {
-      serverLogger.error('Failed to flush audit logs on destroy', error)
+    this.flush().catch(_error => {
+      serverLogger.error('Failed to flush audit logs on destroy', _error)
     })
   }
 }
@@ -298,8 +298,8 @@ export function auditMiddleware(
       // Extract request metadata
       const metadata = {
         request_id: req.headers.get('x-request-id') || crypto.randomUUID(),
-        session_id: req.headers.get('x-session-id'),
-        correlation_id: req.headers.get('x-correlation-id'),
+        session_id: req.headers.get('x-session-id') || undefined,
+        correlation_id: req.headers.get('x-correlation-id') || undefined,
       }
 
       try {
@@ -344,13 +344,13 @@ export function auditMiddleware(
             duration_ms: duration,
           },
           details: {
-            error: error instanceof Error ? error.message : 'Unknown error',
+            error: _error instanceof Error ? _error.message : 'Unknown error',
             method: req.method,
             path: url.pathname,
           },
         })
 
-        throw error
+        throw _error
       }
     }
   }

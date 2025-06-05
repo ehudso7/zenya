@@ -1,4 +1,4 @@
-import { test as base, expect } from '@playwright/test'
+import { test as base, expect, Page } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -30,7 +30,7 @@ export type TestFixtures = {
 
 export const test = base.extend<TestFixtures>({
   // Authenticated page fixture
-  authenticatedPage: async ({ page }, use) => {
+  authenticatedPage: async ({ page }: { page: Page }, use: (page: Page) => Promise<void>) => {
     // Sign in before each test
     await page.goto('/auth/signin')
     await page.getByLabel('Email').fill(TEST_USERS.regular.email)
@@ -101,7 +101,7 @@ export class TestHelpers {
   }
   
   async mockAIResponse(response: string) {
-    await this.page.route('**/api/ai', async (route) => {
+    await this.page.route('**/api/ai', async (route: any) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
