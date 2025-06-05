@@ -4,6 +4,7 @@ interface ApiOptions extends RequestInit {
   retries?: number
   retryDelay?: number
   showErrorToast?: boolean
+  timeout?: number // in milliseconds
 }
 
 class ApiError extends Error {
@@ -25,6 +26,7 @@ export async function apiClient<T = any>(
     retries = 3,
     retryDelay = 1000,
     showErrorToast = true,
+    timeout = 30000, // 30 seconds default
     ...fetchOptions
   } = options
 
@@ -32,13 +34,20 @@ export async function apiClient<T = any>(
 
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
+      // Create AbortController for timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), timeout)
+      
       const response = await fetch(url, {
         ...fetchOptions,
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
           ...fetchOptions.headers,
         },
       })
+      
+      clearTimeout(timeoutId)
 
       // Handle non-JSON responses
       const contentType = response.headers.get('content-type')
@@ -77,6 +86,8 @@ export async function apiClient<T = any>(
   if (showErrorToast) {
     if (lastError instanceof ApiError) {
       toast.error(lastError.message)
+    } else if (lastError?.name === 'AbortError') {
+      toast.error('Request timed out. Please try again.')
     } else if (lastError?.message === 'Failed to fetch') {
       toast.error('Network error. Please check your connection.')
     } else {

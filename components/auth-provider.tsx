@@ -1,0 +1,165 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useStore } from '@/lib/store'
+import toast from 'react-hot-toast'
+
+interface AuthProviderProps {
+  children: React.ReactNode
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const router = useRouter()
+  const setUser = useStore(state => state.setUser)
+  const supabase = createClientComponentClient()
+  const isInitialized = useRef(false)
+
+  useEffect(() => {
+    // Prevent double initialization
+    if (isInitialized.current) return
+    isInitialized.current = true
+
+    // Function to fetch and sync user profile
+    const syncUserProfile = async (userId: string) => {
+      try {
+        const response = await fetch('/api/profile', {
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        })
+        
+        if (response.ok) {
+          const { user: profile } = await response.json()
+          if (profile) {
+            setUser({
+              id: profile.user_id,
+              email: profile.email || '',
+              name: profile.name || '',
+              avatar_url: profile.avatar_url || '',
+              created_at: profile.created_at,
+              current_xp: profile.current_xp || 0,
+              level: profile.level || 1,
+              learning_streak: profile.learning_streak || 0,
+              total_lessons_completed: profile.total_lessons_completed || 0,
+              learning_preferences: {
+                difficulty_level: profile.learning_preferences?.difficulty_level || 'beginner',
+                learning_style: profile.learning_preferences?.learning_style || 'visual',
+                session_duration: profile.learning_preferences?.session_duration || 15,
+                daily_goal: profile.learning_preferences?.daily_goal || 30,
+                topics_of_interest: profile.learning_preferences?.topics_of_interest || [],
+                time_zone: profile.learning_preferences?.time_zone || 'UTC',
+                mood: profile.learning_preferences?.mood || 'focused',
+              },
+              profile_completed: profile.profile_completed || false,
+            })
+          }
+        } else if (response.status === 401) {
+          // User is not authenticated
+          setUser(null)
+        }
+      } catch (error) {
+        console.error('Failed to sync user profile:', error)
+      }
+    }
+
+    // Check initial session
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (session?.user) {
+          await syncUserProfile(session.user.id)
+        } else {
+          setUser(null)
+        }
+      } catch (error) {
+        console.error('Failed to check session:', error)
+        setUser(null)
+      }
+    }
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        await syncUserProfile(session.user.id)
+        
+        // Show success message
+        toast.success('Welcome back!')
+        
+        // Redirect to appropriate page
+        const currentPath = window.location.pathname
+        if (currentPath.startsWith('/auth') || currentPath === '/landing' || currentPath === '/') {
+          const profileResponse = await fetch('/api/profile')
+          if (profileResponse.ok) {
+            const { user: profile } = await profileResponse.json()
+            if (!profile?.profile_completed) {
+              router.push('/profile?onboarding=true')
+            } else {
+              router.push('/learn')
+            }
+          }
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
+        toast.success('Signed out successfully')
+        
+        // Redirect to landing if on protected page
+        const currentPath = window.location.pathname
+        const publicPaths = ['/', '/landing', '/about', '/faq', '/contact', '/privacy', '/terms']
+        if (!publicPaths.includes(currentPath) && !currentPath.startsWith('/auth')) {
+          router.push('/landing')
+        }
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        // Silently sync profile on token refresh
+        await syncUserProfile(session.user.id)
+      } else if (event === 'USER_UPDATED' && session?.user) {
+        // Sync profile when user data is updated
+        await syncUserProfile(session.user.id)
+      }
+    })
+
+    // Check session on mount
+    checkSession()
+
+    // Cleanup
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [router, setUser, supabase])
+
+  // Periodically sync user data (every 5 minutes)
+  useEffect(() => {
+    const user = useStore.getState().user
+    if (!user) return
+
+    const interval = setInterval(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        try {
+          const response = await fetch('/api/profile')
+          if (response.ok) {
+            const { user: profile } = await response.json()
+            if (profile) {
+              // Update XP and streak without overwriting everything
+              setUser({
+                ...useStore.getState().user!,
+                current_xp: profile.current_xp || 0,
+                level: profile.level || 1,
+                learning_streak: profile.learning_streak || 0,
+                total_lessons_completed: profile.total_lessons_completed || 0,
+              })
+            }
+          }
+        } catch (error) {
+          // Silently fail - this is just a background sync
+        }
+      }
+    }, 5 * 60 * 1000) // 5 minutes
+
+    return () => clearInterval(interval)
+  }, [supabase, setUser])
+
+  return <>{children}</>
+}

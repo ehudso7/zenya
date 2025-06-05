@@ -93,7 +93,7 @@ export default function ProfilePage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.name,
+          display_name: formData.name,
           bio: formData.bio,
           learning_style: formData.learning_style,
           timezone: formData.timezone,

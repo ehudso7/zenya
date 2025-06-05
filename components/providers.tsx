@@ -2,11 +2,14 @@
 
 import { Toaster } from 'react-hot-toast'
 import { ErrorBoundary } from './error-boundary'
+import { AuthProvider } from './auth-provider'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
-      {children}
+      <AuthProvider>
+        {children}
+      </AuthProvider>
       <Toaster
         position="top-center"
         toastOptions={{

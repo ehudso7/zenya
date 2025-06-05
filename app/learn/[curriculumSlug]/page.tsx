@@ -12,12 +12,14 @@ import {
   Trophy,
   AlertCircle,
   Sparkles,
-  Brain
+  Brain,
+  MessageSquare
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import AppNavigation from '@/components/app-navigation'
+import { AiChat } from '@/components/ai-chat'
 import { toast } from 'react-hot-toast'
 import { useStore } from '@/lib/store'
 
@@ -76,6 +78,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
   const [completing, setCompleting] = useState(false)
   const [startTime, setStartTime] = useState<number>(0)
   const [showCelebration, setShowCelebration] = useState(false)
+  const [showAiChat, setShowAiChat] = useState(false)
 
   const currentLesson = lessons[currentLessonIndex]
   const completedLessons = lessons.filter(l => l.user_progress?.status === 'completed').length
@@ -425,6 +428,18 @@ export default function CurriculumLessonsPage({ params }: Props) {
                   {/* Lesson Content */}
                   {renderLessonContent()}
 
+                  {/* AI Chat Toggle Button */}
+                  <div className="mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowAiChat(!showAiChat)}
+                      className="w-full"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      {showAiChat ? 'Hide AI Tutor' : 'Ask AI Tutor'}
+                    </Button>
+                  </div>
+
                   {/* Complete Button */}
                   <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <Button
@@ -449,6 +464,24 @@ export default function CurriculumLessonsPage({ params }: Props) {
                 </CardContent>
               </Card>
 
+              {/* AI Chat */}
+              {showAiChat && (
+                <MotionDiv
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="h-[600px]"
+                >
+                  <AiChat
+                    lessonId={currentLesson.id}
+                    lessonContext={`Learning about "${currentLesson.title}" in ${curriculum.title}`}
+                    onSimplify={() => {
+                      toast.success('Simplifying the content...')
+                    }}
+                  />
+                </MotionDiv>
+              )}
+
               {/* Tips */}
               <Card className="glass border-blue-200 dark:border-blue-800">
                 <CardHeader>
@@ -462,7 +495,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
                     <li>• Take your time - there's no rush!</li>
                     <li>• Try the examples yourself for better understanding</li>
                     <li>• Come back anytime to review this lesson</li>
-                    <li>• Ask questions if something isn't clear</li>
+                    <li>• Ask the AI tutor if something isn't clear!</li>
                   </ul>
                 </CardContent>
               </Card>
