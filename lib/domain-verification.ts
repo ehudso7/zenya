@@ -6,16 +6,12 @@
 const AUTHORIZED_DOMAINS = [
   'zenyaai.com',
   'www.zenyaai.com',
-  // Allow preview deployments on Vercel
-  /^zenya-[a-z0-9]+-ehudso7s-projects\.vercel\.app$/,
-  // Allow Vercel preview URLs with various patterns
-  /^zenya-[a-z0-9]+-ehudso7\.vercel\.app$/,
-  /^[a-z0-9]+-ehudso7\.vercel\.app$/,
-  // Allow Vercel's auto-generated URLs
-  /^zenya-git-[a-z0-9]+-ehudso7s-projects\.vercel\.app$/,
-  /^zenya-[a-z0-9]+\.vercel\.app$/,
-  // Allow the project-specific Vercel URL
-  /^zenya\.vercel\.app$/,
+  // Allow all Vercel preview deployments
+  /.*\.vercel\.app$/,
+  // Legacy Vercel domains
+  /.*\.now\.sh$/,
+  // Vercel's internal domains
+  /.*\.vercel\.sh$/,
 ];
 
 // Development domains (only allowed in development mode)
@@ -53,7 +49,7 @@ export function isAuthorizedDomain(hostname: string | null): boolean {
 }
 
 export function getDomainError(): string {
-  return `This application is only authorized to run on zenyaai.com. 
+  return `This application is only authorized to run on zenyaai.com or Vercel preview deployments. 
           If you believe this is an error, please contact support@zenyaai.com`;
 }
 
@@ -89,8 +85,8 @@ export function verifyBuildConfiguration(): void {
         );
       }
     } catch (_error) {
-      if (error instanceof Error) {
-        throw error;
+      if (_error instanceof Error) {
+        throw _error;
       }
       throw new Error(`Invalid NEXT_PUBLIC_APP_URL format: ${appUrl}`);
     }
