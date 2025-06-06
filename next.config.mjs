@@ -15,7 +15,6 @@ const nextConfig = {
   generateEtags: true,
   
   // Bundle optimizations
-  swcMinify: true,
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
@@ -23,12 +22,14 @@ const nextConfig = {
   // Experimental features for performance
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-*'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+  
+  // Turbopack configuration (moved from experimental)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
