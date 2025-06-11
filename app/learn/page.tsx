@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import AppNavigation from '@/components/app-navigation'
 import { useStore } from '@/lib/store'
-import { toast } from 'react-hot-toast'
+import { api } from '@/lib/api-client'
 
 // Dynamic imports for heavy components
 const MoodSelector = dynamic(() => import('@/components/mood-selector'), {
@@ -78,14 +78,12 @@ export default function LearnPage() {
     
     const loadData = async () => {
       try {
-        await fetchCurricula(abortController.signal)
-        if (user && !abortController.signal.aborted) {
-          await fetchUserStats(abortController.signal)
+        await fetchCurricula()
+        if (user) {
+          await fetchUserStats()
         }
       } catch (_error) {
-        if (_error instanceof Error && _error.name !== 'AbortError') {
-          // Error handled by individual fetch functions
-        }
+        // Error handled by individual fetch functions
       }
     }
     
@@ -96,42 +94,27 @@ export default function LearnPage() {
     }
   }, [user])
 
-  const fetchCurricula = async (signal?: AbortSignal) => {
+  const fetchCurricula = async () => {
     try {
-      const response = await fetch('/api/curriculums', { signal })
-      const data = await response.json()
-      
-      if (response.ok) {
-        setCurricula(data.curriculums || [])
-      } else {
-        toast.error('Failed to load curriculums')
-      }
+      const data = await api.get<{ curriculums: Curriculum[] }>('/api/curriculums')
+      setCurricula(data.curriculums || [])
     } catch (_error) {
-      if (_error instanceof Error && _error.name === 'AbortError') {
-        // Request was aborted, don't show error
-        return
-      }
-      toast.error('Failed to load curriculums')
+      // Error is already handled by api client with toast
     } finally {
       setLoading(false)
     }
   }
 
-  const fetchUserStats = async (signal?: AbortSignal) => {
+  const fetchUserStats = async () => {
     try {
-      const response = await fetch('/api/profile', { signal })
-      const data = await response.json()
+      const data = await api.get<{ profile: any }>('/api/profile', { showErrorToast: false })
       
-      if (response.ok && data.profile) {
+      if (data.profile) {
         setUserStats({
           lessonsCompleted: data.profile.lessons_completed || 0
         })
       }
     } catch (_error) {
-      if (_error instanceof Error && _error.name === 'AbortError') {
-        // Request was aborted, silent fail
-        return
-      }
       // Silent fail for stats
     }
   }

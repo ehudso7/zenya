@@ -23,46 +23,70 @@ const ratelimit = redis ? new Ratelimit({
   prefix: '@zenya/ratelimit',
 }) : null
 
-// Create different rate limiters for different endpoints
+// Production-grade rate limiters with tier-based limits
 const rateLimiters = redis ? {
-  // AI endpoints - more restrictive
+  // AI endpoints - tier-based restrictions
   ai: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(20, '1 m'),
+    limiter: Ratelimit.slidingWindow(50, '1 m'), // Increased for production load
     analytics: true,
     prefix: '@zenya/ai',
   }),
   
-  // Auth endpoints - moderate restrictions
+  // AI premium tier (for authenticated pro users)
+  aiPremium: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(200, '1 m'),
+    analytics: true,
+    prefix: '@zenya/ai-premium',
+  }),
+  
+  // Auth endpoints - strict but reasonable
   auth: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(5, '1 m'),
+    limiter: Ratelimit.slidingWindow(3, '5 m'), // 3 attempts per 5 minutes
     analytics: true,
     prefix: '@zenya/auth',
   }),
   
-  // General API endpoints
+  // General API endpoints - generous for normal usage
   api: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(30, '1 m'),
+    limiter: Ratelimit.slidingWindow(1000, '1 m'), // 1000 requests per minute
     analytics: true,
     prefix: '@zenya/api',
   }),
   
-  // Waitlist - prevent spam
+  // Waitlist - strict spam prevention
   waitlist: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(2, '1 h'),
+    limiter: Ratelimit.slidingWindow(1, '1 h'), // 1 signup per hour per IP
     analytics: true,
     prefix: '@zenya/waitlist',
   }),
   
-  // Contact form - prevent spam
+  // Contact form - strict spam prevention  
   contact: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(3, '1 h'),
+    limiter: Ratelimit.slidingWindow(1, '10 m'), // 1 message per 10 minutes
     analytics: true,
     prefix: '@zenya/contact',
+  }),
+  
+  // File upload limits
+  upload: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(10, '1 m'),
+    analytics: true,
+    prefix: '@zenya/upload',
+  }),
+  
+  // Data export limits
+  export: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(2, '1 h'),
+    analytics: true,
+    prefix: '@zenya/export',
   }),
 } : null
 

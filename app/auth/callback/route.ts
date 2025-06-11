@@ -1,5 +1,4 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -17,8 +16,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${requestUrl.origin}/auth/error?error=invalid-code`)
   }
 
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+  const supabase = await createServerSupabaseClient()
   
   try {
     const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code)

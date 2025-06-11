@@ -1,10 +1,12 @@
 export async function register() {
-  // Temporarily disabled for Vercel deployment
-  // if (process.env.NEXT_RUNTIME === 'nodejs') {
-  //   await import('./sentry.server.config')
-  // }
+  // Only enable Sentry in production to avoid development noise
+  if (process.env.NODE_ENV === 'production') {
+    if (process.env.NEXT_RUNTIME === 'nodejs') {
+      await import('./sentry.server.config')
+    }
 
-  // if (process.env.NEXT_RUNTIME === 'edge') {
-  //   await import('./sentry.edge.config')
-  // }
+    if (process.env.NEXT_RUNTIME === 'edge') {
+      await import('./sentry.edge.config')
+    }
+  }
 }

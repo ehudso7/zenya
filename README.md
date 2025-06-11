@@ -9,7 +9,7 @@
   [![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/ehudso7/zenya/releases)
   [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
   
-  [Website](https://zenyaai.com) • [Documentation](docs/public/README.md) • [Report Bug](https://github.com/ehudso7/zenya/issues)
+  [Website](https://zenya.ai) • [Demo](https://zenya.ai/demo) • [Report Bug](https://github.com/ehudso7/zenya/issues)
 </div>
 
 ---
@@ -29,13 +29,9 @@ Zenya is an innovative AI-powered learning platform specifically designed for ad
 - **📊 Progress Tracking** - Visual progress tracking and achievements
 - **🔒 Privacy-First** - Your data stays secure and private
 
-## 🔒 Domain Security Notice
+## 🏃‍♂️ Quick Start
 
-**IMPORTANT**: This application is domain-locked and will only run on:
-- Production: https://zenyaai.com
-- Development: localhost:3000
-
-Attempts to deploy to other domains will be blocked by security measures. See [DOMAIN_LOCK.md](DOMAIN_LOCK.md) for details.
+Get up and running in minutes with our comprehensive setup guide.
 
 ## 🚀 Getting Started
 
@@ -117,9 +113,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 💬 Support
 
-- 📧 Email: support@zenyaai.com
-- 💬 Discord: [Join our community](https://discord.gg/zenya)
-- 📖 Documentation: [docs.zenyaai.com](https://docs.zenyaai.com)
+- 📧 Email: contact@zenya.ai
+- 🐛 Issues: [GitHub Issues](https://github.com/ehudso7/zenya/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/ehudso7/zenya/discussions)
 
 ## 🙏 Acknowledgments
 

@@ -27,14 +27,24 @@ export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
   }
   
   return (
-    <div className="flex flex-col items-center space-y-6">
-      <div className="flex flex-wrap justify-center gap-4">
+    <fieldset className="flex flex-col items-center space-y-6">
+      <legend className="sr-only">Select your current mood</legend>
+      <div 
+        className="flex flex-wrap justify-center gap-4"
+        role="radiogroup"
+        aria-label="Current mood selection"
+      >
         {moods.map((mood, index) => (
           <button
             key={mood.value}
+            type="button"
+            role="radio"
+            aria-checked={value === mood.value}
+            aria-label={`Select ${mood.label} mood`}
+            aria-describedby={`mood-${mood.value}-desc`}
             onClick={() => handleMoodSelect(mood.value)}
             className={cn(
-              'mood-button relative flex flex-col items-center gap-2 p-6 min-w-[100px]',
+              'mood-button relative flex flex-col items-center gap-2 p-6 min-w-[100px] min-h-[100px]',
               'bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm',
               'border border-gray-200/50 dark:border-gray-700/50',
               'md:hover:bg-white/70 dark:md:hover:bg-gray-800/70',
@@ -56,12 +66,18 @@ export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
               animation: 'fadeInUp 0.5s ease-out forwards'
             }}
           >
-            <span className="text-4xl" role="img" aria-label={mood.label}>
+            <span className="text-4xl" role="img" aria-hidden="true">
               {mood.value}
             </span>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span 
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              id={`mood-${mood.value}-desc`}
+            >
               {mood.label}
             </span>
+            {value === mood.value && (
+              <span className="sr-only">Currently selected</span>
+            )}
           </button>
         ))}
       </div>
@@ -78,6 +94,6 @@ export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
           }
         }
       `}</style>
-    </div>
+    </fieldset>
   )
 }

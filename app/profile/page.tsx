@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch'
 import { toast } from 'react-hot-toast'
 import AppNavigation from '@/components/app-navigation'
 import { useStore } from '@/lib/store'
+import { api } from '@/lib/api-client'
 
 interface UserProfile {
   id: string
@@ -45,22 +46,12 @@ export default function ProfilePage() {
     pushNotifications: false
   })
 
-  const fetchProfile = useCallback(async (signal?: AbortSignal) => {
+  const fetchProfile = useCallback(async () => {
     if (!user) return
     
     setIsLoading(true)
     try {
-      const response = await fetch('/api/profile', { signal })
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/auth/signin')
-          return
-        }
-        throw new Error('Failed to fetch profile')
-      }
-
-      const data = await response.json()
+      const data = await api.get<{ profile: UserProfile }>('/api/profile')
       setProfile(data.profile)
       
       // Update form with existing data
@@ -72,25 +63,19 @@ export default function ProfilePage() {
         emailNotifications: data.profile.notification_preferences?.email || false,
         pushNotifications: data.profile.notification_preferences?.push || false
       })
-    } catch (_error) {
-      if (_error instanceof Error && _error.name === 'AbortError') {
-        // Request was aborted, don't show error
+    } catch (error: any) {
+      if (error.status === 401) {
+        router.push('/auth/signin')
         return
       }
-      toast.error('Failed to load profile')
+      // Error is already handled by api client with toast
     } finally {
       setIsLoading(false)
     }
   }, [router, user])
 
   useEffect(() => {
-    const abortController = new AbortController()
-    
-    fetchProfile(abortController.signal)
-    
-    return () => {
-      abortController.abort()
-    }
+    fetchProfile()
   }, [fetchProfile])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,24 +83,17 @@ export default function ProfilePage() {
     setIsSaving(true)
 
     try {
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          display_name: formData.name,
-          bio: formData.bio,
-          learning_style: formData.learning_style,
-          timezone: formData.timezone,
-          notification_preferences: {
-            email: formData.emailNotifications,
-            push: formData.pushNotifications
-          }
-        })
+      const data = await api.put<{ profile: UserProfile }>('/api/profile', {
+        display_name: formData.name,
+        bio: formData.bio,
+        learning_style: formData.learning_style,
+        timezone: formData.timezone,
+        notification_preferences: {
+          email: formData.emailNotifications,
+          push: formData.pushNotifications
+        }
       })
 
-      if (!response.ok) throw new Error('Failed to update profile')
-
-      const data = await response.json()
       setProfile(data.profile)
       toast.success('Profile updated successfully!')
       
@@ -124,7 +102,7 @@ export default function ProfilePage() {
         router.push('/learn')
       }
     } catch (_error) {
-      toast.error('Failed to update profile')
+      // Error is already handled by api client with toast
     } finally {
       setIsSaving(false)
     }
@@ -363,16 +341,16 @@ export default function ProfilePage() {
                     type="button"
                     variant="danger"
                     className="w-full sm:w-auto"
-                    onClick={() => {
+                    onClick={async () => {
                       if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
                         if (confirm('This will permanently delete all your data including progress, achievements, and settings. Type "DELETE" to confirm.')) {
-                          // Implement deletion
-                          fetch('/api/user/delete', { method: 'DELETE' })
-                            .then(() => {
-                              toast.success('Account deleted successfully')
-                              router.push('/')
-                            })
-                            .catch(() => toast.error('Failed to delete account'))
+                          try {
+                            await api.delete('/api/user/delete')
+                            toast.success('Account deleted successfully')
+                            router.push('/')
+                          } catch (_error) {
+                            // Error is already handled by api client with toast
+                          }
                         }
                       }
                     }}

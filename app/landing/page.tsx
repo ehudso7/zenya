@@ -1,15 +1,11 @@
-'use client'
-
-import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { toast } from 'react-hot-toast'
-import { ArrowRight, Brain, Sparkles, Target, Heart, Zap, CheckCircle } from 'lucide-react'
+import { Suspense } from 'react'
+import { ArrowRight, Brain, Sparkles, Target, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Navigation } from '@/components/navigation'
+import { InteractiveDemo } from './interactive-demo'
+import { WaitlistForm } from './waitlist-form'
 
 const features = [
   {
@@ -52,197 +48,77 @@ const testimonials = [
   }
 ]
 
-interface ChatMessage {
-  role: 'zenya' | 'user'
-  content: string
-  timestamp?: Date
-}
-
 export default function LandingPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [hasSimplified, setHasSimplified] = useState(false)
-  const [hasGentlePace, setHasGentlePace] = useState(false)
-  const chatBoxRef = useRef<HTMLDivElement>(null)
-  const [demoMessages, setDemoMessages] = useState<ChatMessage[]>([
-    {
-      role: 'zenya',
-      content: "Hi! Today's quick win is about fractions. 🍕\n\nImagine a pizza cut into 4 slices. If you eat 1 slice, you've eaten 1/4 of the pizza!"
-    },
-    {
-      role: 'user',
-      content: 'So 2 slices would be 2/4?'
-    },
-    {
-      role: 'zenya',
-      content: "Exactly! And here's a cool trick: 2/4 is the same as 1/2. You've got half the pizza! 🎉"
-    }
-  ])
-
-  // Auto-scroll to bottom when new messages are added
-  useEffect(() => {
-    if (chatBoxRef.current) {
-      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight
-    }
-  }, [demoMessages])
-
-  const handleWaitlistSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!email) {
-      toast.error('Please enter your email')
-      return
-    }
-
-    setIsSubmitting(true)
-    
-    try {
-      const response = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        toast.success('You\'re on the list! We\'ll be in touch soon 🎉')
-        setEmail('')
-      } else {
-        toast.error(data.error || 'Something went wrong')
-      }
-    } catch (_error) {
-      toast.error('Failed to join waitlist. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
   return (
     <div className="min-h-screen">
       <Navigation />
-      {/* Premium Background */}
+      {/* Optimized Background */}
       <div className="fixed inset-0 gradient-mesh z-0" />
       
       <main id="main-content" role="main">
-      {/* Hero Section */}
+      {/* Hero Section - Server Component */}
       <section className="relative overflow-hidden z-10" aria-labelledby="hero-heading">
         <div className="container mx-auto px-4 py-20 max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center space-y-6"
-          >
-            <motion.h1 
+          <div className="text-center space-y-6 animate-fade-in">
+            <h1 
               id="hero-heading"
-              className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight"
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.8, type: "spring" }}
+              className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight animate-scale-in"
             >
               <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
                 Zenya
               </span>
-            </motion.h1>
-            <motion.p 
-              className="text-2xl md:text-3xl lg:text-4xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto font-medium"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
+            </h1>
+            <p className="text-2xl md:text-3xl lg:text-4xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto font-medium animate-slide-up">
               Your calm, focused AI tutor — built for real humans with unique attention styles
-            </motion.p>
-            <motion.p 
-              className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            >
+            </p>
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto animate-slide-up">
               Learn anything in 5-minute bursts. Adapt to your mood. Celebrate every win.
               No judgment, just progress.
-            </motion.p>
-            <motion.div 
-              className="pt-8"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4, type: "spring" }}
-            >
+            </p>
+            <div className="pt-8 animate-scale-in">
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  size="lg" 
-                  className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl w-full sm:w-auto"
-                  onClick={() => router.push('/auth/signin-password')}
-                >
-                  Get Started Free
-                  <ArrowRight className="ml-2 w-5 h-5 animate-pulse" aria-hidden="true" />
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="glass" 
-                  className="text-lg px-10 py-6 rounded-2xl shadow-xl w-full sm:w-auto group relative overflow-hidden"
-                  onClick={() => router.push('/auth/signin-password')}
-                >
-                  <span className="relative z-10">Sign In</span>
-                  <span className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                </Button>
+                <Link href="/auth/signin-password">
+                  <Button 
+                    size="lg" 
+                    className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl w-full sm:w-auto"
+                  >
+                    Get Started Free
+                    <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
+                  </Button>
+                </Link>
+                <Link href="/auth/signin-password">
+                  <Button 
+                    size="lg" 
+                    variant="glass" 
+                    className="text-lg px-10 py-6 rounded-2xl shadow-xl w-full sm:w-auto group relative overflow-hidden"
+                  >
+                    <span className="relative z-10">Sign In</span>
+                    <span className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  </Button>
+                </Link>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
         
-        {/* Premium Decorative elements */}
-        <motion.div 
-          className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
-          animate={{ 
-            x: [0, 100, 0],
-            y: [0, -100, 0],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute top-0 right-20 w-96 h-96 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
-          animate={{ 
-            x: [0, -100, 0],
-            y: [0, 100, 0],
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute -bottom-8 left-20 w-96 h-96 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
-          animate={{ 
-            x: [0, 50, 0],
-            y: [0, -50, 0],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        />
+        {/* Simplified Decorative elements */}
+        <div className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" aria-hidden="true" />
+        <div className="absolute top-0 right-20 w-96 h-96 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float-reverse" aria-hidden="true" />
+        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float-slow" aria-hidden="true" />
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - Server Component */}
       <section className="py-24 relative z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/30 to-transparent dark:via-gray-900/30 backdrop-blur-sm" />
         <div className="container mx-auto px-4 max-w-6xl relative z-20">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
+          <div className="animate-fade-in">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-16 text-gradient">
               Learning that works with your brain, not against it
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
+                <div key={index} className="animate-slide-in" style={{ animationDelay: `${index * 0.1}s` }}>
                   <Card variant="glass" className="h-full hover:shadow-premium hover:-translate-y-2 transition-all duration-300 group">
                     <CardContent className="p-8 text-center space-y-4">
                       <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-600/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -254,35 +130,22 @@ export default function LandingPage() {
                       </p>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* How It Works - Server Component */}
       <section className="py-20 relative z-10">
         <div className="container mx-auto px-4 max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="space-y-12"
-          >
+          <div className="space-y-12 animate-fade-in">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-gradient mb-4">
               How Zenya works
             </h2>
             <div className="space-y-8">
-              <motion.div 
-                className="flex items-start gap-4 p-6 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300"
-                whileHover={{ x: 10 }}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-              >
+              <div className="flex items-start gap-4 p-6 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300 hover:translate-x-2 animate-slide-in">
                 <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg">
                   1
                 </div>
@@ -292,15 +155,8 @@ export default function LandingPage() {
                     Tell us how you're feeling today. Tired? Energized? We'll adapt.
                   </p>
                 </div>
-              </motion.div>
-              <motion.div 
-                className="flex items-start gap-4 p-6 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300"
-                whileHover={{ x: 10 }}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                viewport={{ once: true }}
-              >
+              </div>
+              <div className="flex items-start gap-4 p-6 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300 hover:translate-x-2 animate-slide-in" style={{ animationDelay: '0.1s' }}>
                 <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg">
                   2
                 </div>
@@ -310,15 +166,8 @@ export default function LandingPage() {
                     5 minutes of focused learning, tailored to your energy level.
                   </p>
                 </div>
-              </motion.div>
-              <motion.div 
-                className="flex items-start gap-4 p-6 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300"
-                whileHover={{ x: 10 }}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                viewport={{ once: true }}
-              >
+              </div>
+              <div className="flex items-start gap-4 p-6 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300 hover:translate-x-2 animate-slide-in" style={{ animationDelay: '0.2s' }}>
                 <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg">
                   3
                 </div>
@@ -328,146 +177,52 @@ export default function LandingPage() {
                     Earn XP, maintain streaks, and see your growth over time.
                   </p>
                 </div>
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Demo Section */}
+      {/* Demo Section - Lazy Loaded */}
       <section className="py-20 relative z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent dark:from-gray-900/50 dark:to-transparent" />
         <div className="container mx-auto px-4 max-w-4xl relative z-20">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center space-y-8"
-          >
+          <div className="text-center space-y-8 animate-fade-in">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gradient mb-4">
               See Zenya in action
             </h2>
-            <Card variant="glass" className="max-w-2xl mx-auto shadow-premium hover:shadow-2xl transition-all duration-300">
-              <CardContent className="p-8">
-                <div ref={chatBoxRef} className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 text-left space-y-4 shadow-inner max-h-96 overflow-y-auto scroll-smooth">
-                  {demoMessages.map((message, index) => (
-                    <motion.div 
-                      key={index}
-                      className="flex items-start gap-3"
-                      initial={{ opacity: 0, x: message.role === 'zenya' ? -20 : 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: index < 3 ? index * 0.3 : 0.1 }}
-                    >
-                      <div className={`w-10 h-10 rounded-full flex-shrink-0 shadow-lg ${
-                        message.role === 'zenya' 
-                          ? 'bg-gradient-to-br from-blue-500 to-indigo-600 animate-pulse-slow' 
-                          : 'bg-gradient-to-br from-gray-400 to-gray-500'
-                      }`} />
-                      <div>
-                        <p className={`font-semibold mb-1 ${message.role === 'zenya' ? 'text-gradient' : ''}`}>
-                          {message.role === 'zenya' ? 'Zenya' : 'You'}
-                        </p>
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                          {message.content}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-                <motion.div 
-                  className="mt-6 flex gap-3 justify-center"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.8 }}
-                >
-                  <Button 
-                    size="sm" 
-                    variant="secondary" 
-                    className="glass-subtle hover:scale-105 hover:shadow-lg transition-all"
-                    onClick={() => {
-                      if (!hasSimplified) {
-                        setDemoMessages(prev => [...prev, {
-                          role: 'zenya',
-                          content: "Let me break that down even simpler! 🌟\n\nThink of fractions like sharing. If you have 4 cookies and eat 2, you ate half of them. That's why 2/4 = 1/2. It's just two ways of saying 'half'!"
-                        }])
-                        setHasSimplified(true)
-                        toast.success('Concept simplified!')
-                      } else {
-                        toast('Already showing simplified version', {
-                          icon: 'ℹ️',
-                        })
-                      }
-                    }}
-                    disabled={hasSimplified}
-                  >
-                    <Sparkles className="w-4 h-4 mr-1 text-yellow-500" />
-                    Simplify This
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="secondary" 
-                    className="glass-subtle hover:scale-105 hover:shadow-lg transition-all"
-                    onClick={() => {
-                      if (!hasGentlePace) {
-                        setDemoMessages(prev => [...prev, {
-                          role: 'zenya',
-                          content: "Let's slow down a bit... 🌈\n\nFractions = parts of a whole\n• 1/4 = one part out of four\n• 2/4 = two parts out of four\n• 2/4 = 1/2 (both mean half)\n\nTake your time to absorb this. There's no rush! 💙"
-                        }])
-                        setHasGentlePace(true)
-                        toast.success('Switching to gentle pace!')
-                      } else {
-                        toast('Already in gentle pace mode', {
-                          icon: 'ℹ️',
-                        })
-                      }
-                    }}
-                    disabled={hasGentlePace}
-                  >
-                    <Zap className="w-4 h-4 mr-1 text-purple-500" />
-                    Gentle Pace
-                  </Button>
-                </motion.div>
-              </CardContent>
-            </Card>
-          </motion.div>
+            <Suspense fallback={
+              <Card variant="glass" className="max-w-2xl mx-auto shadow-premium">
+                <CardContent className="p-8">
+                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 h-96 flex items-center justify-center">
+                    <div className="animate-pulse text-gray-500">Loading interactive demo...</div>
+                  </div>
+                </CardContent>
+              </Card>
+            }>
+              <InteractiveDemo />
+            </Suspense>
+          </div>
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Testimonials - Server Component */}
       <section className="py-20 relative z-10">
         <div className="container mx-auto px-4 max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
+          <div className="animate-fade-in">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-16 text-gradient">
               Loved by learners like you
             </h2>
             <div className="grid md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
+                <div key={index} className="animate-slide-in" style={{ animationDelay: `${index * 0.1}s` }}>
                   <Card variant="glass" className="h-full hover:shadow-premium hover:-translate-y-2 transition-all duration-300 group">
                     <CardContent className="p-8 space-y-4">
                       <div className="flex gap-1">
                         {[...Array(5)].map((_, i) => (
-                          <motion.span 
-                            key={i} 
-                            className="text-yellow-500 text-xl"
-                            initial={{ opacity: 0, scale: 0 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.3, delay: i * 0.1 }}
-                          >
+                          <span key={i} className="text-yellow-500 text-xl animate-scale-in" style={{ animationDelay: `${i * 0.1}s` }}>
                             ★
-                          </motion.span>
+                          </span>
                         ))}
                       </div>
                       <p className="text-gray-700 dark:text-gray-300 italic text-lg leading-relaxed">
@@ -481,84 +236,41 @@ export default function LandingPage() {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Waitlist Section */}
+      {/* Waitlist Section - Lazy Loaded */}
       <section id="waitlist" className="py-24 relative z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" />
         <div className="container mx-auto px-4 max-w-2xl text-center relative z-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="space-y-6"
-          >
+          <div className="space-y-6 animate-fade-in">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
               Be the first to try Zenya
             </h2>
             <p className="text-xl md:text-2xl text-white/90">
               Get early access, shape the future of calm learning, and lock in founder pricing.
             </p>
-            <motion.form 
-              onSubmit={handleWaitlistSubmit} 
-              className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Input
-                type="email"
-                placeholder="Your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 bg-white/20 backdrop-blur-md border-white/30 text-white placeholder:text-white/70 focus:bg-white/30 hover:bg-white/25 transition-all"
-                required
-              />
-              <Button
-                type="submit"
-                size="lg"
-                variant="secondary"
-                isLoading={isSubmitting}
-                disabled={isSubmitting}
-                className="bg-white text-indigo-600 hover:bg-white/90 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
-              >
-                {isSubmitting ? 'Joining...' : 'Join Waitlist'}
-              </Button>
-            </motion.form>
-            <motion.div 
-              className="flex items-center justify-center gap-6 text-sm text-white/80"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <span className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                No spam, ever
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                Early bird perks
-              </span>
-            </motion.div>
-          </motion.div>
+            <Suspense fallback={
+              <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                <div className="flex-1 h-12 bg-white/20 rounded-lg animate-pulse" />
+                <div className="h-12 w-32 bg-white rounded-lg animate-pulse" />
+              </div>
+            }>
+              <WaitlistForm />
+            </Suspense>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer - Server Component */}
       <footer className="py-16 relative z-10">
         <div className="absolute inset-0 bg-gradient-to-t from-gray-100 to-white dark:from-gray-900 dark:to-gray-800" />
         <div className="container mx-auto px-4 text-center relative z-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div className="animate-fade-in">
             <h3 className="text-3xl font-bold mb-4 text-gradient">Zenya</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-8">
               © 2025 Zenya. Built for brains that zig when others zag.
@@ -580,7 +292,7 @@ export default function LandingPage() {
                 Terms
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </footer>
       </main>

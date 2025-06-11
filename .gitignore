@@ -269,3 +269,29 @@ dev-tools/
 # Internal documentation
 docs/internal/
 *.local.md
+/.env*
+
+# Production cleanup - files that should never be public
+CLAUDE.md
+template.md
+*DEPLOYMENT_INSTRUCTIONS.md
+*DOMAIN_LOCK.md
+*DOMAIN_SECURITY_SUMMARY.md
+*VERCEL_DEPLOYMENT_FIX.md
+*VERCEL_MONITORING_SETUP.md
+*QA_REPORT.md
+*PRODUCTION_READINESS*.md
+*UX_AUDIT_REPORT.md
+*INDUSTRY_STANDARDS*.md
+*DEPLOYMENT_SUMMARY.md
+*.pid
+lighthouse-*.json
+scripts/cleanup-*.sh
+scripts/fix-*.sh
+scripts/restructure-*.sh
+scripts/backup-*.sh
+scripts/production-readiness-*.js
+scripts/generate-*.md
+vercel.production.json
+assets/*/README.md
+assets/*/BRAND_GUIDELINES.md

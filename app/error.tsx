@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { AlertCircle } from 'lucide-react'
-import * as Sentry from '@sentry/nextjs'
 
 export default function Error({
   error,
@@ -13,8 +12,10 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log the error to Sentry
-    Sentry.captureException(error)
+    // Log error to console in development, will be handled by production error tracking
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error boundary:', error)
+    }
   }, [error])
 
   return (

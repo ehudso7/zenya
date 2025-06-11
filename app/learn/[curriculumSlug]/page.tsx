@@ -22,6 +22,7 @@ import AppNavigation from '@/components/app-navigation'
 import { AiChat } from '@/components/ai-chat'
 import { toast } from 'react-hot-toast'
 import { useStore } from '@/lib/store'
+import { api } from '@/lib/api-client'
 
 // Dynamic imports for heavy components
 const MotionDiv = dynamic(
@@ -84,45 +85,33 @@ export default function CurriculumLessonsPage({ params }: Props) {
   const completedLessons = lessons.filter(l => l.user_progress?.status === 'completed').length
   const progress = lessons.length > 0 ? (completedLessons / lessons.length) * 100 : 0
 
-  const fetchLessons = useCallback(async (signal?: AbortSignal) => {
+  const fetchLessons = useCallback(async () => {
     try {
       // First get curriculum info
-      const currResponse = await fetch('/api/curriculums', { signal })
-      const currData = await currResponse.json()
+      const currData = await api.get<{ curriculums: Curriculum[] }>('/api/curriculums')
       
-      if (currResponse.ok) {
-        const curr = currData.curriculums?.find((c: Curriculum) => c.slug === resolvedParams.curriculumSlug)
-        if (curr) {
-          setCurriculum(curr)
-          
-          // Then get lessons for this curriculum
-          const lessonsResponse = await fetch(`/api/lessons?curriculumId=${curr.id}`, { signal })
-          const lessonsData = await lessonsResponse.json()
-          
-          if (lessonsResponse.ok) {
-            setLessons(lessonsData.lessons || [])
-            
-            // Find first incomplete lesson
-            const firstIncomplete = lessonsData.lessons?.findIndex((l: Lesson) => 
-              l.user_progress?.status !== 'completed'
-            )
-            if (firstIncomplete !== -1) {
-              setCurrentLessonIndex(firstIncomplete)
-            }
-          } else {
-            toast.error('Failed to load lessons')
-          }
-        } else {
-          toast.error('Curriculum not found')
-          router.push('/learn')
+      const curr = currData.curriculums?.find((c: Curriculum) => c.slug === resolvedParams.curriculumSlug)
+      if (curr) {
+        setCurriculum(curr)
+        
+        // Then get lessons for this curriculum
+        const lessonsData = await api.get<{ lessons: Lesson[] }>(`/api/lessons?curriculumId=${curr.id}`)
+        
+        setLessons(lessonsData.lessons || [])
+        
+        // Find first incomplete lesson
+        const firstIncomplete = lessonsData.lessons?.findIndex((l: Lesson) => 
+          l.user_progress?.status !== 'completed'
+        )
+        if (firstIncomplete !== -1) {
+          setCurrentLessonIndex(firstIncomplete)
         }
+      } else {
+        toast.error('Curriculum not found')
+        router.push('/learn')
       }
     } catch (_error) {
-      if (_error instanceof Error && _error.name === 'AbortError') {
-        // Request was aborted, don't show error
-        return
-      }
-      toast.error('Failed to load curriculum')
+      // Error is already handled by api client with toast
       router.push('/learn')
     } finally {
       setLoading(false)
@@ -130,13 +119,7 @@ export default function CurriculumLessonsPage({ params }: Props) {
   }, [resolvedParams.curriculumSlug, router])
 
   useEffect(() => {
-    const abortController = new AbortController()
-    
-    fetchLessons(abortController.signal)
-    
-    return () => {
-      abortController.abort()
-    }
+    fetchLessons()
   }, [fetchLessons])
 
   const handleStartLesson = async () => {
@@ -147,17 +130,12 @@ export default function CurriculumLessonsPage({ params }: Props) {
     
     try {
       // Fetch full lesson content
-      const response = await fetch(`/api/lessons/${currentLesson.id}`)
-      const data = await response.json()
+      const data = await api.get<{ lesson: Lesson }>(`/api/lessons/${currentLesson.id}`)
       
-      if (response.ok) {
-        setLessonContent(data.lesson)
-        toast.success(`Starting: ${currentLesson.title}`)
-      } else {
-        toast.error('Failed to load lesson content')
-      }
+      setLessonContent(data.lesson)
+      toast.success(`Starting: ${currentLesson.title}`)
     } catch (_error) {
-      toast.error('Failed to start lesson')
+      // Error is already handled by api client with toast
     }
   }
 
@@ -168,57 +146,50 @@ export default function CurriculumLessonsPage({ params }: Props) {
     const timeSpent = Math.floor((Date.now() - startTime) / 1000)
     
     try {
-      const response = await fetch(`/api/lessons/${currentLesson.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'complete',
-          timeSpent,
-          mood: user?.mood
-        })
+      const data = await api.post<{
+        xp_earned: number
+        achievements?: Array<{ achievement_name: string }>
+      }>(`/api/lessons/${currentLesson.id}`, {
+        action: 'complete',
+        timeSpent,
+        mood: user?.mood
       })
       
-      const data = await response.json()
+      toast.success(`🎉 +${data.xp_earned} XP earned!`)
       
-      if (response.ok) {
-        toast.success(`🎉 +${data.xp_earned} XP earned!`)
-        
-        // Show celebration animation
-        setShowCelebration(true)
-        setTimeout(() => setShowCelebration(false), 4000)
-        
-        // Show achievements if any
-        if (data.achievements?.length > 0) {
-          data.achievements.forEach((achievement: { achievement_name: string }) => {
-            toast.success(`🏆 Achievement unlocked: ${achievement.achievement_name}!`, {
-              duration: 5000
-            })
+      // Show celebration animation
+      setShowCelebration(true)
+      setTimeout(() => setShowCelebration(false), 4000)
+      
+      // Show achievements if any
+      if (data.achievements && data.achievements.length > 0) {
+        data.achievements.forEach((achievement: { achievement_name: string }) => {
+          toast.success(`🏆 Achievement unlocked: ${achievement.achievement_name}!`, {
+            duration: 5000
           })
-        }
-        
-        // Update local state
-        const updatedLessons = [...lessons]
-        updatedLessons[currentLessonIndex].user_progress = {
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-          xp_earned: data.xp_earned
-        }
-        setLessons(updatedLessons)
-        
-        // Move to next lesson or finish
-        if (currentLessonIndex < lessons.length - 1) {
-          setCurrentLessonIndex(currentLessonIndex + 1)
-          setLessonStarted(false)
-          setLessonContent(null)
-        } else {
-          toast.success('🎓 Congratulations! You\'ve completed all lessons!')
-          router.push('/learn')
-        }
+        })
+      }
+      
+      // Update local state
+      const updatedLessons = [...lessons]
+      updatedLessons[currentLessonIndex].user_progress = {
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+        xp_earned: data.xp_earned
+      }
+      setLessons(updatedLessons)
+      
+      // Move to next lesson or finish
+      if (currentLessonIndex < lessons.length - 1) {
+        setCurrentLessonIndex(currentLessonIndex + 1)
+        setLessonStarted(false)
+        setLessonContent(null)
       } else {
-        toast.error('Failed to complete lesson')
+        toast.success('🎓 Congratulations! You\'ve completed all lessons!')
+        router.push('/learn')
       }
     } catch (_error) {
-      toast.error('Failed to save progress')
+      // Error is already handled by api client with toast
     } finally {
       setCompleting(false)
     }

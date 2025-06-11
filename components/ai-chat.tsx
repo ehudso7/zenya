@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
+import { api } from '@/lib/api-client'
 
 interface Message {
   id: string
@@ -36,27 +37,16 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
 
   // Check AI status on mount
   useEffect(() => {
-    const abortController = new AbortController()
-    
     const checkAiStatus = async () => {
       try {
-        const response = await fetch('/api/ai/status', { signal: abortController.signal })
-        const data = await response.json()
+        const data = await api.get<{ status: 'online' | 'degraded' | 'offline' }>('/api/ai/status')
         setAiStatus(data.status)
       } catch (_error) {
-        if (_error instanceof Error && _error.name === 'AbortError') {
-          // Request was aborted, don't update state
-          return
-        }
         setAiStatus('offline')
       }
     }
     
     checkAiStatus()
-    
-    return () => {
-      abortController.abort()
-    }
   }, [])
 
   // Scroll to bottom when messages change
@@ -91,24 +81,16 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
     abortControllerRef.current = new AbortController()
     
     try {
-      const response = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMessage.content,
-          context: lessonContext || 'general learning',
-          lessonId,
-          mood: userMood,
-          previousMessages: messages.slice(-4) // Send last 4 messages for context
-        }),
-        signal: abortControllerRef.current.signal
+      const data = await api.post<{
+        message: string
+        xpAwarded?: number
+      }>('/api/ai', {
+        message: userMessage.content,
+        context: lessonContext || 'general learning',
+        lessonId,
+        mood: userMood,
+        previousMessages: messages.slice(-4) // Send last 4 messages for context
       })
-      
-      if (!response.ok) {
-        throw new Error('Failed to get AI response')
-      }
-      
-      const data = await response.json()
       
       const aiMessage: Message = {
         id: `msg-${Date.now()}-ai`,
@@ -130,7 +112,7 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
         return // Request was cancelled
       }
       
-      toast.error('Failed to get AI response. Please try again.')
+      // Error is already handled by api client with toast
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id))
       setInput(userMessage.content) // Restore input
     } finally {
