@@ -4,6 +4,7 @@
  */
 
 import { WebSocketServer, WebSocket } from 'ws'
+import type { RawData } from 'ws'
 import { IncomingMessage } from 'http'
 import { parse } from 'url'
 // import { verify } from 'jsonwebtoken' - not needed
@@ -271,7 +272,7 @@ export class CollaborativeWebSocketServer {
     })
   }
 
-  private async handleMessage(ws: AuthenticatedWebSocket, data: Buffer) {
+  private async handleMessage(ws: AuthenticatedWebSocket, data: RawData) {
     if (!ws.userId || !ws.sessionId) return
 
     try {
