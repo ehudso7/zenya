@@ -8,7 +8,7 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger'
-import { ConsoleSpanExporter, BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base'
 import { trace, context, SpanStatusCode, SpanKind } from '@opentelemetry/api'
 import { performanceMonitor } from './performance'
 
