@@ -2,6 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile Touch Fixes */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Fix for iOS button touch issues */
+button, 
+a, 
+input[type="button"], 
+input[type="submit"],
+.clickable {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Ensure buttons are tappable on mobile */
+button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Fix for mobile hover states sticking */
+@media (hover: hover) {
+  button:hover {
+    /* Hover styles only for devices that support hover */
+  }
+}
+
+/* Prevent zoom on input focus on iOS */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+/* Fix for mobile form issues */
+form {
+  -webkit-appearance: none;
+}
+
 /* Performance-optimized CSS animations with accessibility support */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(20px); }
