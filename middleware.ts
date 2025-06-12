@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server'
 import { isAuthorizedDomain, getDomainError, getAuthorizedOrigins } from '@/lib/domain-verification'
 import { detectSecurityThreats, getSecurityHeaders, generateCSP } from '@/lib/security'
 import { performanceMonitor } from '@/lib/monitoring/performance'
+import { validateCSRFToken, setCSRFToken } from '@/lib/security/csrf'
 
 export async function middleware(request: NextRequest) {
   const startTime = performance.now()
@@ -83,7 +84,10 @@ export async function middleware(request: NextRequest) {
     )
   }
 
+  // Create response first
   const res = NextResponse.next()
+  
+  // Create Supabase client with proper cookie handling
   const supabase = createMiddlewareClient({ req: request, res })
   
   // Apply comprehensive security headers
@@ -104,13 +108,32 @@ export async function middleware(request: NextRequest) {
   
   // Add CORS headers for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
+    // CSRF Protection for state-changing operations
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+      const isValidCSRF = await validateCSRFToken(request)
+      if (!isValidCSRF) {
+        return new NextResponse(
+          JSON.stringify({
+            error: 'CSRF Token Invalid',
+            message: 'Missing or invalid CSRF token',
+          }),
+          {
+            status: 403,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+      }
+    }
+    
     const origin = request.headers.get('origin')
     const authorizedOrigins = getAuthorizedOrigins()
     
     if (origin && authorizedOrigins.includes(origin)) {
       res.headers.set('Access-Control-Allow-Origin', origin)
       res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-      res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+      res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token')
       res.headers.set('Access-Control-Allow-Credentials', 'true')
     } else if (origin) {
       // Reject requests from unauthorized origins
@@ -135,7 +158,12 @@ export async function middleware(request: NextRequest) {
   }
   
   // Refresh session if expired
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+  
+  // If there's an error getting the session, try to refresh it
+  if (sessionError) {
+    await supabase.auth.refreshSession()
+  }
   
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
   const isPublicPage = [

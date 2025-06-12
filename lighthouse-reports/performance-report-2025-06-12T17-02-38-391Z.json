@@ -1,0 +1,61 @@
+{
+  "timestamp": "2025-06-12T17:02:38.393Z",
+  "summary": {
+    "totalPages": 5,
+    "passedPages": 0,
+    "averageScore": 0
+  },
+  "analyses": [],
+  "thresholds": {
+    "largest-contentful-paint": {
+      "threshold": 2.5,
+      "unit": "s",
+      "critical": true
+    },
+    "first-input-delay": {
+      "threshold": 100,
+      "unit": "ms",
+      "critical": true
+    },
+    "cumulative-layout-shift": {
+      "threshold": 0.1,
+      "unit": "score",
+      "critical": true
+    },
+    "first-contentful-paint": {
+      "threshold": 1.8,
+      "unit": "s",
+      "critical": false
+    },
+    "speed-index": {
+      "threshold": 3,
+      "unit": "s",
+      "critical": false
+    },
+    "total-blocking-time": {
+      "threshold": 200,
+      "unit": "ms",
+      "critical": false
+    },
+    "time-to-interactive": {
+      "threshold": 3.8,
+      "unit": "s",
+      "critical": false
+    },
+    "server-response-time": {
+      "threshold": 600,
+      "unit": "ms",
+      "critical": false
+    },
+    "dom-size": {
+      "threshold": 800,
+      "unit": "elements",
+      "critical": false
+    },
+    "unused-css-rules": {
+      "threshold": 20,
+      "unit": "KB",
+      "critical": false
+    }
+  }
+}

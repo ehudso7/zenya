@@ -27,7 +27,7 @@ describe('validateRequest', () => {
       const result = await validateRequest(request, testSchema)
 
       expect(result.data).toEqual(validData)
-      expect(result.error).toBeUndefined()
+      expect(result.error).toBeNull()
     })
 
     it('should handle empty schema', async () => {
@@ -37,7 +37,7 @@ describe('validateRequest', () => {
       const result = await validateRequest(request, emptySchema)
 
       expect(result.data).toEqual({})
-      expect(result.error).toBeUndefined()
+      expect(result.error).toBeNull()
     })
 
     it('should coerce types when possible', async () => {

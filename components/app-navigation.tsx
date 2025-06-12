@@ -10,6 +10,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { toast } from 'react-hot-toast'
 import { useStore } from '@/lib/store'
 import { useState, useEffect } from 'react'
+import { signOut } from '@/lib/supabase/session'
 
 export default function AppNavigation() {
   const pathname = usePathname()
@@ -36,10 +37,30 @@ export default function AppNavigation() {
   }, [isMobileMenuOpen])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    clearUser()
-    toast.success('Logged out successfully')
-    router.push('/landing')
+    try {
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        throw error
+      }
+      
+      // Clear all sessions and local data
+      await signOut()
+      
+      // Clear store
+      clearUser()
+      
+      // Show success message
+      toast.success('Logged out successfully')
+      
+      // Redirect to landing page
+      router.push('/landing')
+      router.refresh()
+    } catch (error) {
+      console.error('Logout error:', error)
+      toast.error('Failed to sign out. Please try again.')
+    }
   }
 
   const navItems = [

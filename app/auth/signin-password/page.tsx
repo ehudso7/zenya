@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'react-hot-toast'
 import { cn } from '@/lib/utils'
+import { formatAuthError } from '@/lib/auth/errors'
 
 export default function SignInPasswordPage() {
   const [email, setEmail] = useState('')
@@ -61,20 +62,37 @@ export default function SignInPasswordPage() {
         toast.success('Signed in successfully!')
         
         // Check if user profile exists
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('users')
-          .select('onboarding_completed')
+          .select('id, onboarding_completed, profile_completed')
           .eq('id', data.user.id)
           .single()
 
-        if (profile?.onboarding_completed) {
+        if (profileError && profileError.code === 'PGRST116') {
+          // Profile doesn't exist, create it
+          await supabase
+            .from('users')
+            .insert({
+              id: data.user.id,
+              email: data.user.email,
+              name: data.user.email?.split('@')[0],
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+          
+          // Redirect to profile setup
+          router.refresh()
+          router.push('/profile?onboarding=true')
+        } else if (profile?.onboarding_completed || profile?.profile_completed) {
+          router.refresh()
           router.push('/learn')
         } else {
-          router.push('/profile')
+          router.refresh()
+          router.push('/profile?onboarding=true')
         }
       }
     } catch (_error) {
-      const errorMessage = _error instanceof Error ? _error.message : 'Invalid email or password'
+      const errorMessage = formatAuthError(_error)
       setErrors({ form: errorMessage })
       toast.error(errorMessage)
     } finally {
@@ -120,12 +138,12 @@ export default function SignInPasswordPage() {
       }
 
       if (data.user) {
-        // Check if the user email is confirmed (if email confirmation is disabled, this will be true)
+        // Check if the user email is confirmed
         if (data.user.email_confirmed_at) {
           toast.success('Account created! Signing you in...')
           
-          // Wait a bit before signing in to ensure the user is created
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          // Wait for database trigger to create profile
+          await new Promise(resolve => setTimeout(resolve, 2000))
           
           // Sign in immediately after signup
           const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -134,9 +152,29 @@ export default function SignInPasswordPage() {
           })
 
           if (!signInError && signInData.user) {
+            // Ensure profile exists
+            const { data: profile } = await supabase
+              .from('users')
+              .select('id')
+              .eq('id', signInData.user.id)
+              .single()
+            
+            if (!profile) {
+              // Create profile if it doesn't exist
+              await supabase
+                .from('users')
+                .insert({
+                  id: signInData.user.id,
+                  email: signInData.user.email,
+                  name: signInData.user.email?.split('@')[0],
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                })
+            }
+            
             // Force a router refresh to ensure auth state is updated
             router.refresh()
-            router.push('/profile')
+            router.push('/profile?onboarding=true')
           } else if (signInError) {
             toast.error('Account created but failed to sign in. Please try signing in manually.')
           }
@@ -154,7 +192,7 @@ export default function SignInPasswordPage() {
         toast.error('Failed to create account. Please try again.')
       }
     } catch (_error) {
-      const errorMessage = _error instanceof Error ? _error.message : 'Failed to create account'
+      const errorMessage = formatAuthError(_error)
       setErrors({ form: errorMessage })
       toast.error(errorMessage)
     } finally {

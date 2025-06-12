@@ -1,0 +1,62 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "regions": ["iad1"],
+  "env": {
+    "NODE_ENV": "staging",
+    "NEXT_PUBLIC_APP_ENV": "staging",
+    "NEXT_PUBLIC_API_URL": "https://staging.zenyaai.com"
+  },
+  "build": {
+    "env": {
+      "NEXT_TELEMETRY_DISABLED": "1",
+      "ENABLE_EXPERIMENTAL_FEATURES": "true",
+      "NEXT_PUBLIC_ENABLE_DEBUG": "true"
+    }
+  },
+  "functions": {
+    "app/api/ai/[...path].ts": {
+      "maxDuration": 30
+    },
+    "app/api/waitlist/route.ts": {
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Environment",
+          "value": "staging"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/staging-info",
+      "destination": "/api/health",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
+  "github": {
+    "enabled": true,
+    "autoAlias": true,
+    "silent": false,
+    "autoJobCancelation": true
+  },
+  "public": false
+}

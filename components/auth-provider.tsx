@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
+import { setupSessionRecovery } from '@/lib/supabase/session'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -124,6 +125,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Check session on mount
     checkSession()
+    
+    // Set up session recovery mechanisms
+    setupSessionRecovery()
 
     // Cleanup
     return () => {

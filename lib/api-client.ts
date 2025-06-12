@@ -30,6 +30,14 @@ export async function apiClient<T = any>(
     ...fetchOptions
   } = options
 
+  // Get CSRF token from cookies
+  const csrfToken = typeof window !== 'undefined' 
+    ? document.cookie
+        .split('; ')
+        .find(row => row.startsWith('zenya-csrf-token='))
+        ?.split('=')[1]
+    : null
+
   let lastError: Error | null = null
 
   for (let attempt = 0; attempt < retries; attempt++) {
@@ -38,13 +46,21 @@ export async function apiClient<T = any>(
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), timeout)
       
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        ...fetchOptions.headers,
+      }
+      
+      // Add CSRF token for state-changing operations
+      if (csrfToken && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(fetchOptions.method || 'GET')) {
+        headers['x-csrf-token'] = csrfToken
+      }
+      
       const response = await fetch(url, {
         ...fetchOptions,
         signal: controller.signal,
-        headers: {
-          'Content-Type': 'application/json',
-          ...fetchOptions.headers,
-        },
+        headers,
+        credentials: 'include', // Ensure cookies are sent
       })
       
       clearTimeout(timeoutId)

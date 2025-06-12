@@ -1,56 +1,82 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-export async function GET() {
+// Demo account credentials
+const DEMO_EMAIL = 'demo@zenyaai.com'
+const DEMO_PASSWORD = 'demo123456'
+
+export async function GET(request: Request) {
+  const requestUrl = new URL(request.url)
+  const supabase = await createServerSupabaseClient()
+  
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    // First, try to sign in with existing demo account
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+    })
     
-    // Use environment variables for demo credentials
-    const demoEmail = process.env.DEMO_USER_EMAIL || 'demo@zenyaai.com'
-    const demoPassword = process.env.DEMO_USER_PASSWORD
-    
-    if (!demoPassword) {
-      // Demo password not configured
-      return NextResponse.redirect(new URL('/auth?error=demo-not-configured', process.env.NEXT_PUBLIC_APP_URL!))
+    if (signInData.user) {
+      // Demo account exists and signed in successfully
+      return NextResponse.redirect(`${requestUrl.origin}/learn`)
     }
     
-    const { error } = await supabase.auth.signInWithPassword({
-      email: demoEmail,
-      password: demoPassword,
-    })
-
-    if (error) {
-      // If demo user doesn't exist, create it
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: demoEmail,
-        password: demoPassword,
+    // If sign in failed, try to create demo account
+    if (signInError) {
+      console.log('Demo account sign in failed, attempting to create...')
+      
+      // Create demo account
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
         options: {
           data: {
-            name: 'Demo User',
+            full_name: 'Demo User',
+            is_demo: true,
           },
-        },
+          emailRedirectTo: `${requestUrl.origin}/auth/callback`,
+        }
       })
-
+      
       if (signUpError) {
-        return NextResponse.redirect(new URL('/auth?error=demo-failed', process.env.NEXT_PUBLIC_APP_URL!))
+        console.error('Failed to create demo account:', signUpError)
+        return NextResponse.redirect(`${requestUrl.origin}/auth/error?error=demo-setup-failed`)
       }
-
-      // Sign in the newly created demo user
-      const { error: newSignInError } = await supabase.auth.signInWithPassword({
-        email: demoEmail,
-        password: demoPassword,
-      })
-
-      if (newSignInError) {
-        return NextResponse.redirect(new URL('/auth?error=demo-failed', process.env.NEXT_PUBLIC_APP_URL!))
+      
+      if (signUpData.user) {
+        // Wait a moment for the trigger to create the profile
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Try to sign in again
+        const { data: finalSignIn, error: finalError } = await supabase.auth.signInWithPassword({
+          email: DEMO_EMAIL,
+          password: DEMO_PASSWORD,
+        })
+        
+        if (finalSignIn.user) {
+          // Ensure profile is set up correctly
+          await supabase
+            .from('users')
+            .upsert({
+              id: finalSignIn.user.id,
+              email: DEMO_EMAIL,
+              name: 'Demo User',
+              onboarding_completed: true,
+              profile_completed: true,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+          
+          return NextResponse.redirect(`${requestUrl.origin}/learn`)
+        }
       }
     }
-
-    // Redirect to home page after successful demo login
-    return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_APP_URL!))
-  } catch (_error) {
-    // Error will be monitored by error tracking service
-    return NextResponse.redirect(new URL('/auth?error=demo-failed', process.env.NEXT_PUBLIC_APP_URL!))
+    
+    // If we get here, something went wrong
+    return NextResponse.redirect(`${requestUrl.origin}/auth/error?error=demo-failed`)
+    
+  } catch (error) {
+    console.error('Demo sign in error:', error)
+    return NextResponse.redirect(`${requestUrl.origin}/auth/error?error=demo-error`)
   }
 }

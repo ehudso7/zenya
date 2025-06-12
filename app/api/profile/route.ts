@@ -41,14 +41,14 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to create profile' }, { status: 500 })
           }
           
-          return NextResponse.json({ profile: newProfile })
+          return NextResponse.json({ user: newProfile })
         }
         
         // Error will be monitored by error tracking service
         return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
       }
 
-      return NextResponse.json({ profile })
+      return NextResponse.json({ user: profile })
     } catch (_error) {
       // Error will be monitored by error tracking service
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -96,7 +96,7 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
       }
 
-      return NextResponse.json({ profile })
+      return NextResponse.json({ user: profile })
     } catch (_error) {
       // Error will be monitored by error tracking service
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

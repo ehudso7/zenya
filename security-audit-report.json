@@ -1,0 +1,833 @@
+{
+  "timestamp": "2025-06-12T17:00:27.592Z",
+  "duration": 2506,
+  "score": 0,
+  "summary": {
+    "passed": 55,
+    "vulnerabilities": 28,
+    "warnings": 33,
+    "total_issues": 61
+  },
+  "vulnerabilities": [
+    {
+      "timestamp": "2025-06-12T17:00:25.154Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./lib/ml/adaptive-learning.ts",
+      "details": {
+        "file": "./lib/ml/adaptive-learning.ts",
+        "pattern": "API Keys",
+        "line": "generateDifficultyRe..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.240Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./lib/ml/adaptive-learning.ts",
+      "details": {
+        "file": "./lib/ml/adaptive-learning.ts",
+        "pattern": "API Keys",
+        "line": "generateDifficultyRe..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.300Z",
+      "level": "HIGH",
+      "message": "Potential Supabase URL found in ./jest.setup.js",
+      "details": {
+        "file": "./jest.setup.js",
+        "pattern": "Supabase URL",
+        "line": "https://test.supabas..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.328Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/app/api/adaptive-learning/route.js",
+      "details": {
+        "file": "./.next/server/app/api/adaptive-learning/route.js",
+        "pattern": "API Keys",
+        "line": "generateDifficultyRe..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.340Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/9206.js",
+      "details": {
+        "file": "./.next/server/chunks/9206.js",
+        "pattern": "API Keys",
+        "line": "InstrumentationNodeM..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.346Z",
+      "level": "HIGH",
+      "message": "Potential Database URLs found in ./.next/server/chunks/9206.js",
+      "details": {
+        "file": "./.next/server/chunks/9206.js",
+        "pattern": "Database URLs",
+        "line": "postgresql://${t}:${..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.349Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/9236.js",
+      "details": {
+        "file": "./.next/server/chunks/9236.js",
+        "pattern": "API Keys",
+        "line": "00000000000000000000..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.351Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/2831.js",
+      "details": {
+        "file": "./.next/server/chunks/2831.js",
+        "pattern": "API Keys",
+        "line": "abcdefghijklmnopqrst..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.353Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/8548.js",
+      "details": {
+        "file": "./.next/server/chunks/8548.js",
+        "pattern": "API Keys",
+        "line": "extractInterceptionR..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.353Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/4386.js",
+      "details": {
+        "file": "./.next/server/chunks/4386.js",
+        "pattern": "API Keys",
+        "line": "ABCDEFGHIJKLMNOPQRST..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.355Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/3794.js",
+      "details": {
+        "file": "./.next/server/chunks/3794.js",
+        "pattern": "API Keys",
+        "line": "absenceOfDigitsInNum..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.366Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/7605.js",
+      "details": {
+        "file": "./.next/server/chunks/7605.js",
+        "pattern": "API Keys",
+        "line": "InstrumentationNodeM..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.371Z",
+      "level": "HIGH",
+      "message": "Potential Database URLs found in ./.next/server/chunks/7605.js",
+      "details": {
+        "file": "./.next/server/chunks/7605.js",
+        "pattern": "Database URLs",
+        "line": "postgresql://${t}:${..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.372Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/580.js",
+      "details": {
+        "file": "./.next/server/chunks/580.js",
+        "pattern": "API Keys",
+        "line": "throwToInterruptStat..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.374Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/2938.js",
+      "details": {
+        "file": "./.next/server/chunks/2938.js",
+        "pattern": "API Keys",
+        "line": "escapeJSObjectForIns..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.382Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/4481.js",
+      "details": {
+        "file": "./.next/server/chunks/4481.js",
+        "pattern": "API Keys",
+        "line": "InstrumentationNodeM..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.387Z",
+      "level": "HIGH",
+      "message": "Potential Database URLs found in ./.next/server/chunks/4481.js",
+      "details": {
+        "file": "./.next/server/chunks/4481.js",
+        "pattern": "Database URLs",
+        "line": "postgresql://${t}:${..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.388Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/5145.js",
+      "details": {
+        "file": "./.next/server/chunks/5145.js",
+        "pattern": "API Keys",
+        "line": "b13943e359636db027ad..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.391Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/276.js",
+      "details": {
+        "file": "./.next/server/chunks/276.js",
+        "pattern": "API Keys",
+        "line": "calculateDefaultRetr..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.400Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/8431.js",
+      "details": {
+        "file": "./.next/server/chunks/8431.js",
+        "pattern": "API Keys",
+        "line": "getDraftModeProvider..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.402Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/4447.js",
+      "details": {
+        "file": "./.next/server/chunks/4447.js",
+        "pattern": "API Keys",
+        "line": "throwForSearchParams..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.405Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/chunks/979.js",
+      "details": {
+        "file": "./.next/server/chunks/979.js",
+        "pattern": "API Keys",
+        "line": "InstrumentationNodeM..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.408Z",
+      "level": "HIGH",
+      "message": "Potential Database URLs found in ./.next/server/chunks/979.js",
+      "details": {
+        "file": "./.next/server/chunks/979.js",
+        "pattern": "Database URLs",
+        "line": "postgresql://${t}:${..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.411Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/edge-instrumentation.js",
+      "details": {
+        "file": "./.next/server/edge-instrumentation.js",
+        "pattern": "API Keys",
+        "line": "10000000100040008000..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.415Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/server/middleware.js",
+      "details": {
+        "file": "./.next/server/middleware.js",
+        "pattern": "API Keys",
+        "line": "ABCDEFGHIJKLMNOPQRST..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.432Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/static/chunks/vendor-658f7b1d629244e6.js",
+      "details": {
+        "file": "./.next/static/chunks/vendor-658f7b1d629244e6.js",
+        "pattern": "API Keys",
+        "line": "hasInterceptionRoute..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.437Z",
+      "level": "HIGH",
+      "message": "Potential API Keys found in ./.next/static/chunks/framework-7b520bfeb5505986.js",
+      "details": {
+        "file": "./.next/static/chunks/framework-7b520bfeb5505986.js",
+        "pattern": "API Keys",
+        "line": "reactInternalSnapsho..."
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.026Z",
+      "level": "HIGH",
+      "message": "npm audit detected vulnerabilities - check npm audit for details",
+      "details": {}
+    }
+  ],
+  "warnings": [
+    {
+      "timestamp": "2025-06-12T17:00:25.088Z",
+      "level": "MEDIUM",
+      "message": "File package.json is world-readable",
+      "details": {
+        "file": "package.json",
+        "permissions": "644"
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.088Z",
+      "level": "MEDIUM",
+      "message": "File next.config.mjs is world-readable",
+      "details": {
+        "file": "next.config.mjs",
+        "permissions": "644"
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.088Z",
+      "level": "MEDIUM",
+      "message": "File sentry.server.config.ts is world-readable",
+      "details": {
+        "file": "sentry.server.config.ts",
+        "permissions": "644"
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.089Z",
+      "level": "MEDIUM",
+      "message": "File instrumentation.ts is world-readable",
+      "details": {
+        "file": "instrumentation.ts",
+        "permissions": "644"
+      }
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.027Z",
+      "level": "MEDIUM",
+      "message": "CSRF Protection not detected in middleware",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.027Z",
+      "level": "MEDIUM",
+      "message": "Rate Limiting not detected in middleware",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.027Z",
+      "level": "MEDIUM",
+      "message": "HTTPS Redirect not detected in middleware",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.027Z",
+      "level": "MEDIUM",
+      "message": "XSS Protection not detected in middleware",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.027Z",
+      "level": "MEDIUM",
+      "message": "Frame Options not detected in middleware",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.027Z",
+      "level": "LOW",
+      "message": "CSP not configured in Next.js config",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.028Z",
+      "level": "LOW",
+      "message": "HSTS not configured in Next.js",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.589Z",
+      "level": "MEDIUM",
+      "message": "No obvious authentication in app/api/waitlist/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.589Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/waitlist/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/metrics/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/contact/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/health/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/admin/dashboard/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "MEDIUM",
+      "message": "No input validation detected in app/api/user/delete/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/user/delete/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "MEDIUM",
+      "message": "No input validation detected in app/api/user/export/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/user/export/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "MEDIUM",
+      "message": "No obvious authentication in app/api/curriculums/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/curriculums/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "MEDIUM",
+      "message": "No input validation detected in app/api/semantic-search/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/semantic-search/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/profile/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "MEDIUM",
+      "message": "No input validation detected in app/api/ai/status/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/ai/status/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/ai/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/lessons/[lessonId]/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/lessons/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "MEDIUM",
+      "message": "No input validation detected in app/api/adaptive-learning/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "LOW",
+      "message": "No rate limiting in app/api/adaptive-learning/route.ts",
+      "details": {}
+    }
+  ],
+  "passed": [
+    {
+      "timestamp": "2025-06-12T17:00:25.087Z",
+      "level": "PASS",
+      "message": "Environment file .env not found (good for security)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.088Z",
+      "level": "PASS",
+      "message": "Environment file .env.local not found (good for security)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:25.088Z",
+      "level": "PASS",
+      "message": "Environment file .env.production not found (good for security)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.027Z",
+      "level": "PASS",
+      "message": "CSP Headers implemented in middleware",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.582Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/waitlist/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.582Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/metrics/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.582Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/contact/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.583Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/health/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.583Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/admin/dashboard/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.583Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/user/export/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.583Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/curriculums/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.583Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/profile/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.584Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/lessons/[lessonId]/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.584Z",
+      "level": "PASS",
+      "message": "Supabase ORM usage detected in ./app/api/lessons/route.ts (safe)",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.585Z",
+      "level": "PASS",
+      "message": "No SQL injection vulnerabilities detected",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.589Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/waitlist/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.589Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/waitlist/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.589Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/metrics/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.589Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/metrics/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/metrics/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/contact/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/contact/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/contact/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/health/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/health/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/health/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/admin/dashboard/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/admin/dashboard/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/admin/dashboard/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/user/delete/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/user/delete/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/user/export/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/user/export/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/curriculums/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/curriculums/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/semantic-search/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/semantic-search/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/profile/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/profile/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/profile/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/ai/status/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/ai/status/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/ai/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.590Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/ai/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/ai/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/lessons/[lessonId]/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/lessons/[lessonId]/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/lessons/[lessonId]/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/lessons/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "Input validation found in app/api/lessons/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/lessons/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "Authentication check found in app/api/adaptive-learning/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "Error handling implemented in app/api/adaptive-learning/route.ts",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "CORS properly configured with specific origins",
+      "details": {}
+    },
+    {
+      "timestamp": "2025-06-12T17:00:27.591Z",
+      "level": "PASS",
+      "message": "CORS credentials handling configured",
+      "details": {}
+    }
+  ]
+}
