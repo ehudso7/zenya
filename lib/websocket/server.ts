@@ -92,7 +92,7 @@ export class CollaborativeWebSocketServer {
     this.wss = new WebSocketServer({
       server,
       path: '/api/ws/collaborate',
-      verifyClient: async (info) => {
+      verifyClient: async (info: { req: IncomingMessage }) => {
         return await this.verifyClient(info)
       }
     })
