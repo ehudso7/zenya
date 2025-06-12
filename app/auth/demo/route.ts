@@ -1,9 +1,9 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// Demo account credentials
-const DEMO_EMAIL = 'demo@zenyaai.com'
-const DEMO_PASSWORD = 'demo123456'
+// Demo account credentials from environment variables
+const DEMO_EMAIL = process.env.DEMO_EMAIL || 'demo@zenyaai.com'
+const DEMO_PASSWORD = process.env.DEMO_PASSWORD || process.env.DEMO_ACCOUNT_PASSWORD || 'DemoUser2025!'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     
     // If sign in failed, try to create demo account
     if (signInError) {
-      console.error('Demo account sign in failed, attempting to create...')
+      console.warn('Demo account sign in failed, attempting to create...')
       
       // Create demo account
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -33,6 +33,7 @@ export async function GET(request: Request) {
           data: {
             full_name: 'Demo User',
             is_demo: true,
+            demo_account: true,
           },
           emailRedirectTo: `${requestUrl.origin}/auth/callback`,
         }
