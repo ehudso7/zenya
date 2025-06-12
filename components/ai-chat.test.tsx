@@ -1,7 +1,7 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { AIChat } from './ai-chat'
+import { AiChat } from './ai-chat'
 import { apiClient } from '@/lib/api-client'
 import toast from 'react-hot-toast'
 
@@ -18,7 +18,7 @@ jest.mock('@/lib/monitoring/client-performance', () => ({
 const mockApiClient = apiClient as jest.MockedFunction<typeof apiClient>
 const mockToast = toast as jest.Mocked<typeof toast>
 
-describe('AIChat', () => {
+describe('AiChat', () => {
   const defaultProps = {
     lessonId: 'lesson-123',
     onXPEarned: jest.fn(),
@@ -33,7 +33,7 @@ describe('AIChat', () => {
   })
 
   it('should render chat interface', () => {
-    render(<AIChat {...defaultProps} />)
+    render(<AiChat {...defaultProps} />)
     
     expect(screen.getByText('AI Learning Assistant')).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/Ask a question/i)).toBeInTheDocument()
@@ -42,7 +42,7 @@ describe('AIChat', () => {
 
   it('should send message on form submit', async () => {
     const user = userEvent.setup()
-    render(<AIChat {...defaultProps} />)
+    render(<AiChat {...defaultProps} />)
     
     const input = screen.getByPlaceholderText(/Ask a question/i)
     const sendButton = screen.getByRole('button', { name: /send/i })
@@ -64,7 +64,7 @@ describe('AIChat', () => {
 
   it('should display AI response', async () => {
     const user = userEvent.setup()
-    render(<AIChat {...defaultProps} />)
+    render(<AiChat {...defaultProps} />)
     
     const input = screen.getByPlaceholderText(/Ask a question/i)
     await user.type(input, 'Test question')
@@ -77,7 +77,7 @@ describe('AIChat', () => {
 
   it('should show XP earned', async () => {
     const user = userEvent.setup()
-    render(<AIChat {...defaultProps} />)
+    render(<AiChat {...defaultProps} />)
     
     const input = screen.getByPlaceholderText(/Ask a question/i)
     await user.type(input, 'Test question')
@@ -93,7 +93,7 @@ describe('AIChat', () => {
     mockApiClient.mockRejectedValueOnce(new Error('API Error'))
     const user = userEvent.setup()
     
-    render(<AIChat {...defaultProps} />)
+    render(<AiChat {...defaultProps} />)
     
     const input = screen.getByPlaceholderText(/Ask a question/i)
     await user.type(input, 'Test question')
@@ -106,7 +106,7 @@ describe('AIChat', () => {
 
   it('should disable input while loading', async () => {
     const user = userEvent.setup()
-    render(<AIChat {...defaultProps} />)
+    render(<AiChat {...defaultProps} />)
     
     const input = screen.getByPlaceholderText(/Ask a question/i)
     const sendButton = screen.getByRole('button', { name: /send/i })
@@ -125,7 +125,7 @@ describe('AIChat', () => {
 
   it('should maintain chat history', async () => {
     const user = userEvent.setup()
-    render(<AIChat {...defaultProps} />)
+    render(<AiChat {...defaultProps} />)
     
     const input = screen.getByPlaceholderText(/Ask a question/i)
     
@@ -150,7 +150,7 @@ describe('AIChat', () => {
 
   it('should handle quick actions', async () => {
     const user = userEvent.setup()
-    render(<AIChat {...defaultProps} />)
+    render(<AiChat {...defaultProps} />)
     
     // Click on a quick action button
     const quickAction = screen.getByText('Explain this concept')
@@ -169,10 +169,11 @@ describe('AIChat', () => {
   })
 
   it('should track performance metrics', async () => {
-    const { performanceMonitor } = require('@/lib/monitoring/client-performance')
+    const clientPerformance = await import('@/lib/monitoring/client-performance')
+    const { performanceMonitor } = clientPerformance
     const user = userEvent.setup()
     
-    render(<AIChat {...defaultProps} />)
+    render(<AiChat {...defaultProps} />)
     
     const input = screen.getByPlaceholderText(/Ask a question/i)
     await user.type(input, 'Test question')

@@ -53,7 +53,7 @@ async function measureQuery<T>(
   return {
     queryName: name,
     executionTime,
-    rowCount,
+    rowCount: rowCount || 0,
     status: getPerformanceStatus(executionTime),
     details: { count }
   }
@@ -180,7 +180,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'User lookup by email (indexed)',
-    () => supabase
+    async () => supabase
       .from('users')
       .select('*')
       .eq('email', testData.users[0].email)
@@ -189,7 +189,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'User progress by user_id (indexed)',
-    () => supabase
+    async () => supabase
       .from('user_progress')
       .select('*')
       .eq('user_id', testData.users[0].id)
@@ -198,7 +198,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'Lessons by curriculum (indexed)',
-    () => supabase
+    async () => supabase
       .from('lessons')
       .select('*')
       .eq('curriculum_id', testData.curricula[0].id)
@@ -210,7 +210,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'User progress with lesson and curriculum data',
-    () => supabase
+    async () => supabase
       .from('user_progress')
       .select(`
         *,
@@ -230,7 +230,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'User sessions with full context',
-    () => supabase
+    async () => supabase
       .from('user_sessions')
       .select(`
         *,
@@ -255,7 +255,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'Count total lessons per curriculum',
-    () => supabase
+    async () => supabase
       .from('lessons')
       .select('curriculum_id', { count: 'exact' })
       .eq('is_active', true)
@@ -263,7 +263,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'User progress statistics',
-    () => supabase
+    async () => supabase
       .from('user_progress')
       .select('status', { count: 'exact' })
       .eq('user_id', testData.users[0].id)
@@ -274,7 +274,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'Full-text search on lessons',
-    () => supabase
+    async () => supabase
       .from('lessons')
       .select('*')
       .textSearch('search_vector', 'programming development')
@@ -288,7 +288,7 @@ async function runPerformanceTests(testData: any) {
   for (let page = 0; page < 3; page++) {
     results.push(await measureQuery(
       `Paginated user progress (page ${page + 1})`,
-      () => supabase
+      async () => supabase
         .from('user_progress')
         .select('*', { count: 'exact' })
         .order('updated_at', { ascending: false })
@@ -301,7 +301,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'User learning stats (materialized view)',
-    () => supabase
+    async () => supabase
       .from('user_learning_stats')
       .select('*')
       .order('total_xp_earned', { ascending: false })
@@ -310,7 +310,7 @@ async function runPerformanceTests(testData: any) {
   
   results.push(await measureQuery(
     'Lesson analytics (materialized view)',
-    () => supabase
+    async () => supabase
       .from('lesson_analytics')
       .select('*')
       .order('completion_rate', { ascending: false })

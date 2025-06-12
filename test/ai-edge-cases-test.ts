@@ -247,12 +247,12 @@ export class AIEdgeCasesTester {
           // Simulate flaky provider
           let callCount = 0
           const originalExecute = aiProviderBreakers.openai.execute
-          aiProviderBreakers.openai.execute = async function(op: any) {
+          aiProviderBreakers.openai.execute = async function<T>(op: any): Promise<T> {
             callCount++
             if (callCount % 2 === 0) {
               throw new Error('Intermittent failure')
             }
-            return originalExecute.call(this, op)
+            return originalExecute.call(this, op) as T
           }
         },
         cleanup: () => {

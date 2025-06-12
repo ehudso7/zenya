@@ -97,7 +97,7 @@ export async function GET() {
         reason: 'No authenticated user'
       })
     }
-  } catch (error) {
+  } catch (_error) {
     tests.push({
       name: 'RLS policy test',
       status: 'passed',

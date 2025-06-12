@@ -35,7 +35,7 @@ export function usePusherCollaboration(options: UseCollaborationOptions) {
   })
   
   const clientRef = useRef<PusherWebSocketClient | null>(null)
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>()
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const reconnectAttemptsRef = useRef(0)
 
   // Initialize Pusher client

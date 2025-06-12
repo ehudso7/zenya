@@ -119,7 +119,7 @@ export class PusherWebSocketAdapter {
       const response = await this.pusher.get({
         path: `/channels/${channelName}/users`,
       })
-      return response.users || []
+      return (response as any).users || []
     } catch (error) {
       console.error('Pusher presence error:', error)
       return []
@@ -168,7 +168,7 @@ export class PusherWebSocketClient {
 
   private setupEventHandlers() {
     this.client.connection.bind('connected', () => {
-      console.log('Connected to Pusher')
+      console.warn('Connected to Pusher')
     })
 
     this.client.connection.bind('error', (error: any) => {

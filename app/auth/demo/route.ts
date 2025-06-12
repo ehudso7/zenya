@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     
     // If sign in failed, try to create demo account
     if (signInError) {
-      console.log('Demo account sign in failed, attempting to create...')
+      console.error('Demo account sign in failed, attempting to create...')
       
       // Create demo account
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -48,7 +48,7 @@ export async function GET(request: Request) {
         await new Promise(resolve => setTimeout(resolve, 1000))
         
         // Try to sign in again
-        const { data: finalSignIn, error: finalError } = await supabase.auth.signInWithPassword({
+        const { data: finalSignIn, error: _finalError } = await supabase.auth.signInWithPassword({
           email: DEMO_EMAIL,
           password: DEMO_PASSWORD,
         })

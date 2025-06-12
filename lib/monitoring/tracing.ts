@@ -3,8 +3,8 @@
  * God-Tier observability with comprehensive trace collection
  */
 
-import { NodeSDK } from '@opentelemetry/sdk-node'
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
+// import { NodeSDK } from '@opentelemetry/sdk-node'
+// import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 // import { JaegerExporter } from '@opentelemetry/exporter-jaeger' // Not compatible with Next.js edge runtime
@@ -27,7 +27,7 @@ export function initializeTracing() {
   const environment = process.env.NODE_ENV || 'development'
 
   // Configure resource attributes
-  const resource = new Resource({
+  const _resource = new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
     [SemanticResourceAttributes.SERVICE_VERSION]: serviceVersion,
     [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: environment,
@@ -57,39 +57,39 @@ export function initializeTracing() {
   //   )
   // }
 
-  // Create SDK
-  const sdk = new NodeSDK({
-    resource,
-    instrumentations: [
-      getNodeAutoInstrumentations({
-        // Customize instrumentation
-        '@opentelemetry/instrumentation-fs': {
-          enabled: false // Disable filesystem instrumentation to reduce noise
-        },
-        '@opentelemetry/instrumentation-http': {
-          enabled: true,
-          requestHook: (span, request) => {
-            const req = request as any
-            if (req.headers) {
-              span.setAttributes({
-                'http.user_agent': req.headers['user-agent'],
-                'http.x_forwarded_for': req.headers['x-forwarded-for']
-              })
-            }
-          }
-        },
-        '@opentelemetry/instrumentation-express': {
-          enabled: true
-        }
-      })
-    ],
-    // Span processor configuration handled by SDK internally
-  })
+  // Disable SDK for now due to Next.js compatibility issues
+  // const sdk = new NodeSDK({
+  //   resource,
+  //   instrumentations: [
+  //     getNodeAutoInstrumentations({
+  //       // Customize instrumentation
+  //       '@opentelemetry/instrumentation-fs': {
+  //         enabled: false // Disable filesystem instrumentation to reduce noise
+  //       },
+  //       '@opentelemetry/instrumentation-http': {
+  //         enabled: true,
+  //         requestHook: (span, request) => {
+  //           const req = request as any
+  //           if (req.headers) {
+  //             span.setAttributes({
+  //               'http.user_agent': req.headers['user-agent'],
+  //               'http.x_forwarded_for': req.headers['x-forwarded-for']
+  //             })
+  //           }
+  //         }
+  //       },
+  //       '@opentelemetry/instrumentation-express': {
+  //         enabled: true
+  //       }
+  //     })
+  //   ],
+  //   // Span processor configuration handled by SDK internally
+  // })
 
   try {
-    sdk.start()
+    // sdk.start()
     tracer = trace.getTracer(serviceName, serviceVersion)
-    console.log('✅ OpenTelemetry tracing initialized')
+    console.log('✅ OpenTelemetry tracing initialized (limited mode)')
   } catch (error) {
     console.warn('⚠️ Failed to initialize tracing:', error)
   }

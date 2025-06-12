@@ -27,8 +27,8 @@ export function CDNScriptLoader({
   onError,
   fallbackSrc,
 }: CDNScriptLoaderProps) {
-  const [loaded, setLoaded] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
+  const [_loaded, setLoaded] = useState(false)
+  const [_error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
     const script = document.createElement('script')
@@ -48,7 +48,7 @@ export function CDNScriptLoader({
       onLoad?.()
     }
 
-    const handleError = (e: ErrorEvent) => {
+    const handleError = (_e: ErrorEvent) => {
       const error = new Error(`Failed to load script: ${cdnUrl}`)
       setError(error)
       

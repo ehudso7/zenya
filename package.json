@@ -92,6 +92,8 @@
     "next": "^15.3.3",
     "nodemailer": "^7.0.3",
     "openai": "^5.0.1",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.5.2",

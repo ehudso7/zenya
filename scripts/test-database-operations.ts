@@ -121,8 +121,10 @@ async function testDatabaseSchema() {
       schema_name: 'public'
     }).single()
     
-    if (indexes) {
+    if (indexes && Array.isArray(indexes)) {
       log(`Total indexes found: ${indexes.length}`, 'info')
+    } else if (indexes) {
+      log(`Indexes found (non-array format)`, 'info')
     }
     
   } catch (error) {
@@ -271,7 +273,7 @@ async function testQueryPerformance() {
     // 1. User progress lookup
     const { result: progressResult, time: progressTime } = await measureQueryTime(
       'User progress lookup',
-      () => adminClient
+      async () => adminClient
         .from('user_progress')
         .select('*, lessons(*), curriculums(*)')
         .eq('user_id', randomUUID())
@@ -282,7 +284,7 @@ async function testQueryPerformance() {
     // 2. Lesson search with full-text
     const { time: searchTime } = await measureQueryTime(
       'Full-text lesson search',
-      () => adminClient
+      async () => adminClient
         .from('lessons')
         .select('*')
         .textSearch('search_vector', 'javascript programming')
@@ -293,7 +295,7 @@ async function testQueryPerformance() {
     // 3. User learning stats aggregation
     const { time: statsTime } = await measureQueryTime(
       'User learning statistics',
-      () => adminClient
+      async () => adminClient
         .from('user_learning_stats')
         .select('*')
         .limit(1)
@@ -303,7 +305,7 @@ async function testQueryPerformance() {
     // 4. Complex join query
     const { time: joinTime } = await measureQueryTime(
       'Complex join query',
-      () => adminClient
+      async () => adminClient
         .from('user_sessions')
         .select(`
           *,
@@ -324,15 +326,15 @@ async function testQueryPerformance() {
     const indexedQueries = [
       {
         name: 'Indexed user lookup',
-        query: () => adminClient.from('users').select('*').eq('email', 'test@example.com')
+        query: async () => adminClient.from('users').select('*').eq('email', 'test@example.com')
       },
       {
         name: 'Indexed progress by status',
-        query: () => adminClient.from('user_progress').select('*').eq('status', 'completed').limit(10)
+        query: async () => adminClient.from('user_progress').select('*').eq('status', 'completed').limit(10)
       },
       {
         name: 'Indexed lesson by curriculum',
-        query: () => adminClient.from('lessons').select('*').eq('curriculum_id', randomUUID()).order('order_index')
+        query: async () => adminClient.from('lessons').select('*').eq('curriculum_id', randomUUID()).order('order_index')
       }
     ]
     
@@ -627,7 +629,7 @@ async function testSupabaseFeatures() {
     const requests = Array.from({ length: concurrentRequests }, (_, i) => 
       measureQueryTime(
         `Request ${i}`,
-        () => adminClient.from('users').select('id').limit(1)
+        async () => adminClient.from('users').select('id').limit(1)
       )
     )
     

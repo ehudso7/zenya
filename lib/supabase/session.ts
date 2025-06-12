@@ -107,9 +107,9 @@ export function setupSessionRecovery() {
   const supabase = getSupabaseClient()
   
   // Listen for auth state changes
-  supabase.auth.onAuthStateChange(async (event, session) => {
+  supabase.auth.onAuthStateChange(async (event: any, _session: any) => {
     if (event === 'TOKEN_REFRESHED') {
-      console.log('Session token refreshed')
+      console.warn('Session token refreshed')
     } else if (event === 'SIGNED_OUT') {
       // Ensure complete cleanup
       await signOut()

@@ -10,8 +10,8 @@ import toast from 'react-hot-toast'
 import { signOut } from '@/lib/supabase/session'
 
 interface LogoutButtonProps {
-  variant?: 'default' | 'ghost' | 'outline'
-  size?: 'default' | 'sm' | 'lg' | 'icon'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'premium' | 'glass'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   showIcon?: boolean
   showText?: boolean
   className?: string
@@ -19,14 +19,14 @@ interface LogoutButtonProps {
 
 export function LogoutButton({ 
   variant = 'ghost', 
-  size = 'default',
+  size = 'md',
   showIcon = true,
   showText = true,
   className 
 }: LogoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const resetStore = useStore(state => state.reset)
+  const clearUser = useStore(state => state.clearUser)
   const supabase = createClientComponentClient()
 
   const handleLogout = async () => {
@@ -44,7 +44,7 @@ export function LogoutButton({
       await signOut()
       
       // Reset store
-      resetStore()
+      clearUser()
       
       // Show success message
       toast.success('Signed out successfully')

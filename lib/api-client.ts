@@ -46,9 +46,9 @@ export async function apiClient<T = any>(
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), timeout)
       
-      const headers: HeadersInit = {
+      const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        ...fetchOptions.headers,
+        ...fetchOptions.headers as Record<string, string>,
       }
       
       // Add CSRF token for state-changing operations

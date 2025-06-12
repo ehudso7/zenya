@@ -23,7 +23,7 @@ export async function createServerSupabaseClient() {
               httpOnly: true,
               path: '/',
             })
-          } catch (error) {
+          } catch (_error) {
             // The `set` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
@@ -41,7 +41,7 @@ export async function createServerSupabaseClient() {
               httpOnly: true,
               path: '/',
             })
-          } catch (error) {
+          } catch (_error) {
             // The `remove` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
@@ -79,7 +79,7 @@ export async function createServerSupabaseAdminClient() {
               httpOnly: true,
               path: '/',
             })
-          } catch (error) {
+          } catch (_error) {
             // Ignore cookie errors in Server Components
           }
         },
@@ -95,7 +95,7 @@ export async function createServerSupabaseAdminClient() {
               httpOnly: true,
               path: '/',
             })
-          } catch (error) {
+          } catch (_error) {
             // Ignore cookie errors in Server Components
           }
         },
