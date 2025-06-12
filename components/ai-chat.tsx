@@ -8,7 +8,7 @@ import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 import { api } from '@/lib/api-client'
-import { usePerformanceTracking, performanceMonitor } from '@/lib/monitoring/performance'
+// Performance tracking removed for client component compatibility
 import { VoiceInteraction } from './voice-interaction'
 
 interface Message {
@@ -26,7 +26,6 @@ interface AiChatProps {
 }
 
 export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiChatProps) {
-  const { trackRender } = usePerformanceTracking('AiChat')
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -40,10 +39,7 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
   const { user } = useStore()
   const userMood = user?.mood || 'focused'
 
-  // Track component render performance
-  useEffect(() => {
-    trackRender()
-  }, [trackRender])
+  // Component mounted successfully
   
   // Check AI status on mount
   useEffect(() => {

@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import toast from 'react-hot-toast'
-import { tracing } from '@/lib/monitoring/tracing'
-import { performanceMonitor } from '@/lib/monitoring/performance'
 
 interface VoiceInteractionProps {
   onTranscript: (text: string) => void
@@ -90,12 +88,7 @@ function useSpeechRecognition() {
         setError(event.error)
         setIsListening(false)
         
-        tracing.addEvent('voice_recognition_error', {
-          error: event.error,
-          timestamp: Date.now()
-        })
-
-        performanceMonitor.trackError(new Error(`Speech recognition error: ${event.error}`), 'voice_recognition')
+        console.warn('Speech recognition error:', event.error)
       }
 
       recognition.onend = () => {

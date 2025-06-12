@@ -5,7 +5,7 @@ import * as Sentry from '@sentry/nextjs'
 import { AlertCircle, RefreshCw, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { performanceMonitor } from '@/lib/monitoring/performance'
+// Performance monitoring removed for client component compatibility
 
 interface Props {
   children: React.ReactNode
@@ -57,18 +57,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
       Sentry.captureException(error)
     })
     
-    // Track error in performance monitoring
-    performanceMonitor.trackError(error, 'error_boundary')
-    performanceMonitor.trackMetric({
-      name: 'component_error',
-      value: 1,
-      unit: 'count',
-      metadata: {
-        errorName: error.name,
-        errorMessage: error.message.substring(0, 100),
-        componentStack: errorInfo.componentStack?.substring(0, 200) || 'unknown'
-      }
-    })
+    // Error logged to Sentry for monitoring
+    console.error('Error boundary caught error:', error.message)
   }
 
   handleReset = () => {

@@ -7,8 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
-import { tracing } from '@/lib/monitoring/tracing'
-import { performanceMonitor } from '@/lib/monitoring/performance'
 
 interface Participant {
   userId: string
@@ -93,18 +91,9 @@ function useCollaborativeWebSocket(sessionId: string, userId: string) {
         setIsConnected(true)
         reconnectAttempts.current = 0
         
-        performanceMonitor.trackMetric({
-          name: 'websocket_connected',
-          value: 1,
-          unit: 'count',
-          metadata: { sessionId, userId }
-        })
+        // Connected successfully
         
-        tracing.addEvent('websocket_connected', {
-          sessionId,
-          userId,
-          timestamp: Date.now()
-        })
+        console.log('🔌 WebSocket connected to session:', sessionId)
       }
 
       websocket.onmessage = (event) => {
@@ -132,7 +121,7 @@ function useCollaborativeWebSocket(sessionId: string, userId: string) {
 
       websocket.onerror = (error) => {
         console.error('WebSocket error:', error)
-        performanceMonitor.trackError(new Error('WebSocket connection error'), 'websocket')
+        console.error('WebSocket connection error')
       }
 
       setWs(websocket)
