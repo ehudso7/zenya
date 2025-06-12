@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Invited to Join Zenya AI</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 40px 0;">
+    <tr>
+      <td align="center">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07); overflow: hidden;">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 48px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">You're Invited! 🎊</h1>
+              <p style="margin: 12px 0 0 0; color: #e0e7ff; font-size: 18px; font-weight: 400;">Join Zenya AI's learning community</p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 48px 40px;">
+              <h2 style="margin: 0 0 24px 0; color: #1a202c; font-size: 24px; font-weight: 600;">Someone special wants you to join Zenya AI</h2>
+              
+              <p style="margin: 0 0 24px 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                Great news! You've been invited to experience the future of personalized learning with Zenya AI.
+              </p>
+              
+              <div style="margin: 32px 0; padding: 24px; background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-radius: 12px; border-left: 4px solid #667eea;">
+                <p style="margin: 0 0 8px 0; color: #2d3748; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                  Invited by:
+                </p>
+                <p style="margin: 0; color: #4a5568; font-size: 18px; font-weight: 500;">
+                  {{ .InviterName }} ({{ .InviterEmail }})
+                </p>
+                {{ if .PersonalMessage }}
+                <p style="margin: 16px 0 0 0; color: #4a5568; font-size: 15px; font-style: italic;">
+                  "{{ .PersonalMessage }}"
+                </p>
+                {{ end }}
+              </div>
+              
+              <p style="margin: 0 0 32px 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                Click the button below to accept your invitation and create your account:
+              </p>
+              
+              <!-- CTA Button -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="{{ .InvitationURL }}" style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; font-size: 18px; font-weight: 600; border-radius: 12px; box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.4); transition: all 0.3s ease;">
+                      Accept Invitation
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 32px 0 16px 0; color: #718096; font-size: 14px; line-height: 1.6;">
+                Or copy and paste this link in your browser:
+              </p>
+              
+              <p style="margin: 0 0 32px 0; padding: 16px; background-color: #f7fafc; border-radius: 8px; color: #4a5568; font-size: 14px; word-break: break-all; font-family: 'Courier New', monospace;">
+                {{ .InvitationURL }}
+              </p>
+              
+              <!-- Why Join Section -->
+              <div style="margin: 40px 0; padding: 32px; background-color: #f7fafc; border-radius: 12px;">
+                <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 18px; font-weight: 600;">Why join Zenya AI?</h3>
+                
+                <div style="display: table; width: 100%;">
+                  <div style="display: table-row;">
+                    <div style="display: table-cell; vertical-align: top; padding-right: 16px; color: #667eea; font-size: 24px;">🎯</div>
+                    <div style="display: table-cell; vertical-align: top;">
+                      <h4 style="margin: 0 0 8px 0; color: #2d3748; font-size: 16px; font-weight: 600;">Personalized Learning</h4>
+                      <p style="margin: 0 0 16px 0; color: #4a5568; font-size: 14px; line-height: 1.5;">AI-powered lessons that adapt to your unique learning style and pace</p>
+                    </div>
+                  </div>
+                  
+                  <div style="display: table-row;">
+                    <div style="display: table-cell; vertical-align: top; padding-right: 16px; color: #667eea; font-size: 24px;">🧠</div>
+                    <div style="display: table-cell; vertical-align: top;">
+                      <h4 style="margin: 0 0 8px 0; color: #2d3748; font-size: 16px; font-weight: 600;">Neurodiverse-Friendly</h4>
+                      <p style="margin: 0 0 16px 0; color: #4a5568; font-size: 14px; line-height: 1.5;">Designed specifically for ADHD and neurodiverse learners</p>
+                    </div>
+                  </div>
+                  
+                  <div style="display: table-row;">
+                    <div style="display: table-cell; vertical-align: top; padding-right: 16px; color: #667eea; font-size: 24px;">🏆</div>
+                    <div style="display: table-cell; vertical-align: top;">
+                      <h4 style="margin: 0 0 8px 0; color: #2d3748; font-size: 16px; font-weight: 600;">Gamified Experience</h4>
+                      <p style="margin: 0; color: #4a5568; font-size: 14px; line-height: 1.5;">Earn XP, unlock achievements, and track your progress</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <p style="margin: 0 0 8px 0; color: #718096; font-size: 14px; line-height: 1.6;">
+                This invitation will expire in 7 days.
+              </p>
+              
+              <p style="margin: 0; color: #718096; font-size: 14px; line-height: 1.6;">
+                If you don't know {{ .InviterName }} or don't want to join, you can safely ignore this email.
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 32px 40px; background-color: #f7fafc; border-top: 1px solid #e2e8f0;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <p style="margin: 0 0 16px 0; color: #718096; font-size: 14px;">
+                      Questions? <a href="https://zenyaai.com/about" style="color: #667eea; text-decoration: none; font-weight: 500;">Learn more about Zenya AI</a>
+                    </p>
+                    
+                    <p style="margin: 0 0 16px 0; color: #a0aec0; font-size: 13px;">
+                      © 2024 Zenya AI. All rights reserved.
+                    </p>
+                    
+                    <p style="margin: 0; color: #a0aec0; font-size: 12px;">
+                      <a href="https://zenyaai.com/privacy" style="color: #718096; text-decoration: none;">Privacy Policy</a> • 
+                      <a href="https://zenyaai.com/terms" style="color: #718096; text-decoration: none;">Terms of Service</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

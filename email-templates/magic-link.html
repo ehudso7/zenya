@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Zenya AI Magic Link</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 40px 0;">
+    <tr>
+      <td align="center">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07); overflow: hidden;">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 48px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">Your Magic Link ✨</h1>
+              <p style="margin: 12px 0 0 0; color: #e0e7ff; font-size: 18px; font-weight: 400;">Sign in to Zenya AI instantly</p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 48px 40px;">
+              <h2 style="margin: 0 0 24px 0; color: #1a202c; font-size: 24px; font-weight: 600;">Click to sign in instantly</h2>
+              
+              <p style="margin: 0 0 16px 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                Hi {{ .Email }},
+              </p>
+              
+              <p style="margin: 0 0 32px 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                We received a request to sign in to your Zenya AI account. Click the secure link below to access your account instantly - no password needed!
+              </p>
+              
+              <!-- CTA Button -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="{{ .MagicLink }}" style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; font-size: 18px; font-weight: 600; border-radius: 12px; box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.4); transition: all 0.3s ease;">
+                      Sign In to Zenya AI
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 32px 0 16px 0; color: #718096; font-size: 14px; line-height: 1.6;">
+                Or copy and paste this link in your browser:
+              </p>
+              
+              <p style="margin: 0 0 32px 0; padding: 16px; background-color: #f7fafc; border-radius: 8px; color: #4a5568; font-size: 14px; word-break: break-all; font-family: 'Courier New', monospace;">
+                {{ .MagicLink }}
+              </p>
+              
+              <!-- Security Notice -->
+              <div style="margin: 40px 0; padding: 24px; background-color: #fef5e7; border-radius: 12px; border-left: 4px solid #f6ad55;">
+                <h3 style="margin: 0 0 12px 0; color: #744210; font-size: 16px; font-weight: 600;">
+                  🔒 Security Notice
+                </h3>
+                <ul style="margin: 0; padding: 0 0 0 20px; color: #744210; font-size: 14px; line-height: 1.6;">
+                  <li style="margin-bottom: 8px;">This link will expire in <strong>15 minutes</strong> for your security</li>
+                  <li style="margin-bottom: 8px;">It can only be used <strong>once</strong></li>
+                  <li style="margin-bottom: 8px;">Request originated from: <strong>{{ .RequestIP }}</strong></li>
+                  <li>Time: <strong>{{ .RequestTime }}</strong></li>
+                </ul>
+              </div>
+              
+              <!-- Quick Tips -->
+              <div style="margin: 32px 0; padding: 24px; background-color: #f7fafc; border-radius: 12px;">
+                <h3 style="margin: 0 0 16px 0; color: #2d3748; font-size: 16px; font-weight: 600;">
+                  💡 Quick tip: Bookmark your dashboard
+                </h3>
+                <p style="margin: 0; color: #4a5568; font-size: 14px; line-height: 1.6;">
+                  Once you're signed in, bookmark your dashboard at <a href="https://zenyaai.com/learn" style="color: #667eea; text-decoration: none; font-weight: 500;">zenyaai.com/learn</a> for quick access to your lessons.
+                </p>
+              </div>
+              
+              <p style="margin: 0 0 8px 0; color: #718096; font-size: 14px; line-height: 1.6;">
+                <strong>Didn't request this?</strong> If you didn't try to sign in, you can safely ignore this email. Your account remains secure.
+              </p>
+              
+              <p style="margin: 0; color: #718096; font-size: 14px; line-height: 1.6;">
+                For added security, we recommend enabling two-factor authentication in your <a href="https://zenyaai.com/profile" style="color: #667eea; text-decoration: none;">account settings</a>.
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 32px 40px; background-color: #f7fafc; border-top: 1px solid #e2e8f0;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <p style="margin: 0 0 16px 0; color: #718096; font-size: 14px;">
+                      Having trouble? <a href="mailto:support@zenyaai.com" style="color: #667eea; text-decoration: none; font-weight: 500;">Contact support</a>
+                    </p>
+                    
+                    <p style="margin: 0 0 16px 0; color: #a0aec0; font-size: 13px;">
+                      © 2024 Zenya AI. All rights reserved.
+                    </p>
+                    
+                    <p style="margin: 0; color: #a0aec0; font-size: 12px;">
+                      <a href="https://zenyaai.com/privacy" style="color: #718096; text-decoration: none;">Privacy Policy</a> • 
+                      <a href="https://zenyaai.com/terms" style="color: #718096; text-decoration: none;">Terms of Service</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

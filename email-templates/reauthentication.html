@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Verification Required - Zenya AI</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 40px 0;">
+    <tr>
+      <td align="center">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07); overflow: hidden;">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 48px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">Security Check 🛡️</h1>
+              <p style="margin: 12px 0 0 0; color: #e0e7ff; font-size: 18px; font-weight: 400;">Verify your identity to continue</p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 48px 40px;">
+              <h2 style="margin: 0 0 24px 0; color: #1a202c; font-size: 24px; font-weight: 600;">Reauthentication required</h2>
+              
+              <p style="margin: 0 0 16px 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                Hi {{ .Email }},
+              </p>
+              
+              <p style="margin: 0 0 32px 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                For your security, we need to verify your identity before completing this sensitive action. This is an extra layer of protection for your account.
+              </p>
+              
+              <!-- Action Details -->
+              <div style="margin: 32px 0; padding: 24px; background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-radius: 12px;">
+                <h3 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 600;">
+                  Action Requiring Verification:
+                </h3>
+                <p style="margin: 0 0 16px 0; color: #4a5568; font-size: 15px; line-height: 1.6;">
+                  <strong>{{ .ActionDescription }}</strong>
+                </p>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="color: #718096; font-size: 14px;">
+                  <tr>
+                    <td style="padding: 4px 0;">
+                      <strong>Requested at:</strong> {{ .RequestTime }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0;">
+                      <strong>From device:</strong> {{ .DeviceInfo }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0;">
+                      <strong>Location:</strong> {{ .Location }}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              <p style="margin: 0 0 32px 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                Click the button below to verify your identity and proceed:
+              </p>
+              
+              <!-- CTA Button -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="{{ .ReauthURL }}" style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; font-size: 18px; font-weight: 600; border-radius: 12px; box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.4); transition: all 0.3s ease;">
+                      Verify & Continue
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 32px 0 16px 0; color: #718096; font-size: 14px; line-height: 1.6;">
+                Or copy and paste this link in your browser:
+              </p>
+              
+              <p style="margin: 0 0 32px 0; padding: 16px; background-color: #f7fafc; border-radius: 8px; color: #4a5568; font-size: 14px; word-break: break-all; font-family: 'Courier New', monospace;">
+                {{ .ReauthURL }}
+              </p>
+              
+              <!-- Security Alert -->
+              <div style="margin: 40px 0; padding: 24px; background-color: #fff5f5; border-radius: 12px; border-left: 4px solid #fc8181;">
+                <h3 style="margin: 0 0 12px 0; color: #742a2a; font-size: 16px; font-weight: 600;">
+                  🚨 Security Alert
+                </h3>
+                <p style="margin: 0 0 12px 0; color: #742a2a; font-size: 14px; line-height: 1.6;">
+                  <strong>This wasn't you?</strong> If you didn't attempt this action, your account may be compromised. Take these steps immediately:
+                </p>
+                <ol style="margin: 0; padding: 0 0 0 20px; color: #742a2a; font-size: 14px; line-height: 1.6;">
+                  <li style="margin-bottom: 8px;">Do NOT click the verification link</li>
+                  <li style="margin-bottom: 8px;"><a href="https://zenyaai.com/auth/reset-password" style="color: #e53e3e; font-weight: 600;">Reset your password immediately</a></li>
+                  <li style="margin-bottom: 8px;">Review your recent account activity</li>
+                  <li><a href="mailto:security@zenyaai.com" style="color: #e53e3e; font-weight: 600;">Contact our security team</a></li>
+                </ol>
+              </div>
+              
+              <!-- Why Reauthentication -->
+              <div style="margin: 32px 0; padding: 24px; background-color: #f7fafc; border-radius: 12px;">
+                <h3 style="margin: 0 0 16px 0; color: #2d3748; font-size: 16px; font-weight: 600;">
+                  🔐 Why am I seeing this?
+                </h3>
+                <p style="margin: 0 0 12px 0; color: #4a5568; font-size: 14px; line-height: 1.6;">
+                  We require reauthentication for sensitive actions to protect your account:
+                </p>
+                <ul style="margin: 0; padding: 0 0 0 20px; color: #4a5568; font-size: 14px; line-height: 1.6;">
+                  <li style="margin-bottom: 8px;">Changing account security settings</li>
+                  <li style="margin-bottom: 8px;">Accessing sensitive personal data</li>
+                  <li style="margin-bottom: 8px;">Modifying payment information</li>
+                  <li style="margin-bottom: 8px;">Deleting your account or data</li>
+                  <li>Unusual activity detected on your account</li>
+                </ul>
+              </div>
+              
+              <p style="margin: 0 0 8px 0; color: #718096; font-size: 14px; line-height: 1.6;">
+                This verification link expires in <strong>10 minutes</strong> and can only be used once.
+              </p>
+              
+              <p style="margin: 0; color: #718096; font-size: 14px; line-height: 1.6;">
+                Learn more about <a href="https://zenyaai.com/security" style="color: #667eea; text-decoration: none; font-weight: 500;">how we protect your account</a>.
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 32px 40px; background-color: #f7fafc; border-top: 1px solid #e2e8f0;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <p style="margin: 0 0 16px 0; color: #718096; font-size: 14px;">
+                      Security concerns? <a href="mailto:security@zenyaai.com" style="color: #667eea; text-decoration: none; font-weight: 500;">Contact our security team</a>
+                    </p>
+                    
+                    <p style="margin: 0 0 16px 0; color: #a0aec0; font-size: 13px;">
+                      © 2024 Zenya AI. All rights reserved.
+                    </p>
+                    
+                    <p style="margin: 0; color: #a0aec0; font-size: 12px;">
+                      <a href="https://zenyaai.com/privacy" style="color: #718096; text-decoration: none;">Privacy Policy</a> • 
+                      <a href="https://zenyaai.com/terms" style="color: #718096; text-decoration: none;">Terms of Service</a> • 
+                      <a href="https://zenyaai.com/security" style="color: #718096; text-decoration: none;">Security</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
