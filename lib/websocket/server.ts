@@ -6,7 +6,7 @@
 import { WebSocketServer, WebSocket } from 'ws'
 import { IncomingMessage } from 'http'
 import { parse } from 'url'
-import { verify } from 'jsonwebtoken'
+// import { verify } from 'jsonwebtoken' - not needed
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { tracing } from '@/lib/monitoring/tracing'
 import { performanceMonitor } from '@/lib/monitoring/performance'
@@ -101,7 +101,7 @@ export class CollaborativeWebSocketServer {
       this.handleConnection(ws, request)
     })
 
-    console.log('✅ Collaborative WebSocket server initialized')
+    // Collaborative WebSocket server initialized
   }
 
   private async verifyClient(info: { req: IncomingMessage }): Promise<boolean> {
@@ -191,7 +191,7 @@ export class CollaborativeWebSocketServer {
         }
       })
 
-      console.log(`👥 User ${userId} connected to session ${sessionId}`)
+      // User connected to session
       
     } catch (error) {
       tracing.recordException(error as Error, {
@@ -500,7 +500,7 @@ export class CollaborativeWebSocketServer {
 
     this.userConnections.delete(ws.userId)
     
-    console.log(`👋 User ${ws.userId} disconnected from session ${ws.sessionId}`)
+    // User disconnected from session
   }
 
   private handleError(ws: AuthenticatedWebSocket, error: Error) {

@@ -355,7 +355,7 @@ export function AdaptiveRecommendations({
                           onClick={() => applyRecommendation(recommendation)}
                           disabled={isApplied}
                           size="sm"
-                          variant={isApplied ? 'secondary' : 'default'}
+                          variant={isApplied ? 'secondary' : 'primary'}
                         >
                           {isApplied ? '✓ Applied' : 'Apply'}
                         </Button>
@@ -377,7 +377,7 @@ export function AdaptiveRecommendations({
         <CardContent className="pt-0">
           <div className="flex flex-wrap gap-2">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={() => recordLearningEvent({
                 conceptId: 'quick_review',
@@ -392,7 +392,7 @@ export function AdaptiveRecommendations({
             </Button>
             
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={() => recordLearningEvent({
                 conceptId: 'practice_session',
@@ -407,7 +407,7 @@ export function AdaptiveRecommendations({
             </Button>
             
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={loadAdaptiveData}
             >

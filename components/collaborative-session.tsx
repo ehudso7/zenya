@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Users, Share, Mic, MicOff, Video, VideoOff, MessageSquare, PenTool, Eye, EyeOff } from 'lucide-react'
+import { Users, Share, Mic, MicOff, Video, VideoOff, MessageSquare, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
+import { performanceMonitor } from '@/lib/monitoring/client-performance'
 
 interface Participant {
   userId: string
@@ -61,7 +62,7 @@ interface CollaborativeSessionProps {
 }
 
 // WebSocket hook for real-time collaboration
-function useCollaborativeWebSocket(sessionId: string, userId: string) {
+function useCollaborativeWebSocket(sessionId: string, _userId: string) {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const [participants, setParticipants] = useState<Participant[]>([])
@@ -72,7 +73,7 @@ function useCollaborativeWebSocket(sessionId: string, userId: string) {
     whiteboard: []
   })
   
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>()
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const reconnectAttempts = useRef(0)
   const maxReconnectAttempts = 5
 
@@ -87,13 +88,20 @@ function useCollaborativeWebSocket(sessionId: string, userId: string) {
       const websocket = new WebSocket(wsUrl)
       
       websocket.onopen = () => {
-        console.log('🔗 Connected to collaborative session')
+        // Connected to collaborative session - logged
         setIsConnected(true)
         reconnectAttempts.current = 0
         
         // Connected successfully
         
-        console.log('🔌 WebSocket connected to session:', sessionId)
+        performanceMonitor.trackMetric({
+          name: 'websocket_connected',
+          value: 1,
+          unit: 'count',
+          metadata: { sessionId }
+        })
+        
+        // WebSocket connected to session - tracked
       }
 
       websocket.onmessage = (event) => {
@@ -106,7 +114,7 @@ function useCollaborativeWebSocket(sessionId: string, userId: string) {
       }
 
       websocket.onclose = (event) => {
-        console.log('🔌 WebSocket connection closed:', event.code, event.reason)
+        console.error(`WebSocket connection closed: ${event.code} ${event.reason}`)
         setIsConnected(false)
         
         // Attempt to reconnect unless explicitly closed
@@ -121,7 +129,7 @@ function useCollaborativeWebSocket(sessionId: string, userId: string) {
 
       websocket.onerror = (error) => {
         console.error('WebSocket error:', error)
-        console.error('WebSocket connection error')
+        performanceMonitor.trackError(new Error('WebSocket connection error'), 'websocket')
       }
 
       setWs(websocket)
@@ -130,7 +138,7 @@ function useCollaborativeWebSocket(sessionId: string, userId: string) {
       console.error('Failed to connect to WebSocket:', error)
       toast.error('Failed to join collaborative session')
     }
-  }, [sessionId, userId])
+  }, [sessionId])
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -207,7 +215,7 @@ function useCollaborativeWebSocket(sessionId: string, userId: string) {
         break
 
       case 'lesson_context_updated':
-        toast.info(`Lesson changed: ${message.lessonTitle}`)
+        toast(`Lesson changed: ${message.lessonTitle}`, { icon: 'ℹ️' })
         break
 
       case 'typing_indicator':
@@ -220,7 +228,7 @@ function useCollaborativeWebSocket(sessionId: string, userId: string) {
         break
 
       default:
-        console.log('Unknown WebSocket message type:', message.type)
+        console.error(`Unknown WebSocket message type: ${message.type}`)
     }
   }
 
@@ -253,7 +261,7 @@ export function CollaborativeSession({
   const [isVideoEnabled, setIsVideoEnabled] = useState(false)
   const [isScreenSharing, setIsScreenSharing] = useState(false)
   const [newNote, setNewNote] = useState('')
-  const [notePosition, setNotePosition] = useState({ x: 0, y: 0 })
+  const [notePosition] = useState({ x: 0, y: 0 })
   
   const containerRef = useRef<HTMLDivElement>(null)
   const cursorTrackingRef = useRef<boolean>(false)
@@ -373,12 +381,12 @@ export function CollaborativeSession({
         // Handle stream end
         stream.getVideoTracks()[0].onended = () => {
           setIsScreenSharing(false)
-          toast.info('Screen sharing stopped')
+          toast('Screen sharing stopped', { icon: 'ℹ️' })
         }
       } else {
         setIsScreenSharing(false)
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to start screen sharing')
     }
   }
@@ -399,7 +407,7 @@ export function CollaborativeSession({
             
             <div className="flex items-center gap-2">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => setShowCursors(!showCursors)}
               >
@@ -408,7 +416,7 @@ export function CollaborativeSession({
               </Button>
               
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => setShowParticipants(!showParticipants)}
               >
@@ -422,7 +430,7 @@ export function CollaborativeSession({
         <CardContent className="pt-0">
           <div className="flex items-center gap-2">
             <Button
-              variant={isVoiceMuted ? 'outline' : 'default'}
+              variant={isVoiceMuted ? 'ghost' : 'primary'}
               size="sm"
               onClick={handleVoiceToggle}
             >
@@ -430,7 +438,7 @@ export function CollaborativeSession({
             </Button>
             
             <Button
-              variant={isVideoEnabled ? 'default' : 'outline'}
+              variant={isVideoEnabled ? 'primary' : 'ghost'}
               size="sm"
               onClick={() => setIsVideoEnabled(!isVideoEnabled)}
             >
@@ -438,7 +446,7 @@ export function CollaborativeSession({
             </Button>
             
             <Button
-              variant={isScreenSharing ? 'default' : 'outline'}
+              variant={isScreenSharing ? 'primary' : 'ghost'}
               size="sm"
               onClick={handleScreenShare}
             >

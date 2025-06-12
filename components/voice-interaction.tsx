@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Mic, MicOff, Volume2, VolumeX, Play, Pause, RotateCcw } from 'lucide-react'
+import { Mic, MicOff, Volume2, VolumeX, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import toast from 'react-hot-toast'
+import { performanceMonitor } from '@/lib/monitoring/client-performance'
 
 interface VoiceInteractionProps {
   onTranscript: (text: string) => void
@@ -25,7 +26,7 @@ function useSpeechRecognition() {
   const [error, setError] = useState<string | null>(null)
   
   const recognitionRef = useRef<any>(null)
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     // Check for browser support
@@ -88,7 +89,7 @@ function useSpeechRecognition() {
         setError(event.error)
         setIsListening(false)
         
-        console.warn('Speech recognition error:', event.error)
+        console.error('Speech recognition error:', event.error)
       }
 
       recognition.onend = () => {
@@ -109,7 +110,7 @@ function useSpeechRecognition() {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [])
+  }, [isListening])
 
   const startListening = useCallback(() => {
     if (recognitionRef.current && !isListening) {
@@ -188,18 +189,7 @@ function useTextToSpeech() {
   const speak = useCallback(async (text: string) => {
     if (!isSupported || !text.trim()) return
 
-    return tracing.traceOperation(
-      'voice_synthesis',
-      async (span) => {
-        span.setAttributes({
-          'voice.text_length': text.length,
-          'voice.selected_voice': selectedVoice?.name || 'default',
-          'voice.rate': rate,
-          'voice.pitch': pitch,
-          'voice.volume': volume
-        })
-
-        return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
           // Cancel any ongoing speech
           speechSynthesis.cancel()
 
@@ -211,7 +201,7 @@ function useTextToSpeech() {
 
           utterance.onstart = () => {
             setIsSpeaking(true)
-            span.addEvent('speech_started')
+            // Speech started
             performanceMonitor.trackMetric({
               name: 'voice_synthesis_started',
               value: 1,
@@ -225,7 +215,7 @@ function useTextToSpeech() {
 
           utterance.onend = () => {
             setIsSpeaking(false)
-            span.addEvent('speech_completed')
+            // Speech completed
             performanceMonitor.trackMetric({
               name: 'voice_synthesis_completed',
               value: 1,
@@ -236,16 +226,14 @@ function useTextToSpeech() {
 
           utterance.onerror = (event) => {
             setIsSpeaking(false)
-            span.recordException(new Error(`Speech synthesis error: ${event.error}`))
+            // Speech synthesis error
             performanceMonitor.trackError(new Error(`Speech synthesis error: ${event.error}`), 'voice_synthesis')
             reject(new Error(`Speech synthesis failed: ${event.error}`))
           }
 
           utteranceRef.current = utterance
           speechSynthesis.speak(utterance)
-        })
-      }
-    )
+    })
   }, [isSupported, selectedVoice, rate, pitch, volume])
 
   const stop = useCallback(() => {
@@ -314,7 +302,7 @@ export function VoiceInteraction({
   } = useTextToSpeech()
 
   const [autoSpeak, setAutoSpeak] = useState(false)
-  const [visualMode, setVisualMode] = useState<'waveform' | 'circular'>('circular')
+  const [visualMode] = useState<'waveform' | 'circular'>('circular')
 
   // Handle speech recognition results
   useEffect(() => {
@@ -368,7 +356,7 @@ export function VoiceInteraction({
       if (isSpeaking) {
         stopSpeaking()
       } else {
-        speak(aiResponse).catch(error => {
+        speak(aiResponse).catch(_error => {
           toast.error('Failed to speak response')
         })
       }
@@ -397,7 +385,7 @@ export function VoiceInteraction({
               <Button
                 onClick={handleVoiceToggle}
                 disabled={disabled || isProcessing}
-                variant={isListening ? 'destructive' : 'default'}
+                variant={isListening ? 'danger' : 'primary'}
                 size="sm"
                 className="relative"
               >
@@ -422,7 +410,7 @@ export function VoiceInteraction({
               <Button
                 onClick={handleSpeakResponse}
                 disabled={disabled}
-                variant={isSpeaking ? 'destructive' : 'secondary'}
+                variant={isSpeaking ? 'danger' : 'secondary'}
                 size="sm"
               >
                 {isSpeaking ? (
@@ -442,7 +430,7 @@ export function VoiceInteraction({
             <Button
               onClick={resetTranscript}
               disabled={disabled || !transcript}
-              variant="outline"
+              variant="ghost"
               size="sm"
             >
               <RotateCcw className="w-4 h-4" />

@@ -123,7 +123,7 @@ export class SemanticSearchEngine {
 
   // Initialize embeddings for knowledge base
   private async initializeKnowledgeBase() {
-    console.log('🧠 Initializing semantic knowledge base...')
+    // Initializing semantic knowledge base...
     
     for (const item of this.knowledgeBase) {
       const vector = await this.generateEmbedding(item.content)
@@ -142,7 +142,7 @@ export class SemanticSearchEngine {
       })
     }
     
-    console.log(`✅ Loaded ${this.embeddings.size} semantic embeddings`)
+    // Loaded semantic embeddings
   }
 
   // Build concept relationship graph
@@ -336,7 +336,7 @@ export class SemanticSearchEngine {
           return (b.similarity + boostB) - (a.similarity + boostA)
         })
 
-        const finalResults = results.slice(0, limit).map(({ id, ...rest }) => rest)
+        const finalResults = results.slice(0, limit).map(({ id: _id, ...rest }) => rest)
 
         span.setAttributes({
           'search.results_found': results.length,

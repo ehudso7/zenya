@@ -155,7 +155,7 @@ export class AdaptiveLearningEngine {
 
   constructor() {
     this.initializeModelWeights()
-    console.log('🧠 Adaptive Learning Engine initialized')
+    // Adaptive Learning Engine initialized
   }
 
   private initializeModelWeights() {
@@ -453,7 +453,7 @@ export class AdaptiveLearningEngine {
   }
 
   // Determine learning style based on performance patterns
-  private determineLearningStyle(data: LearningDataPoint[]): 'visual' | 'auditory' | 'kinesthetic' | 'reading' | 'mixed' {
+  private determineLearningStyle(_data: LearningDataPoint[]): 'visual' | 'auditory' | 'kinesthetic' | 'reading' | 'mixed' {
     // This is simplified - in reality would analyze interaction patterns
     // For now, return mixed as we don't have detailed interaction data
     return 'mixed'
@@ -859,7 +859,7 @@ export class AdaptiveLearningEngine {
   // Generate content recommendations
   private generateContentRecommendation(
     profile: UserLearningProfile,
-    recentData: LearningDataPoint[]
+    _recentData: LearningDataPoint[]
   ): AdaptiveRecommendation | null {
     if (profile.strongAreas.length === 0 && profile.improvementAreas.length === 0) return null
 

@@ -8,7 +8,7 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger'
-import { ConsoleSpanExporter, BatchSpanProcessor } from '@opentelemetry/sdk-trace-node'
+import { ConsoleSpanExporter, BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
 import { trace, context, SpanStatusCode, SpanKind } from '@opentelemetry/api'
 import { performanceMonitor } from './performance'
 
@@ -69,10 +69,13 @@ export function initializeTracing() {
         '@opentelemetry/instrumentation-http': {
           enabled: true,
           requestHook: (span, request) => {
-            span.setAttributes({
-              'http.user_agent': request.headers['user-agent'],
-              'http.x_forwarded_for': request.headers['x-forwarded-for']
-            })
+            const req = request as any
+            if (req.headers) {
+              span.setAttributes({
+                'http.user_agent': req.headers['user-agent'],
+                'http.x_forwarded_for': req.headers['x-forwarded-for']
+              })
+            }
           }
         },
         '@opentelemetry/instrumentation-express': {
@@ -80,16 +83,7 @@ export function initializeTracing() {
         }
       })
     ],
-    spanProcessor: new BatchSpanProcessor(
-      // Use first available exporter
-      exporters[0] || new ConsoleSpanExporter(),
-      {
-        maxExportBatchSize: 512,
-        maxQueueSize: 2048,
-        scheduledDelayMillis: 1000,
-        exportTimeoutMillis: 30000
-      }
-    )
+    // Span processor configuration handled by SDK internally
   })
 
   try {

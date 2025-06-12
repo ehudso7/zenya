@@ -314,7 +314,7 @@ async function generateSmartResponse(
       const enhancedResponse = semanticContext ? {
         ...response,
         suggestions: [
-          ...response.suggestions,
+          ...(response.suggestions || []),
           ...semanticContext.suggestions.slice(0, 2)
         ]
       } : response
@@ -377,7 +377,7 @@ export async function POST(request: NextRequest) {
       const semanticContext = await semanticSearch.enhancedSearch({
         query: message,
         userId: user.id,
-        difficulty: user.mood === 'overwhelmed' ? 3 : 5,
+        difficulty: mood === '😴' ? 3 : 5,
         includeExamples: true,
         limit: 3
       })

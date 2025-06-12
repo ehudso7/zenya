@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
 interface ServiceWorkerManager {
@@ -18,33 +18,50 @@ export function ServiceWorkerManager() {
     cacheSize: 0
   })
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      registerServiceWorker()
+  const getCacheSize = useCallback(() => {
+    if (sw.registration?.active) {
+      const messageChannel = new MessageChannel()
+      
+      messageChannel.port1.onmessage = (event) => {
+        setSw(prev => ({ ...prev, cacheSize: event.data.size }))
+      }
+      
+      sw.registration.active.postMessage(
+        { type: 'GET_CACHE_SIZE' },
+        [messageChannel.port2]
+      )
     }
+  }, [sw.registration?.active])
 
-    // Online/offline detection
-    const handleOnline = () => {
-      setSw(prev => ({ ...prev, isOnline: true }))
-      toast.success('Connection restored! Syncing offline actions...')
-      syncOfflineActions()
+  const clearCache = useCallback(async () => {
+    if (sw.registration?.active) {
+      sw.registration.active.postMessage({ type: 'CLEAR_CACHE' })
+      toast.success('Cache cleared successfully')
+      getCacheSize()
     }
+  }, [sw.registration?.active, getCacheSize])
 
-    const handleOffline = () => {
-      setSw(prev => ({ ...prev, isOnline: false }))
-      toast.info('You\'re offline. Don\'t worry, your progress is saved!')
+  const preloadContent = useCallback(async (urls: string[]) => {
+    if (sw.registration?.active) {
+      sw.registration.active.postMessage({
+        type: 'CACHE_URLS',
+        data: { urls }
+      })
+      toast.success('Content cached for offline use')
     }
+  }, [sw.registration?.active])
 
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
-
-    return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
+  const syncOfflineActions = useCallback(async () => {
+    if (sw.registration && 'sync' in sw.registration) {
+      try {
+        await (sw.registration as any).sync.register('background-sync')
+      } catch (error) {
+        console.warn('Background sync not supported:', error)
+      }
     }
-  }, [])
+  }, [sw.registration])
 
-  const registerServiceWorker = async () => {
+  const registerServiceWorker = useCallback(async () => {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js', {
         scope: '/'
@@ -84,7 +101,7 @@ export function ServiceWorkerManager() {
         }
       })
 
-      console.log('✅ Service Worker registered successfully')
+      // Service Worker registered successfully
       
       // Get initial cache size
       getCacheSize()
@@ -92,55 +109,38 @@ export function ServiceWorkerManager() {
     } catch (error) {
       console.error('❌ Service Worker registration failed:', error)
     }
-  }
+  }, [getCacheSize])
 
-  const updateServiceWorker = () => {
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      registerServiceWorker()
+    }
+
+    // Online/offline detection
+    const handleOnline = () => {
+      setSw(prev => ({ ...prev, isOnline: true }))
+      toast.success('Connection restored! Syncing offline actions...')
+      syncOfflineActions()
+    }
+
+    const handleOffline = () => {
+      setSw(prev => ({ ...prev, isOnline: false }))
+      toast('You\'re offline. Don\'t worry, your progress is saved!', { icon: 'ℹ️' })
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [registerServiceWorker, syncOfflineActions])
+
+  const _updateServiceWorker = () => {
     if (sw.registration?.waiting) {
       sw.registration.waiting.postMessage({ type: 'SKIP_WAITING' })
       window.location.reload()
-    }
-  }
-
-  const syncOfflineActions = async () => {
-    if (sw.registration?.sync) {
-      try {
-        await sw.registration.sync.register('background-sync')
-      } catch (error) {
-        console.warn('Background sync not supported:', error)
-      }
-    }
-  }
-
-  const getCacheSize = () => {
-    if (sw.registration?.active) {
-      const messageChannel = new MessageChannel()
-      
-      messageChannel.port1.onmessage = (event) => {
-        setSw(prev => ({ ...prev, cacheSize: event.data.size }))
-      }
-      
-      sw.registration.active.postMessage(
-        { type: 'GET_CACHE_SIZE' },
-        [messageChannel.port2]
-      )
-    }
-  }
-
-  const clearCache = async () => {
-    if (sw.registration?.active) {
-      sw.registration.active.postMessage({ type: 'CLEAR_CACHE' })
-      toast.success('Cache cleared successfully')
-      getCacheSize()
-    }
-  }
-
-  const preloadContent = async (urls: string[]) => {
-    if (sw.registration?.active) {
-      sw.registration.active.postMessage({
-        type: 'CACHE_URLS',
-        data: { urls }
-      })
-      toast.success('Content cached for offline use')
     }
   }
 
@@ -153,7 +153,7 @@ export function ServiceWorkerManager() {
       isOnline: sw.isOnline,
       cacheSize: sw.cacheSize
     }
-  }, [sw])
+  }, [sw, preloadContent, clearCache, getCacheSize])
 
   return null // This is a utility component with no UI
 }

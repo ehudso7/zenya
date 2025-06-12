@@ -8,7 +8,7 @@ import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 import { api } from '@/lib/api-client'
-// Performance tracking removed for client component compatibility
+import { performanceMonitor } from '@/lib/monitoring/client-performance'
 import { VoiceInteraction } from './voice-interaction'
 
 interface Message {
@@ -291,7 +291,7 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
         </div>
         
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={() => setShowVoiceInput(!showVoiceInput)}
           className="ml-2"
