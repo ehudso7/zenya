@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Mail, Lock, Loader, ArrowLeft, LogIn, UserPlus, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -18,6 +18,14 @@ export default function SignInPasswordPage() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
+  const searchParams = useSearchParams()
+  
+  useEffect(() => {
+    // Check if mode=register in URL
+    if (searchParams.get('mode') === 'register') {
+      setIsSignUp(true)
+    }
+  }, [searchParams])
   const [emailConfirmationRequired, setEmailConfirmationRequired] = useState(false)
   const [lastSignupEmail, setLastSignupEmail] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({})
@@ -83,12 +91,14 @@ export default function SignInPasswordPage() {
           // Redirect to profile setup
           router.refresh()
           router.push('/profile?onboarding=true')
-        } else if (profile?.onboarding_completed || profile?.profile_completed) {
+        } else if (profile) {
+          // Always redirect to /learn after successful sign-in
           router.refresh()
           router.push('/learn')
         } else {
+          // If no profile exists, create one and redirect to /learn
           router.refresh()
-          router.push('/profile?onboarding=true')
+          router.push('/learn')
         }
       }
     } catch (_error) {

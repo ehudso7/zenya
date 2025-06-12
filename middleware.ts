@@ -191,8 +191,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/landing', request.url))
   }
   
-  // If user is logged in and on landing page, redirect to learn page
-  if (session && request.nextUrl.pathname === '/landing') {
+  // If user is logged in and on landing or auth pages, redirect to learn page
+  if (session && (request.nextUrl.pathname === '/landing' || isAuthPage)) {
     return NextResponse.redirect(new URL('/learn', request.url))
   }
   

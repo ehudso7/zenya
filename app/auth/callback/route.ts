@@ -30,19 +30,8 @@ export async function GET(request: Request) {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (user) {
-      // Check if this is their first login
-      const { data: profile } = await supabase
-        .from('users')
-        .select('onboarding_completed')
-        .eq('id', user.id)
-        .single()
-
-      // Redirect based on onboarding status
-      if (profile?.onboarding_completed) {
-        return NextResponse.redirect(`${requestUrl.origin}/learn`)
-      } else {
-        return NextResponse.redirect(`${requestUrl.origin}/profile`)
-      }
+      // Always redirect to /learn after email confirmation
+      return NextResponse.redirect(`${requestUrl.origin}/learn`)
     }
   } catch (_error) {
     // Error will be monitored by error tracking service

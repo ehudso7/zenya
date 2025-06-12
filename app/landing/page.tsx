@@ -1,3 +1,5 @@
+'use client'
+
 import { Suspense } from 'react'
 import { ArrowRight, Brain, Sparkles, Target, Heart } from 'lucide-react'
 import Link from 'next/link'
@@ -6,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Navigation } from '@/components/navigation'
 import { InteractiveDemo } from './interactive-demo'
 import { WaitlistForm } from './waitlist-form'
+import { useRouter } from 'next/navigation'
 
 const features = [
   {
@@ -49,6 +52,7 @@ const testimonials = [
 ]
 
 export default function LandingPage() {
+  const router = useRouter()
 
   return (
     <div className="min-h-screen">
@@ -78,25 +82,23 @@ export default function LandingPage() {
             </p>
             <div className="pt-8 animate-scale-in">
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/auth/signin-password">
-                  <Button 
-                    size="lg" 
-                    className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl w-full sm:w-auto"
-                  >
-                    Get Started Free
-                    <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
-                  </Button>
-                </Link>
-                <Link href="/auth/signin-password">
-                  <Button 
-                    size="lg" 
-                    variant="glass" 
-                    className="text-lg px-10 py-6 rounded-2xl shadow-xl w-full sm:w-auto group relative overflow-hidden"
-                  >
-                    <span className="relative z-10">Sign In</span>
-                    <span className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  </Button>
-                </Link>
+                <Button 
+                  size="lg" 
+                  className="btn-premium text-lg px-10 py-6 rounded-2xl shadow-2xl w-full sm:w-auto"
+                  onClick={() => router.push('/auth/register')}
+                >
+                  Get Started Free
+                  <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="glass" 
+                  className="text-lg px-10 py-6 rounded-2xl shadow-xl w-full sm:w-auto group relative overflow-hidden"
+                  onClick={() => router.push('/auth/signin')}
+                >
+                  <span className="relative z-10">Sign In</span>
+                  <span className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                </Button>
               </div>
             </div>
           </div>

@@ -7,8 +7,8 @@ export default function RegisterPage() {
   const router = useRouter()
   
   useEffect(() => {
-    // Redirect to password-based sign in (which includes registration)
-    router.replace('/auth/signin-password')
+    // Redirect to password-based sign up with registration mode
+    router.replace('/auth/signin-password?mode=register')
   }, [router])
   
   return null
