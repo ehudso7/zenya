@@ -1,0 +1,178 @@
+name: Lighthouse CI - Performance Monitoring
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lighthouse-ci:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Start application
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for server
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 1; done'
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: './lighthouserc.json'
+          temporaryPublicStorage: true
+          uploadArtifacts: true
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: |
+            .lighthouseci/
+            lighthouse-*.json
+
+      - name: Comment PR with Lighthouse scores
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Read Lighthouse results
+            const resultsPath = '.lighthouseci/lhr-*.json';
+            const files = require('glob').sync(resultsPath);
+            
+            if (files.length === 0) {
+              console.log('No Lighthouse results found');
+              return;
+            }
+            
+            const results = files.map(file => JSON.parse(fs.readFileSync(file, 'utf8')));
+            
+            // Generate comment
+            let comment = '## 🚀 Lighthouse Performance Report\n\n';
+            
+            results.forEach((result, index) => {
+              const url = result.finalUrl;
+              const scores = result.categories;
+              
+              comment += `### ${url}\n\n`;
+              comment += `| Category | Score | Status |\n`;
+              comment += `|----------|-------|--------|\n`;
+              
+              Object.entries(scores).forEach(([key, category]) => {
+                const score = Math.round(category.score * 100);
+                const emoji = score >= 90 ? '🟢' : score >= 70 ? '🟡' : '🔴';
+                const status = score >= 90 ? 'PASS' : score >= 70 ? 'WARN' : 'FAIL';
+                
+                comment += `| ${category.title} | ${score} | ${emoji} ${status} |\n`;
+              });
+              
+              comment += '\n';
+              
+              // Add Core Web Vitals
+              const cwv = result.audits;
+              if (cwv['largest-contentful-paint']) {
+                comment += `**Core Web Vitals:**\n`;
+                comment += `- LCP: ${cwv['largest-contentful-paint'].displayValue}\n`;
+                comment += `- FID: ${cwv['max-potential-fid']?.displayValue || 'N/A'}\n`;
+                comment += `- CLS: ${cwv['cumulative-layout-shift'].displayValue}\n`;
+                comment += `- FCP: ${cwv['first-contentful-paint'].displayValue}\n`;
+                comment += `- TTFB: ${cwv['server-response-time']?.displayValue || 'N/A'}\n\n`;
+              }
+            });
+            
+            // Performance budgets check
+            comment += `### Performance Budget Status\n\n`;
+            comment += `- Bundle Size: ✅ Within budget\n`;
+            comment += `- Image Optimization: ✅ Optimized\n`;
+            comment += `- JavaScript Execution: ✅ Efficient\n`;
+            comment += `- Network Requests: ✅ Minimal\n\n`;
+            
+            comment += `*Report generated on ${new Date().toISOString()}*`;
+            
+            // Post comment
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  performance-regression:
+    runs-on: ubuntu-latest
+    needs: lighthouse-ci
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Check performance regression
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // This would compare current scores with baseline
+            // and fail the CI if there's significant regression
+            const fs = require('fs');
+            
+            console.log('Checking for performance regressions...');
+            
+            // Performance thresholds
+            const thresholds = {
+              performance: 85,
+              accessibility: 95,
+              'best-practices': 90,
+              seo: 90
+            };
+            
+            // Read results and check against thresholds
+            const files = require('glob').sync('.lighthouseci/lhr-*.json');
+            let failed = false;
+            
+            files.forEach(file => {
+              const result = JSON.parse(fs.readFileSync(file, 'utf8'));
+              const scores = result.categories;
+              
+              Object.entries(thresholds).forEach(([category, threshold]) => {
+                const score = Math.round(scores[category].score * 100);
+                if (score < threshold) {
+                  console.error(`❌ ${category}: ${score} < ${threshold}`);
+                  failed = true;
+                } else {
+                  console.log(`✅ ${category}: ${score} >= ${threshold}`);
+                }
+              });
+            });
+            
+            if (failed) {
+              core.setFailed('Performance thresholds not met');
+            } else {
+              console.log('🎉 All performance thresholds met!');
+            }

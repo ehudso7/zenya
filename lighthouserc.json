@@ -1,0 +1,130 @@
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "npm start",
+      "startServerReadyPattern": "ready on",
+      "startServerReadyTimeout": 60000,
+      "numberOfRuns": 3,
+      "url": [
+        "http://localhost:3000/",
+        "http://localhost:3000/landing",
+        "http://localhost:3000/learn",
+        "http://localhost:3000/auth/signin",
+        "http://localhost:3000/profile"
+      ],
+      "settings": {
+        "chromeFlags": "--no-sandbox --disable-dev-shm-usage",
+        "preset": "desktop",
+        "throttling": {
+          "cpuSlowdownMultiplier": 1,
+          "downloadThroughputKbps": 10240,
+          "uploadThroughputKbps": 10240,
+          "rttMs": 40
+        }
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", {"minScore": 0.85}],
+        "categories:accessibility": ["error", {"minScore": 0.95}],
+        "categories:best-practices": ["error", {"minScore": 0.90}],
+        "categories:seo": ["error", {"minScore": 0.90}],
+        "categories:pwa": ["warn", {"minScore": 0.80}]
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  },
+  "budgets": [
+    {
+      "path": "/*",
+      "timings": [
+        {
+          "metric": "first-contentful-paint",
+          "budget": 1800,
+          "tolerance": 200
+        },
+        {
+          "metric": "largest-contentful-paint", 
+          "budget": 2500,
+          "tolerance": 300
+        },
+        {
+          "metric": "cumulative-layout-shift",
+          "budget": 0.1,
+          "tolerance": 0.05
+        },
+        {
+          "metric": "total-blocking-time",
+          "budget": 200,
+          "tolerance": 50
+        },
+        {
+          "metric": "speed-index",
+          "budget": 3000,
+          "tolerance": 500
+        }
+      ],
+      "resourceSizes": [
+        {
+          "resourceType": "script",
+          "budget": 300,
+          "tolerance": 50
+        },
+        {
+          "resourceType": "stylesheet",
+          "budget": 50,
+          "tolerance": 10
+        },
+        {
+          "resourceType": "image",
+          "budget": 500,
+          "tolerance": 100
+        },
+        {
+          "resourceType": "document",
+          "budget": 50,
+          "tolerance": 10
+        },
+        {
+          "resourceType": "font",
+          "budget": 100,
+          "tolerance": 20
+        },
+        {
+          "resourceType": "other",
+          "budget": 100,
+          "tolerance": 20
+        },
+        {
+          "resourceType": "total",
+          "budget": 1000,
+          "tolerance": 200
+        }
+      ],
+      "resourceCounts": [
+        {
+          "resourceType": "total",
+          "budget": 50,
+          "tolerance": 10
+        },
+        {
+          "resourceType": "script",
+          "budget": 15,
+          "tolerance": 5
+        },
+        {
+          "resourceType": "stylesheet",
+          "budget": 5,
+          "tolerance": 2
+        },
+        {
+          "resourceType": "image",
+          "budget": 20,
+          "tolerance": 5
+        }
+      ]
+    }
+  ]
+}

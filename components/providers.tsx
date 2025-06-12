@@ -3,11 +3,13 @@
 import { Toaster } from 'react-hot-toast'
 import { ErrorBoundary } from './error-boundary'
 import { AuthProvider } from './auth-provider'
+import { ServiceWorkerManager } from './service-worker-manager'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
       <AuthProvider>
+        <ServiceWorkerManager />
         {children}
       </AuthProvider>
       <Toaster

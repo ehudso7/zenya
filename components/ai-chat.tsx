@@ -8,6 +8,8 @@ import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 import { api } from '@/lib/api-client'
+import { usePerformanceTracking, performanceMonitor } from '@/lib/monitoring/performance'
+import { VoiceInteraction } from './voice-interaction'
 
 interface Message {
   id: string
@@ -24,10 +26,13 @@ interface AiChatProps {
 }
 
 export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiChatProps) {
+  const { trackRender } = usePerformanceTracking('AiChat')
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [aiStatus, setAiStatus] = useState<'online' | 'degraded' | 'offline'>('online')
+  const [showVoiceInput, setShowVoiceInput] = useState(false)
+  const [currentResponse, setCurrentResponse] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
@@ -35,6 +40,11 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
   const { user } = useStore()
   const userMood = user?.mood || 'focused'
 
+  // Track component render performance
+  useEffect(() => {
+    trackRender()
+  }, [trackRender])
+  
   // Check AI status on mount
   useEffect(() => {
     const checkAiStatus = async () => {
@@ -65,6 +75,10 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
     e.preventDefault()
     
     if (!input.trim() || isLoading) return
+    
+    // Track AI interaction start
+    const interactionStart = performance.now()
+    performanceMonitor.trackUserInteraction('ai_chat_message_sent', 'chat', 1)
     
     const userMessage: Message = {
       id: `msg-${Date.now()}`,
@@ -100,17 +114,48 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
       }
       
       setMessages(prev => [...prev, aiMessage])
+      setCurrentResponse(data.message) // Store for voice output
+      
+      // Track successful AI interaction
+      const interactionDuration = performance.now() - interactionStart
+      performanceMonitor.trackMetric({
+        name: 'ai_chat_interaction_success',
+        value: interactionDuration,
+        unit: 'ms',
+        metadata: {
+          lessonId: lessonId || 'general',
+          mood: userMood,
+          messageLength: userMessage.content.length,
+          responseLength: data.message.length
+        }
+      })
       
       // Award XP for engagement
       if (data.xpAwarded) {
         const addXP = useStore.getState().addXP
         addXP(data.xpAwarded)
         toast.success(`+${data.xpAwarded} XP for active learning!`)
+        
+        performanceMonitor.trackUserInteraction('xp_awarded', 'ai_chat', data.xpAwarded)
       }
     } catch (error: any) {
       if (error.name === 'AbortError') {
         return // Request was cancelled
       }
+      
+      // Track AI interaction failure
+      const interactionDuration = performance.now() - interactionStart
+      performanceMonitor.trackError(error, 'ai_chat_interaction')
+      performanceMonitor.trackMetric({
+        name: 'ai_chat_interaction_failure',
+        value: interactionDuration,
+        unit: 'ms',
+        metadata: {
+          errorType: error.name || 'unknown',
+          mood: userMood,
+          messageLength: userMessage.content.length
+        }
+      })
       
       // Error is already handled by api client with toast
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id))
@@ -231,22 +276,59 @@ export function AiChat({ lessonId, lessonContext, onSimplify, className }: AiCha
         <div ref={messagesEndRef} />
       </div>
       
-      {/* Quick Actions */}
-      <div className="px-4 py-2 flex gap-2 border-t border-gray-200 dark:border-gray-700">
-        {quickActions.map((action, index) => (
-          <Button
-            key={index}
-            variant="ghost"
-            size="sm"
-            onClick={action.action}
-            disabled={isLoading || aiStatus === 'offline'}
-            className="flex items-center gap-1"
-          >
-            <action.icon className="w-4 h-4" />
-            {action.label}
-          </Button>
-        ))}
+      {/* Voice Input Toggle */}
+      <div className="px-4 py-2 flex justify-between items-center border-t border-gray-200 dark:border-gray-700">
+        <div className="flex gap-2">
+          {quickActions.map((action, index) => (
+            <Button
+              key={index}
+              variant="ghost"
+              size="sm"
+              onClick={action.action}
+              disabled={isLoading || aiStatus === 'offline'}
+              className="flex items-center gap-1"
+            >
+              <action.icon className="w-4 h-4" />
+              {action.label}
+            </Button>
+          ))}
+        </div>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowVoiceInput(!showVoiceInput)}
+          className="ml-2"
+        >
+          🎤 Voice
+        </Button>
       </div>
+
+      {/* Voice Interaction Panel */}
+      {showVoiceInput && (
+        <div className="px-4 pb-4">
+          <VoiceInteraction
+            onTranscript={(text) => {
+              setInput(text)
+              // Auto-submit voice input
+              if (text.trim()) {
+                setTimeout(() => {
+                  if (inputRef.current) {
+                    inputRef.current.form?.requestSubmit()
+                  }
+                }, 500)
+              }
+            }}
+            onSpeechStart={() => {
+              // Clear current input when starting voice input
+              setInput('')
+            }}
+            aiResponse={currentResponse}
+            isProcessing={isLoading}
+            disabled={aiStatus === 'offline'}
+          />
+        </div>
+      )}
       
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700">

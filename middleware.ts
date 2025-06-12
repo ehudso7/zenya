@@ -2,8 +2,50 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isAuthorizedDomain, getDomainError, getAuthorizedOrigins } from '@/lib/domain-verification'
+import { detectSecurityThreats, getSecurityHeaders, generateCSP } from '@/lib/security'
+import { performanceMonitor } from '@/lib/monitoring/performance'
 
 export async function middleware(request: NextRequest) {
+  const startTime = performance.now()
+  
+  // Advanced security threat detection
+  const threatAnalysis = detectSecurityThreats(request)
+  
+  if (threatAnalysis.isThreat && threatAnalysis.riskScore > 80) {
+    // Block high-risk requests immediately
+    console.warn('Blocked high-risk request:', {
+      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+      userAgent: request.headers.get('user-agent'),
+      threats: threatAnalysis.reasons,
+      riskScore: threatAnalysis.riskScore,
+      path: request.nextUrl.pathname
+    })
+    
+    return new NextResponse(
+      JSON.stringify({
+        error: 'Request Blocked',
+        message: 'Security policy violation detected'
+      }),
+      {
+        status: 403,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Security-Block': 'true'
+        }
+      }
+    )
+  }
+  
+  // Log medium-risk requests for monitoring
+  if (threatAnalysis.isThreat && threatAnalysis.riskScore > 50) {
+    console.warn('Medium-risk request detected:', {
+      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+      threats: threatAnalysis.reasons,
+      riskScore: threatAnalysis.riskScore,
+      path: request.nextUrl.pathname
+    })
+  }
+  
   // Domain verification - ensure app only runs on authorized domains
   const hostname = request.headers.get('host') || request.headers.get('x-forwarded-host')
   
@@ -44,29 +86,21 @@ export async function middleware(request: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req: request, res })
   
-  // Add security headers
-  res.headers.set('X-Frame-Options', 'DENY')
-  res.headers.set('X-Content-Type-Options', 'nosniff')
-  res.headers.set('X-XSS-Protection', '1; mode=block')
-  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  // Apply comprehensive security headers
+  const securityHeaders = getSecurityHeaders()
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    res.headers.set(key, value)
+  })
   
-  // Content Security Policy
-  const csp = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.anthropic.com https://api.openai.com https://www.google-analytics.com",
-    "frame-src 'none'",
-    "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "upgrade-insecure-requests"
-  ].join('; ')
-  
+  // Generate dynamic Content Security Policy
+  const csp = generateCSP()
   res.headers.set('Content-Security-Policy', csp)
+  
+  // Add security monitoring headers
+  res.headers.set('X-Security-Score', threatAnalysis.riskScore.toString())
+  if (threatAnalysis.isThreat) {
+    res.headers.set('X-Security-Threats', threatAnalysis.reasons.join(','))
+  }
   
   // Add CORS headers for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
@@ -132,6 +166,22 @@ export async function middleware(request: NextRequest) {
   // If user is logged in and on landing page, redirect to learn page
   if (session && request.nextUrl.pathname === '/landing') {
     return NextResponse.redirect(new URL('/learn', request.url))
+  }
+  
+  // Track middleware performance
+  const duration = performance.now() - startTime
+  if (typeof window === 'undefined') {
+    // Server-side performance tracking
+    performanceMonitor.trackMetric({
+      name: 'middleware_duration',
+      value: duration,
+      unit: 'ms',
+      metadata: {
+        path: request.nextUrl.pathname,
+        method: request.method,
+        threatScore: threatAnalysis.riskScore
+      }
+    })
   }
   
   return res

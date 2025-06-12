@@ -15,6 +15,10 @@ import {
 } from '@/lib/ai/anthropic'
 import { aiRequestSchema } from '@/lib/validations'
 import { validateRequest } from '@/lib/validation-middleware'
+import { aiProviderBreakers, retryManager } from '@/lib/ai/circuit-breaker'
+import { trackAPICall, performanceMonitor } from '@/lib/monitoring/performance'
+import { tracing } from '@/lib/monitoring/tracing'
+import { semanticSearch } from '@/lib/ai/semantic-search'
 
 // Provider configuration
 interface ProviderConfig {
@@ -54,12 +58,13 @@ function incrementProviderUsage(providerName: string) {
   providerUsage.set(providerName, usage)
 }
 
-// OpenAI provider implementation
+// OpenAI provider implementation with circuit breaker
 async function generateOpenAIResponse(
   message: string,
   mood: Mood | null,
   context?: string
 ): Promise<AIResponse> {
+  return aiProviderBreakers.openai.execute(async () => {
   const openaiKey = process.env.OPENAI_API_KEY
   if (!openaiKey) {
     throw new Error('OpenAI API key not configured')
@@ -92,14 +97,16 @@ async function generateOpenAIResponse(
   } catch (_error) {
     throw _error
   }
+  })
 }
 
-// Anthropic provider implementation
+// Anthropic provider implementation with circuit breaker
 async function generateAnthropicResponse(
   message: string,
   mood: Mood | null,
   context?: string
 ): Promise<AIResponse> {
+  return aiProviderBreakers.anthropic.execute(async () => {
   const anthropicKey = process.env.ANTHROPIC_API_KEY
   if (!anthropicKey) {
     throw new Error('Anthropic API key not configured')
@@ -132,14 +139,16 @@ async function generateAnthropicResponse(
   } catch (_error) {
     throw _error
   }
+  })
 }
 
-// Hugging Face provider implementation
+// Hugging Face provider implementation with circuit breaker
 async function generateHuggingFaceResponse(
   message: string,
   mood: Mood | null,
   _context?: string
 ): Promise<AIResponse> {
+  return aiProviderBreakers.huggingface.execute(async () => {
   const token = process.env.HUGGINGFACE_API_KEY
   if (!token) {
     throw new Error('Hugging Face API key not configured')
@@ -164,14 +173,16 @@ async function generateHuggingFaceResponse(
   } catch (_error) {
     throw _error
   }
+  })
 }
 
-// Cohere provider implementation
+// Cohere provider implementation with circuit breaker
 async function generateCohereResponse(
   message: string,
   mood: Mood | null,
   _context?: string
 ): Promise<AIResponse> {
+  return aiProviderBreakers.cohere.execute(async () => {
   const apiKey = process.env.COHERE_API_KEY
   if (!apiKey) {
     throw new Error('Cohere API key not configured')
@@ -201,6 +212,7 @@ async function generateCohereResponse(
   } catch (_error) {
     throw _error
   }
+  })
 }
 
 // Define all available providers
@@ -235,11 +247,12 @@ const providers: ProviderConfig[] = [
   },
 ]
 
-// Smart provider selection with load balancing
+// Smart provider selection with load balancing and semantic context
 async function generateSmartResponse(
   message: string,
   mood: Mood | null,
-  context?: string
+  context?: string,
+  semanticContext?: any
 ): Promise<AIResponse & { provider: string }> {
   resetDailyLimits()
   
@@ -275,19 +288,38 @@ async function generateSmartResponse(
   if (selectedProvider) {
     try {
       incrementProviderUsage(selectedProvider.name)
-      const response = await selectedProvider.generate(message, mood, context)
+      
+      // Enhanced context with semantic search results
+      const enhancedContext = semanticContext ? 
+        `${context || ''}\n\nRelevant context from knowledge base:\n${
+          semanticContext.results.map((r: any) => 
+            `- ${r.content} (${r.context})`
+          ).join('\n')
+        }\n\nRelated concepts: ${semanticContext.context.relatedConcepts.join(', ')}` 
+        : context
+        
+      const response = await selectedProvider.generate(message, mood, enhancedContext)
       
       // If provider returns error message, try free alternatives
       if (response.message.includes('trouble connecting') && selectedProvider.cost === 'premium') {
         const freeAlternative = freeProviders[Math.floor(Math.random() * freeProviders.length)]
         if (freeAlternative) {
           incrementProviderUsage(freeAlternative.name)
-          const freeResponse = await freeAlternative.generate(message, mood, context)
+          const freeResponse = await freeAlternative.generate(message, mood, enhancedContext)
           return { ...freeResponse, provider: freeAlternative.name }
         }
       }
       
-      return { ...response, provider: selectedProvider.name }
+      // Add semantic suggestions to response
+      const enhancedResponse = semanticContext ? {
+        ...response,
+        suggestions: [
+          ...response.suggestions,
+          ...semanticContext.suggestions.slice(0, 2)
+        ]
+      } : response
+      
+      return { ...enhancedResponse, provider: selectedProvider.name }
     } catch (_error) {
       // Provider failed, will try fallback
       // Continue to fallback
@@ -317,7 +349,10 @@ function _getProviderStats() {
 
 export async function POST(request: NextRequest) {
   return withRateLimit(request, async (req) => {
+    return trackAPICall('/api/ai', 'POST', async () => {
     try {
+      const startTime = performance.now()
+      performanceMonitor.trackUserInteraction('ai_request_started')
       // Check authentication
       const supabase = await createServerSupabaseClient()
       const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -338,23 +373,107 @@ export async function POST(request: NextRequest) {
 
       const { message, mood, context } = data!
 
-      // Use smart provider selection with load balancing
-      const response = await generateSmartResponse(
-        message,
-        mood as Mood | null,
-        context
+      // Enhanced semantic search integration
+      const semanticContext = await semanticSearch.enhancedSearch({
+        query: message,
+        userId: user.id,
+        difficulty: user.mood === 'overwhelmed' ? 3 : 5,
+        includeExamples: true,
+        limit: 3
+      })
+
+      // Use smart provider selection with advanced retry logic and tracing
+      const response = await tracing.traceAIOperation(
+        'smart_provider',
+        'generate_response',
+        async (span) => {
+          span.setAttributes({
+            'ai.message_length': message.length,
+            'ai.mood': mood || 'none',
+            'ai.has_context': !!context,
+            'ai.semantic_results_count': semanticContext.results.length,
+            'ai.semantic_difficulty': semanticContext.context.difficulty
+          })
+
+          return await retryManager.execute(
+            () => generateSmartResponse(message, mood as Mood | null, context, semanticContext),
+            (error, attempt) => {
+              // Retry on rate limits and temporary failures
+              const shouldRetry = error.message.includes('rate limit') || 
+                                 error.message.includes('temporary') ||
+                                 error.message.includes('timeout')
+              
+              if (shouldRetry && attempt <= 3) {
+                span.addEvent('ai_request_retry', {
+                  'retry.attempt': attempt,
+                  'retry.error': error.message
+                })
+                
+                performanceMonitor.trackMetric({
+                  name: 'ai_request_retry',
+                  value: attempt,
+                  unit: 'count',
+                  metadata: { error: error.message, provider: 'unknown' }
+                })
+              }
+              
+              return shouldRetry && attempt <= 3
+            }
+          )
+        },
+        {
+          model: 'smart_routing',
+          promptTokens: message.length / 4 // Rough token estimate
+        }
       )
 
-      // Provider stats tracked internally
+      // Track performance metrics with trace context
+      const duration = performance.now() - startTime
+      const traceContext = tracing.getCurrentTraceContext()
+      
+      performanceMonitor.trackMetric({
+        name: 'ai_response_time',
+        value: duration,
+        unit: 'ms',
+        metadata: { 
+          provider: response.provider, 
+          mood: mood || 'none',
+          traceId: traceContext?.traceId || 'unknown'
+        }
+      })
+      
+      tracing.addAttributes({
+        'ai.response_provider': response.provider,
+        'ai.response_length': response.message.length,
+        'ai.suggestions_count': response.suggestions?.length || 0
+      })
+      
+      performanceMonitor.trackUserInteraction('ai_request_completed', response.provider, 1)
 
       return NextResponse.json(response)
     } catch (_error) {
-      // Error will be monitored by error tracking service
+      // Enhanced error tracking and monitoring with tracing
+      const error = _error as Error
+      
+      tracing.recordException(error, {
+        'error.component': 'ai_generation',
+        'error.operation': 'smart_provider_selection'
+      })
+      
+      performanceMonitor.trackError(error, 'ai_generation')
+      
+      console.error('AI generation failed:', {
+        error: error.message,
+        stack: error.stack?.substring(0, 500),
+        timestamp: new Date().toISOString(),
+        traceId: tracing.getCurrentTraceContext()?.traceId || 'unknown'
+      })
       
       return NextResponse.json(
         { error: 'Failed to generate response' },
         { status: 500 }
       )
     }
+    })
   }, 'ai')
 }

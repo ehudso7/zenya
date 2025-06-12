@@ -1,9 +1,11 @@
 'use client'
 
 import React from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { AlertCircle, RefreshCw, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { performanceMonitor } from '@/lib/monitoring/performance'
 
 interface Props {
   children: React.ReactNode
@@ -25,9 +27,48 @@ export class ErrorBoundary extends React.Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(_error: Error, _errorInfo: React.ErrorInfo) {
-    // Error will be reported to error tracking service
-    // In production, this would send to Sentry or similar
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Enhanced error reporting with context
+    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    
+    // Report to Sentry with additional context
+    Sentry.withScope(scope => {
+      scope.setTag('errorBoundary', true)
+      scope.setLevel('error')
+      scope.setContext('errorInfo', {
+        componentStack: errorInfo.componentStack,
+        errorBoundary: true,
+        timestamp: new Date().toISOString(),
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+        url: typeof window !== 'undefined' ? window.location.href : 'unknown'
+      })
+      
+      // Add breadcrumbs for better debugging
+      Sentry.addBreadcrumb({
+        message: 'Error boundary activated',
+        category: 'error',
+        level: 'error',
+        data: {
+          errorMessage: error.message,
+          errorName: error.name
+        }
+      })
+      
+      Sentry.captureException(error)
+    })
+    
+    // Track error in performance monitoring
+    performanceMonitor.trackError(error, 'error_boundary')
+    performanceMonitor.trackMetric({
+      name: 'component_error',
+      value: 1,
+      unit: 'count',
+      metadata: {
+        errorName: error.name,
+        errorMessage: error.message.substring(0, 100),
+        componentStack: errorInfo.componentStack?.substring(0, 200) || 'unknown'
+      }
+    })
   }
 
   handleReset = () => {
