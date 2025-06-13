@@ -1,4 +1,5 @@
 import { toast } from 'react-hot-toast'
+import { debugLogger } from './debug-logger'
 
 interface ApiOptions extends RequestInit {
   retries?: number
@@ -42,6 +43,8 @@ export async function apiClient<T = any>(
 
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
+      debugLogger.api(fetchOptions.method || 'GET', url, fetchOptions.body, { attempt: attempt + 1 })
+      
       // Create AbortController for timeout
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), timeout)
@@ -71,6 +74,11 @@ export async function apiClient<T = any>(
 
       if (!response.ok) {
         const errorData = isJson ? await response.json() : await response.text()
+        debugLogger.api(fetchOptions.method || 'GET', url, fetchOptions.body, {
+          status: response.status,
+          error: errorData,
+          attempt: attempt + 1
+        })
         throw new ApiError(
           errorData.message || errorData.error || `HTTP ${response.status} error`,
           response.status,
@@ -79,6 +87,11 @@ export async function apiClient<T = any>(
       }
 
       const data = isJson ? await response.json() : await response.text()
+      debugLogger.api(fetchOptions.method || 'GET', url, undefined, {
+        status: response.status,
+        success: true,
+        responseType: isJson ? 'json' : 'text'
+      })
       return data as T
     } catch (_error) {
       lastError = _error as Error

@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import toast from 'react-hot-toast'
 import { performanceMonitor } from '@/lib/monitoring/client-performance'
+import { debugLogger } from '@/lib/debug-logger'
 
 interface VoiceInteractionProps {
   onTranscript: (text: string) => void
@@ -44,6 +45,7 @@ function useSpeechRecognition() {
       recognition.onstart = () => {
         setIsListening(true)
         setError(null)
+        debugLogger.voice('recognition_started', { isListening: true })
         performanceMonitor.trackMetric({
           name: 'voice_recognition_started',
           value: 1,
@@ -88,12 +90,13 @@ function useSpeechRecognition() {
       recognition.onerror = (event: any) => {
         setError(event.error)
         setIsListening(false)
-        
+        debugLogger.voice('recognition_error', { error: event.error, isListening: false })
         console.error('Speech recognition error:', event.error)
       }
 
       recognition.onend = () => {
         setIsListening(false)
+        debugLogger.voice('recognition_ended', { isListening: false })
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current)
         }
@@ -113,18 +116,34 @@ function useSpeechRecognition() {
   }, [isListening])
 
   const startListening = useCallback(() => {
+    debugLogger.voice('start_listening_called', { hasRecognition: !!recognitionRef.current, isListening })
     if (recognitionRef.current && !isListening) {
       setTranscript('')
       setError(null)
-      recognitionRef.current.start()
+      try {
+        recognitionRef.current.start()
+        debugLogger.voice('recognition_start_initiated')
+      } catch (error) {
+        debugLogger.voice('recognition_start_failed', { error: error?.message })
+        setError('Failed to start listening')
+      }
     }
   }, [isListening])
 
   const stopListening = useCallback(() => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop()
+    debugLogger.voice('stop_listening_called', { hasRecognition: !!recognitionRef.current, isListening })
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop()
+        setIsListening(false)
+        debugLogger.voice('recognition_stop_initiated')
+      } catch (error) {
+        console.error('Error stopping speech recognition:', error)
+        debugLogger.voice('recognition_stop_failed', { error: error?.message })
+        setIsListening(false)
+      }
     }
-  }, [isListening])
+  }, [])
 
   const resetTranscript = useCallback(() => {
     setTranscript('')
@@ -343,6 +362,7 @@ export function VoiceInteraction({
   }, [isListening, onSpeechStart, onSpeechEnd])
 
   const handleVoiceToggle = () => {
+    debugLogger.voice('voice_toggle_clicked', { isListening, isProcessing })
     if (isListening) {
       stopListening()
     } else {
