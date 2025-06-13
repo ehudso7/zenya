@@ -737,16 +737,63 @@ html {
    FIX FOR UI INTERACTION ISSUES
    =========================================== */
 
-/* Ensure mood selector buttons have proper z-index */
+/* Ensure mood selector buttons have proper z-index and isolation */
 .mood-button {
   position: relative;
   z-index: 10;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+/* Fix backdrop-filter interference with clicks */
+.mood-button::before {
+  content: none !important;
 }
 
 /* Ensure all interactive elements are clickable */
 button:not(:disabled) {
   cursor: pointer !important;
   pointer-events: auto !important;
+}
+
+/* Fix mood selector specific hover issues */
+.mood-button {
+  position: relative !important;
+  z-index: 50 !important;
+  isolation: isolate !important;
+  transform-style: flat !important;
+  -webkit-transform-style: flat !important;
+  will-change: transform, box-shadow;
+}
+
+/* Prevent child elements from interfering with clicks */
+.mood-button > * {
+  pointer-events: none !important;
+}
+
+/* Only apply hover to the specific button being hovered */
+.mood-button:not(:hover) {
+  transform: translateY(0) scale(1) !important;
+}
+
+/* Prevent hover state from sticking on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .mood-button:hover {
+    transform: none !important;
+    background-color: inherit !important;
+  }
+}
+
+/* Fix for multiple buttons receiving hover state */
+.mood-button:hover:not(:active) {
+  z-index: 60 !important;
+}
+
+/* Ensure click feedback works */
+.mood-button:active {
+  transform: scale(0.95) !important;
+  z-index: 70 !important;
 }
 
 /* Fix mobile touch issues specifically */
