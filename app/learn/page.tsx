@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import AppNavigation from '@/components/app-navigation'
 import { useStore } from '@/lib/store'
 import { api } from '@/lib/api-client'
+import type { Mood } from '@/types'
 
 // Dynamic imports for heavy components
 const MoodSelector = dynamic(() => import('@/components/mood-selector'), {
@@ -72,6 +73,7 @@ export default function LearnPage() {
   const [curricula, setCurricula] = useState<Curriculum[]>([])
   const [_loading, setLoading] = useState(true)
   const [userStats, setUserStats] = useState({ lessonsCompleted: 0 })
+  const [selectedMood, setSelectedMood] = useState<Mood | null>(null)
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -81,6 +83,10 @@ export default function LearnPage() {
         await fetchCurricula()
         if (user) {
           await fetchUserStats()
+          // Sync mood if user has one but local state doesn't
+          if (user.mood && !selectedMood) {
+            setSelectedMood(user.mood)
+          }
         }
       } catch (_error) {
         // Error handled by individual fetch functions
@@ -92,7 +98,7 @@ export default function LearnPage() {
     return () => {
       abortController.abort()
     }
-  }, [user])
+  }, [user, selectedMood])
 
   const fetchCurricula = async () => {
     try {
@@ -121,6 +127,17 @@ export default function LearnPage() {
 
   const handleStartCurriculum = (curriculumSlug: string) => {
     router.push(`/learn/${curriculumSlug}`)
+  }
+
+  const handleMoodSelect = (mood: Mood) => {
+    setSelectedMood(mood)
+    
+    if (user) {
+      updateMood(mood)
+    } else {
+      // Store mood temporarily even if not logged in
+      // This allows the UI to update immediately
+    }
   }
 
   if (_loading) {
@@ -216,12 +233,12 @@ export default function LearnPage() {
             </CardHeader>
             <CardContent>
               <MoodSelector 
-                value={user?.mood || null}
-                onChange={updateMood}
+                value={selectedMood || user?.mood || null}
+                onChange={handleMoodSelect}
               />
-              {user?.mood && (
+              {(selectedMood || user?.mood) && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
-                  Great! We'll adjust the pace and content to match your {user.mood} mood.
+                  Great! We'll adjust the pace and content to match your {selectedMood || user?.mood} mood.
                 </p>
               )}
             </CardContent>
