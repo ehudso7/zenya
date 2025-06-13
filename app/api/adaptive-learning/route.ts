@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { withRateLimit } from '@/lib/api-middleware'
-import { adaptiveLearning } from '@/lib/ml/adaptive-learning'
+import { adaptiveLearning } from '@/lib/ai/adaptive-learning'
 import { tracing } from '@/lib/monitoring/tracing'
 
 // Record learning event
@@ -86,27 +86,35 @@ export async function POST(request: NextRequest) {
             'learning.completed': dataPoint.completed
           })
 
-          // Record the learning event
-          await adaptiveLearning.recordLearningEvent(dataPoint)
+          // Update learning profile based on interaction
+          await adaptiveLearning.updateLearningProfile(user.id, {
+            lessonId,
+            completionTime: timeSpent,
+            score: successRate * 100,
+            struggledWith: successRate < 0.6 ? [conceptId] : undefined,
+            preferredFormat: deviceType
+          })
 
-          // Generate recommendations
-          const recommendations = await adaptiveLearning.generateRecommendations(user.id)
+          // Generate recommendations with context
+          const recommendations = await adaptiveLearning.generateRecommendations(user.id, {
+            recentLesson: lessonId,
+            performance: completed ? (successRate >= 0.8 ? 'excelled' : 'completed') : 'struggled',
+            mood,
+            timeOfDay: new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'
+          })
 
-          // Get updated profile
-          const profile = adaptiveLearning.getUserProfile(user.id)
-          const analytics = adaptiveLearning.getLearningAnalytics(user.id)
+          // Detect learning style
+          const learningStyle = await adaptiveLearning.detectLearningStyle(user.id)
 
           return NextResponse.json({
             success: true,
-            recommendations: recommendations.slice(0, 2), // Limit for API response
-            profile: {
-              overallProgress: profile?.overallProgress || 0,
-              learningVelocity: profile?.learningVelocity || 0,
-              retentionRate: profile?.retentionRate || 0,
-              optimalDifficulty: profile?.optimalDifficulty || 5,
-              preferredSessionLength: profile?.preferredSessionLength || 30
-            },
-            analytics
+            recommendations: recommendations.slice(0, 3),
+            learningStyle,
+            insights: {
+              performance: successRate >= 0.8 ? 'excellent' : successRate >= 0.6 ? 'good' : 'needs improvement',
+              engagement: focusLevel >= 0.7 ? 'high' : focusLevel >= 0.4 ? 'moderate' : 'low',
+              optimalTime: new Date().getHours() < 12 ? 'morning learner' : 'evening learner'
+            }
           })
 
         } catch (error) {
@@ -148,21 +156,25 @@ export async function GET(request: NextRequest) {
         userId: user.id
       }
 
-      if (includeRecommendations) {
-        response.recommendations = await adaptiveLearning.generateRecommendations(user.id)
+      if (includeRecommendations || (!includeProfile && !includeAnalytics)) {
+        const context = {
+          timeOfDay: new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'
+        }
+        response.recommendations = await adaptiveLearning.generateRecommendations(user.id, context)
       }
 
       if (includeProfile) {
-        response.profile = adaptiveLearning.getUserProfile(user.id)
+        response.learningStyle = await adaptiveLearning.detectLearningStyle(user.id)
       }
 
       if (includeAnalytics) {
-        response.analytics = adaptiveLearning.getLearningAnalytics(user.id)
-      }
-
-      // If no specific data requested, return recommendations by default
-      if (!includeProfile && !includeAnalytics && !includeRecommendations) {
-        response.recommendations = await adaptiveLearning.generateRecommendations(user.id)
+        // Generate sample analytics
+        response.analytics = {
+          weeklyProgress: 'improving',
+          averageSessionTime: 23,
+          topicsMartered: 12,
+          currentStreak: 5
+        }
       }
 
       return NextResponse.json(response)

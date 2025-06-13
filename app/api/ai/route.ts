@@ -21,6 +21,7 @@ import { tracing } from '@/lib/monitoring/tracing'
 import { semanticSearch } from '@/lib/ai/semantic-search'
 import { ZenyaOpenAIProvider } from '@/lib/ai/zenya-openai-provider'
 import type { UserContext } from '@/lib/ai/zenya-model-config'
+import { protectPrompt } from '@/lib/security/prompt-protection'
 
 // Provider configuration
 interface ProviderConfig {
@@ -424,6 +425,36 @@ export async function POST(request: NextRequest) {
 
       const { message, mood, context } = data!
 
+      // Apply prompt protection
+      const { safe, prompt: processedPrompt, analysis } = await protectPrompt(
+        message,
+        user.id,
+        {
+          sanitize: true,
+          wrap: true,
+          context: `Educational assistance with mood: ${mood || 'neutral'}`
+        }
+      )
+
+      if (!safe) {
+        console.warn('Unsafe prompt detected:', {
+          userId: user.id,
+          riskScore: analysis.riskScore,
+          reasons: analysis.reasons
+        })
+        
+        return NextResponse.json({
+          message: "I'm here to help with educational content. Could you please rephrase your question in a way that relates to learning?",
+          tone: 'supportive',
+          suggestions: [
+            'Ask about a specific topic you want to learn',
+            'Request help with homework or studies',
+            'Explore a new subject area'
+          ],
+          warning: 'prompt_filtered'
+        })
+      }
+
       // Get user profile for model selection
       const { data: profile } = await supabase
         .from('users')
@@ -467,7 +498,7 @@ export async function POST(request: NextRequest) {
           })
 
           return await retryManager.execute(
-            () => generateSmartResponse(message, mood as Mood | null, context, semanticContext, userContext),
+            () => generateSmartResponse(processedPrompt, mood as Mood | null, context, semanticContext, userContext),
             (error, attempt) => {
               // Retry on rate limits and temporary failures
               const shouldRetry = error.message.includes('rate limit') || 
