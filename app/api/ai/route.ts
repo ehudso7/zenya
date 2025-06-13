@@ -19,12 +19,14 @@ import { aiProviderBreakers, retryManager } from '@/lib/ai/circuit-breaker'
 import { trackAPICall, performanceMonitor } from '@/lib/monitoring/performance'
 import { tracing } from '@/lib/monitoring/tracing'
 import { semanticSearch } from '@/lib/ai/semantic-search'
+import { ZenyaOpenAIProvider } from '@/lib/ai/zenya-openai-provider'
+import type { UserContext } from '@/lib/ai/zenya-model-config'
 
 // Provider configuration
 interface ProviderConfig {
   name: string
   isAvailable: () => boolean
-  generate: (message: string, mood: Mood | null, context?: string) => Promise<AIResponse>
+  generate: (message: string, mood: Mood | null, context?: string, userContext?: UserContext) => Promise<AIResponse>
   cost: 'premium' | 'low' | 'free'
   priority: number
 }
@@ -56,6 +58,47 @@ function incrementProviderUsage(providerName: string) {
   const usage = providerUsage.get(providerName) || { count: 0, lastReset: new Date() }
   usage.count++
   providerUsage.set(providerName, usage)
+}
+
+// Zenya Fine-tuned OpenAI provider instance
+const zenyaProvider = new ZenyaOpenAIProvider({
+  apiKey: process.env.OPENAI_API_KEY
+})
+
+// Zenya Fine-tuned provider implementation with circuit breaker
+async function generateZenyaResponse(
+  message: string,
+  mood: Mood | null,
+  context?: string,
+  userContext?: UserContext
+): Promise<AIResponse> {
+  return aiProviderBreakers.openai.execute(async () => {
+    const tone = mood ? openAIMoodToTone[mood] : 'encouraging'
+    const systemPrompt = getOpenAISystemPrompt(tone, context)
+    
+    try {
+      const responseContent = await zenyaProvider.chat(
+        [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message }
+        ],
+        {
+          user: userContext,
+          variant: 'zenya-chat',
+          temperature: 0.7,
+          maxTokens: 200
+        }
+      )
+
+      return {
+        message: responseContent,
+        tone: tone as AIResponse['tone'],
+        suggestions: generateSuggestions(message),
+      }
+    } catch (_error) {
+      throw _error
+    }
+  })
 }
 
 // OpenAI provider implementation with circuit breaker
@@ -218,6 +261,13 @@ async function generateCohereResponse(
 // Define all available providers
 const providers: ProviderConfig[] = [
   {
+    name: 'zenya',
+    isAvailable: () => !!process.env.OPENAI_API_KEY && process.env.ENABLE_FINE_TUNED_MODEL === 'true',
+    generate: generateZenyaResponse,
+    cost: 'premium',
+    priority: 0, // Highest priority when enabled
+  },
+  {
     name: 'openai',
     isAvailable: () => !!process.env.OPENAI_API_KEY,
     generate: generateOpenAIResponse,
@@ -252,7 +302,8 @@ async function generateSmartResponse(
   message: string,
   mood: Mood | null,
   context?: string,
-  semanticContext?: any
+  semanticContext?: any,
+  userContext?: UserContext
 ): Promise<AIResponse & { provider: string }> {
   resetDailyLimits()
   
@@ -298,14 +349,14 @@ async function generateSmartResponse(
         }\n\nRelated concepts: ${semanticContext.context.relatedConcepts.join(', ')}` 
         : context
         
-      const response = await selectedProvider.generate(message, mood, enhancedContext)
+      const response = await selectedProvider.generate(message, mood, enhancedContext, userContext)
       
       // If provider returns error message, try free alternatives
       if (response.message.includes('trouble connecting') && selectedProvider.cost === 'premium') {
         const freeAlternative = freeProviders[Math.floor(Math.random() * freeProviders.length)]
         if (freeAlternative) {
           incrementProviderUsage(freeAlternative.name)
-          const freeResponse = await freeAlternative.generate(message, mood, enhancedContext)
+          const freeResponse = await freeAlternative.generate(message, mood, enhancedContext, userContext)
           return { ...freeResponse, provider: freeAlternative.name }
         }
       }
@@ -373,6 +424,26 @@ export async function POST(request: NextRequest) {
 
       const { message, mood, context } = data!
 
+      // Get user profile for model selection
+      const { data: profile } = await supabase
+        .from('users')
+        .select('id, usage_score, xp, lessons_completed, total_lessons')
+        .eq('id', user.id)
+        .single()
+
+      // Calculate usage score if not present
+      const usageScore = profile?.usage_score || 
+        (profile ? Math.min(100, Math.floor((profile.lessons_completed / Math.max(1, profile.total_lessons)) * 100)) : 0)
+
+      // Create user context for model selection
+      const userContext: UserContext = {
+        id: user.id,
+        usageScore,
+        segment: usageScore >= 80 ? 'power-user' : usageScore >= 40 ? 'regular' : 'new',
+        persona: 'zenya', // Default persona for Zenya AI
+        abTestGroup: undefined // Will be determined by model selector
+      }
+
       // Enhanced semantic search integration
       const semanticContext = await semanticSearch.enhancedSearch({
         query: message,
@@ -396,7 +467,7 @@ export async function POST(request: NextRequest) {
           })
 
           return await retryManager.execute(
-            () => generateSmartResponse(message, mood as Mood | null, context, semanticContext),
+            () => generateSmartResponse(message, mood as Mood | null, context, semanticContext, userContext),
             (error, attempt) => {
               // Retry on rate limits and temporary failures
               const shouldRetry = error.message.includes('rate limit') || 

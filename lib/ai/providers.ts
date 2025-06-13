@@ -3,6 +3,7 @@
  */
 
 export { OpenAIProvider } from './openai-provider'
+export { ZenyaOpenAIProvider } from './zenya-openai-provider'
 export { AnthropicProvider } from './anthropic-provider'
 export { FreeModelProvider } from './free-provider'
 
