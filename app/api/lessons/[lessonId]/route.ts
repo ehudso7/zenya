@@ -8,8 +8,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
-  return withRateLimit(request, async (_req) => {
+  return withRateLimit(request, async (req) => {
     const { lessonId } = await params
+    const { searchParams } = new URL(req.url)
+    const mood = searchParams.get('mood') || 'neutral'
     
     try {
       const supabase = await createServerSupabaseClient()
@@ -66,18 +68,100 @@ export async function GET(
           started_at: new Date().toISOString()
         })
 
-        // Create a learning session
-        await supabase.from('user_sessions').insert({
+        // Create AI interaction for adaptive learning
+        await supabase.from('ai_interactions').insert({
           user_id: user.id,
           lesson_id: lessonId,
-          started_at: new Date().toISOString()
+          curriculum_id: lesson.curriculum_id,
+          message: 'Started lesson',
+          mood: mood,
+          interaction_type: 'lesson_start',
+          context: { user_mood: mood }
         })
+      }
+
+      // Adapt content based on mood
+      let adaptedContent = lesson.content
+      let adaptedContentBlocks = lesson.content_blocks
+
+      // Mood-based content adaptations
+      const moodAdaptations = {
+        excited: {
+          prefix: "🚀 Let's dive right in! ",
+          pacing: 'fast',
+          style: 'energetic',
+          extraContent: "\n\n💪 Challenge: Try to complete this lesson in record time!"
+        },
+        happy: {
+          prefix: "😊 Great to see you in high spirits! ",
+          pacing: 'moderate',
+          style: 'positive',
+          extraContent: "\n\n✨ Fun fact: Learning while happy improves retention by up to 30%!"
+        },
+        curious: {
+          prefix: "🔍 Let's explore this topic together! ",
+          pacing: 'detailed',
+          style: 'exploratory',
+          extraContent: "\n\n🤔 Think about: How does this connect to what you already know?"
+        },
+        focused: {
+          prefix: "🎯 Perfect mindset for deep learning. ",
+          pacing: 'structured',
+          style: 'precise',
+          extraContent: "\n\n📝 Pro tip: Take notes to maximize your focused state."
+        },
+        relaxed: {
+          prefix: "🌊 Let's take this at a comfortable pace. ",
+          pacing: 'slow',
+          style: 'gentle',
+          extraContent: "\n\n🧘 Remember: There's no rush. Understanding is more important than speed."
+        }
+      }
+
+      const adaptation = moodAdaptations[mood as keyof typeof moodAdaptations] || {
+        prefix: "",
+        pacing: 'moderate',
+        style: 'standard',
+        extraContent: ""
+      }
+
+      // Apply mood adaptations to content
+      if (adaptation.prefix) {
+        adaptedContent = adaptation.prefix + adaptedContent + adaptation.extraContent
+      }
+
+      // Adapt content blocks if they exist
+      if (adaptedContentBlocks && Array.isArray(adaptedContentBlocks)) {
+        adaptedContentBlocks = adaptedContentBlocks.map((block: any, index: number) => {
+          if (index === 0 && block.type === 'text') {
+            return {
+              ...block,
+              content: adaptation.prefix + block.content
+            }
+          }
+          return block
+        })
+
+        // Add mood-specific content block at the end
+        if (adaptation.extraContent) {
+          adaptedContentBlocks.push({
+            type: 'text',
+            content: adaptation.extraContent
+          })
+        }
       }
 
       return NextResponse.json({ 
         lesson: {
           ...lesson,
-          user_progress: progress
+          content: adaptedContent,
+          content_blocks: adaptedContentBlocks,
+          user_progress: progress,
+          mood_adaptation: {
+            mood: mood,
+            pacing: adaptation.pacing,
+            style: adaptation.style
+          }
         }
       }, {
         status: 200,

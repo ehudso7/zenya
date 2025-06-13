@@ -42,7 +42,7 @@ export class ZenyaOpenAIProvider implements AIProvider {
     
     // Log interaction start
     if (process.env.NODE_ENV === 'development') {
-      console.log('zenya.chat.started', {
+      console.error('zenya.chat.started', {
         requestId,
         userId: user?.id,
         model,
@@ -67,7 +67,7 @@ export class ZenyaOpenAIProvider implements AIProvider {
 
       // Log successful interaction in development
       if (process.env.NODE_ENV === 'development') {
-        console.log('zenya.chat.completed', {
+        console.error('zenya.chat.completed', {
           requestId,
           userId: user?.id,
           model,
@@ -142,7 +142,7 @@ export class ZenyaOpenAIProvider implements AIProvider {
       // If using fine-tuned model, retry with fallback
       if (isFineTuned && model !== this.fallbackModel) {
         if (process.env.NODE_ENV === 'development') {
-          console.log('zenya.chat.fallback', {
+          console.error('zenya.chat.fallback', {
             requestId,
             userId: user?.id,
             fromModel: model,

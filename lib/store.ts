@@ -26,6 +26,8 @@ interface StoreUser {
     mood?: string
   }
   profile_completed?: boolean
+  subscription_status?: string
+  role?: string
 }
 
 interface LessonSession {
