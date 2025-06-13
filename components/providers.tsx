@@ -4,12 +4,14 @@ import { Toaster } from 'react-hot-toast'
 import { ErrorBoundary } from './error-boundary'
 import { AuthProvider } from './auth-provider'
 import { ServiceWorkerManager } from './service-worker-manager'
+import { ClientErrorLogger } from './client-error-logger'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <ServiceWorkerManager />
+        <ClientErrorLogger />
         {children}
       </AuthProvider>
       <Toaster
