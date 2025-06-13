@@ -35,6 +35,7 @@ export default function DebugMonitor() {
 
       eventSource.onopen = () => {
         setIsConnected(true)
+        // eslint-disable-next-line no-console
         console.log('Debug stream connected')
       }
 
@@ -157,7 +158,7 @@ export default function DebugMonitor() {
                 </Button>
                 <Button
                   size="sm"
-                  variant="destructive"
+                  variant="danger"
                   onClick={clearLogs}
                   disabled={logs.length === 0}
                 >

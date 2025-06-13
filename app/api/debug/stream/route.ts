@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
       const heartbeat = setInterval(() => {
         try {
           controller.enqueue(encoder.encode(`:heartbeat ${Date.now()}\n\n`))
-        } catch (error) {
+        } catch (_error) {
           clearInterval(heartbeat)
           connections.delete(sessionId)
         }
@@ -64,14 +64,14 @@ export async function POST(req: NextRequest) {
     connections.forEach((controller, id) => {
       try {
         controller.enqueue(message)
-      } catch (error) {
+      } catch (_error) {
         // Remove dead connections
         connections.delete(id)
       }
     })
     
     return NextResponse.json({ success: true, connections: connections.size })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to broadcast debug message' }, { status: 500 })
   }
 }

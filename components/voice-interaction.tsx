@@ -124,7 +124,7 @@ function useSpeechRecognition() {
         recognitionRef.current.start()
         debugLogger.voice('recognition_start_initiated')
       } catch (error) {
-        debugLogger.voice('recognition_start_failed', { error: error?.message })
+        debugLogger.voice('recognition_start_failed', { error: error instanceof Error ? error.message : String(error) })
         setError('Failed to start listening')
       }
     }
@@ -139,11 +139,11 @@ function useSpeechRecognition() {
         debugLogger.voice('recognition_stop_initiated')
       } catch (error) {
         console.error('Error stopping speech recognition:', error)
-        debugLogger.voice('recognition_stop_failed', { error: error?.message })
+        debugLogger.voice('recognition_stop_failed', { error: error instanceof Error ? error.message : String(error) })
         setIsListening(false)
       }
     }
-  }, [])
+  }, [isListening])
 
   const resetTranscript = useCallback(() => {
     setTranscript('')

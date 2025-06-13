@@ -96,7 +96,7 @@ describe('Rate Limiting Integration', () => {
       
       // Function should not throw even without Redis config
       const request = createRequest()
-      expect(() => checkRateLimit(request, '/api/test')).not.toThrow()
+      expect(() => checkRateLimit(request, 'api')).not.toThrow()
       
       // Restore
       process.env.UPSTASH_REDIS_REST_URL = originalUrl

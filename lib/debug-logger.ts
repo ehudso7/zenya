@@ -50,6 +50,7 @@ class DebugLogger {
   // Log different types of events
   log(message: string, data?: any) {
     if (!this.enabled) return
+    // eslint-disable-next-line no-console
     console.log(`[DEBUG] ${message}`, data)
     this.sendToStream('log', { message, data })
   }
@@ -66,30 +67,35 @@ class DebugLogger {
 
   api(method: string, url: string, data?: any, response?: any) {
     if (!this.enabled) return
+    // eslint-disable-next-line no-console
     console.log(`[DEBUG API] ${method} ${url}`, { data, response })
     this.sendToStream('api', { method, url, data, response })
   }
 
   user(action: string, data?: any) {
     if (!this.enabled) return
+    // eslint-disable-next-line no-console
     console.log(`[DEBUG USER] ${action}`, data)
     this.sendToStream('user', { action, data })
   }
 
   performance(metric: string, value: number, metadata?: any) {
     if (!this.enabled) return
+    // eslint-disable-next-line no-console
     console.log(`[DEBUG PERF] ${metric}: ${value}ms`, metadata)
     this.sendToStream('performance', { metric, value, metadata })
   }
 
   state(component: string, state: any, action?: string) {
     if (!this.enabled) return
+    // eslint-disable-next-line no-console
     console.log(`[DEBUG STATE] ${component}${action ? ` - ${action}` : ''}`, state)
     this.sendToStream('state', { component, state, action })
   }
 
   voice(event: string, data?: any) {
     if (!this.enabled) return
+    // eslint-disable-next-line no-console
     console.log(`[DEBUG VOICE] ${event}`, data)
     this.sendToStream('voice', { event, data })
   }
