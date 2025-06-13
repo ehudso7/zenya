@@ -21,7 +21,6 @@ export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
   const [isAnimating, setIsAnimating] = useState(false)
   
   const handleMoodSelect = (mood: Mood) => {
-    console.log('Mood selected:', mood) // Debug log
     setIsAnimating(true)
     onChange(mood)
     setTimeout(() => setIsAnimating(false), 300)
