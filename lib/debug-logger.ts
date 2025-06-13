@@ -61,7 +61,9 @@ class DebugLogger {
   private async sendToStream(type: string, data: any) {
     // Always send errors, even if debug is disabled
     const isError = type === 'error' || data?.isError
-    if (!this.enabled && !isError || typeof window === 'undefined') return
+    if ((!this.enabled && !isError) || typeof window === 'undefined') {
+      return
+    }
 
     try {
       // Try the new broadcast endpoint first
@@ -98,13 +100,16 @@ class DebugLogger {
     this.sendToStream('error', { 
       message, 
       error: error?.message || error,
-      stack: error?.stack 
+      stack: error?.stack,
+      isError: true 
     })
   }
 
   api(method: string, url: string, data?: any, response?: any) {
     // Always log API errors even if debug is disabled
     const isError = response?.error || response?.status >= 400
+    
+    console.log(`[DebugLogger] API call:`, { method, url, isError, response })
     
     // Always send errors to stream regardless of enabled state
     if (isError) {
@@ -116,7 +121,8 @@ class DebugLogger {
         url, 
         data, 
         response,
-        error: response?.error || response?.message || `HTTP ${response?.status}` 
+        error: response?.error || response?.message || `HTTP ${response?.status}`,
+        isError: true 
       })
     } else if (this.enabled) {
       // eslint-disable-next-line no-console
