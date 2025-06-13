@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, BarChart3, Brain, LogOut, User, Menu, X } from 'lucide-react'
+import { BookOpen, LogOut, User, Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { toast } from 'react-hot-toast'
@@ -60,8 +60,6 @@ export default function AppNavigation() {
 
   const navItems = [
     { href: '/learn', label: 'Learn', icon: BookOpen },
-    { href: '/progress', label: 'Progress', icon: BarChart3 },
-    { href: '/insights', label: 'Insights', icon: Brain },
     { href: '/profile', label: 'Profile', icon: User },
   ]
 

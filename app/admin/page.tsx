@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { 
@@ -78,7 +80,9 @@ export default function AdminDashboard() {
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const router = useRouter()
+  const supabase = createClient()
 
   const fetchMetrics = async () => {
     try {
@@ -132,16 +136,47 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => {
-    fetchMetrics()
+    const checkAuth = async () => {
+      try {
+        // Check if user is authenticated
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        
+        if (authError || !user) {
+          router.push('/auth/signin')
+          return
+        }
 
-    // Set up auto-refresh every 30 seconds
-    const interval = setInterval(fetchMetrics, 30000)
-    setRefreshInterval(interval)
+        // Check if user has admin role
+        const { data: profile, error: profileError } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single()
 
-    return () => {
-      if (interval) clearInterval(interval)
+        if (profileError || !profile || profile.role !== 'admin') {
+          setError('You do not have permission to access this page')
+          setTimeout(() => router.push('/learn'), 2000)
+          return
+        }
+
+        setIsAdmin(true)
+        fetchMetrics()
+
+        // Set up auto-refresh every 30 seconds
+        const interval = setInterval(fetchMetrics, 30000)
+
+        return () => {
+          if (interval) clearInterval(interval)
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err)
+        setError('Authentication error')
+        setTimeout(() => router.push('/auth/signin'), 2000)
+      }
     }
-  }, [refreshInterval])
+
+    checkAuth()
+  }, [router, supabase])
 
   if (loading) {
     return (
@@ -167,7 +202,7 @@ export default function AdminDashboard() {
     )
   }
 
-  if (!metrics) {
+  if (!metrics || !isAdmin) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
