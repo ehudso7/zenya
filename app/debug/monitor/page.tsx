@@ -235,7 +235,13 @@ export default function DebugMonitor() {
                         </Badge>
                         <div className="flex-1 overflow-hidden">
                           <pre className="text-xs whitespace-pre-wrap break-all">
-                            {JSON.stringify(log.data, null, 2)}
+                            {(() => {
+                              try {
+                                return JSON.stringify(log.data, null, 2)
+                              } catch (e) {
+                                return `[Error stringifying data: ${e}]`
+                              }
+                            })()}
                           </pre>
                         </div>
                       </div>

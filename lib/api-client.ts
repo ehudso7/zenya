@@ -1,6 +1,11 @@
 import { toast } from 'react-hot-toast'
 import { debugLogger } from './debug-logger'
 
+// Initialize debug logger for localhost
+if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+  debugLogger.enable()
+}
+
 interface ApiOptions extends RequestInit {
   retries?: number
   retryDelay?: number

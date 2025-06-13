@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { debugLogger } from '@/lib/debug-logger'
+import { initializeDebugInterceptor } from '@/lib/debug-interceptor'
 
 export function DebugInitializer() {
   useEffect(() => {
@@ -12,16 +13,18 @@ export function DebugInitializer() {
       
       if (isLocalhost) {
         debugLogger.enable()
+        initializeDebugInterceptor()
         // eslint-disable-next-line no-console
-        console.log('[Debug] Debug logger enabled for localhost')
+        console.log('[Debug] Debug logger and interceptor enabled for localhost')
       }
       
       // Also check for debug query parameter
       const urlParams = new URLSearchParams(window.location.search)
       if (urlParams.get('debug') === 'true') {
         debugLogger.enable()
+        initializeDebugInterceptor()
         // eslint-disable-next-line no-console
-        console.log('[Debug] Debug logger enabled via query parameter')
+        console.log('[Debug] Debug logger and interceptor enabled via query parameter')
       }
     }
   }, [])

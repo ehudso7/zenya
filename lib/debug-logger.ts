@@ -8,6 +8,9 @@ class DebugLogger {
   private isDevelopment = false
 
   private constructor() {
+    // Generate session ID
+    this.sessionId = `debug-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    
     // Check environment once during initialization
     if (typeof window !== 'undefined') {
       try {
@@ -18,7 +21,7 @@ class DebugLogger {
         // Log initialization
         if (this.enabled) {
           // eslint-disable-next-line no-console
-          console.log('[DebugLogger] Initialized - enabled:', this.enabled, 'isDevelopment:', this.isDevelopment)
+          console.log('[DebugLogger] Initialized - enabled:', this.enabled, 'isDevelopment:', this.isDevelopment, 'sessionId:', this.sessionId)
         }
       } catch {
         // Silently fail if window.location access fails
@@ -58,32 +61,24 @@ class DebugLogger {
     }
   }
 
-  private async sendToStream(type: string, data: any) {
+  private sendToStream(type: string, data: any) {
     // Always send errors, even if debug is disabled
     const isError = type === 'error' || data?.isError
     if ((!this.enabled && !isError) || typeof window === 'undefined') {
       return
     }
 
-    try {
-      // Try the new broadcast endpoint first
-      await fetch('/api/debug/connect', {
+    // Use setTimeout to avoid blocking and potential recursion
+    setTimeout(() => {
+      // Try the stream endpoint
+      fetch('/api/debug/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type, data, sessionId: this.sessionId })
-      })
-    } catch {
-      // Fallback to the stream endpoint
-      try {
-        await fetch('/api/debug/stream', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type, data, sessionId: this.sessionId })
-        })
-      } catch {
+      }).catch(() => {
         // Silently fail - don't log errors about logging
-      }
-    }
+      })
+    }, 0)
   }
 
   // Log different types of events
