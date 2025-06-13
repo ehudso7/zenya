@@ -25,10 +25,6 @@ export default function DebugMonitor() {
   const logsEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') {
-      return
-    }
-
     const connectToStream = () => {
       const eventSource = new EventSource('/api/debug/stream')
       eventSourceRef.current = eventSource
@@ -109,20 +105,6 @@ export default function DebugMonitor() {
       case 'voice': return 'text-orange-600 dark:text-orange-400'
       default: return 'text-gray-600 dark:text-gray-400'
     }
-  }
-
-  if (process.env.NODE_ENV !== 'development') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card>
-          <CardContent className="p-8">
-            <p className="text-center text-gray-600">
-              Debug monitor is only available in development mode
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    )
   }
 
   return (

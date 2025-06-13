@@ -50,6 +50,11 @@ export async function middleware(request: NextRequest) {
     })
   }
   
+  // Protect debug routes in production
+  if (request.nextUrl.pathname.startsWith('/debug') && process.env.NODE_ENV === 'production') {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+  
   // Domain verification - ensure app only runs on authorized domains
   const hostname = request.headers.get('host') || request.headers.get('x-forwarded-host')
   

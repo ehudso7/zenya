@@ -7,9 +7,14 @@ class DebugLogger {
   private isConnected = false
 
   private constructor() {
-    // Enable debug mode in development or when DEBUG flag is set
-    this.enabled = process.env.NODE_ENV === 'development' || 
-                   typeof window !== 'undefined' && window.localStorage?.getItem('DEBUG') === 'true'
+    // Enable debug mode based on localStorage or hostname
+    if (typeof window !== 'undefined') {
+      const isDevelopment = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1'
+      this.enabled = isDevelopment || window.localStorage?.getItem('DEBUG') === 'true'
+    } else {
+      this.enabled = false
+    }
   }
 
   static getInstance(): DebugLogger {
@@ -105,9 +110,14 @@ class DebugLogger {
 export const debugLogger = DebugLogger.getInstance()
 
 // Browser-only: Connect to debug stream
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  // Auto-enable in development
-  debugLogger.enable()
+if (typeof window !== 'undefined') {
+  // Auto-enable in development (check hostname)
+  const isDevelopment = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1'
+  
+  if (isDevelopment) {
+    debugLogger.enable()
+  }
   
   // Add global debug commands
   ;(window as any).debug = {
