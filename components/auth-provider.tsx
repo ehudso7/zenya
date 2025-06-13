@@ -2,10 +2,9 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 import { useStore } from '@/lib/store'
 import toast from 'react-hot-toast'
-import { setupSessionRecovery } from '@/lib/supabase/session'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -14,7 +13,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter()
   const setUser = useStore(state => state.setUser)
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   const isInitialized = useRef(false)
 
   useEffect(() => {
@@ -84,29 +83,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
+      // Log auth state changes for debugging
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log('Auth state change:', event)
+      }
+      
       if (event === 'SIGNED_IN' && session?.user) {
         await syncUserProfile(session.user.id)
         
-        // Show success message
-        toast.success('Welcome back!')
-        
-        // Redirect to appropriate page
-        const currentPath = window.location.pathname
-        if (currentPath.startsWith('/auth') || currentPath === '/landing' || currentPath === '/') {
-          const profileResponse = await fetch('/api/profile')
-          if (profileResponse.ok) {
-            const { user: profile } = await profileResponse.json()
-            if (!profile?.profile_completed) {
-              router.push('/profile?onboarding=true')
-            } else {
-              router.push('/learn')
+        // Only show success message and redirect for initial sign in
+        if (event === 'SIGNED_IN') {
+          toast.success('Welcome back!')
+          
+          // Redirect to appropriate page
+          const currentPath = window.location.pathname
+          if (currentPath.startsWith('/auth') || currentPath === '/landing' || currentPath === '/') {
+            const profileResponse = await fetch('/api/profile')
+            if (profileResponse.ok) {
+              const { user: profile } = await profileResponse.json()
+              if (!profile?.profile_completed) {
+                router.push('/profile?onboarding=true')
+              } else {
+                router.push('/learn')
+              }
             }
           }
         }
       } else if (event === 'SIGNED_OUT') {
         setUser(null)
-        toast.success('Signed out successfully')
+        // Don't show toast here - it's handled by the logout button
         
         // Redirect to landing if on protected page
         const currentPath = window.location.pathname
@@ -114,20 +121,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (!publicPaths.includes(currentPath) && !currentPath.startsWith('/auth')) {
           router.push('/landing')
         }
-      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-        // Silently sync profile on token refresh
-        await syncUserProfile(session.user.id)
-      } else if (event === 'USER_UPDATED' && session?.user) {
-        // Sync profile when user data is updated
+      } else if ((event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') && session?.user) {
+        // Silently sync profile on token refresh or user update
         await syncUserProfile(session.user.id)
       }
     })
 
     // Check session on mount
     checkSession()
-    
-    // Set up session recovery mechanisms
-    setupSessionRecovery()
 
     // Cleanup
     return () => {

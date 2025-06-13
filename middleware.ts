@@ -1,4 +1,4 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isAuthorizedDomain, getDomainError, getAuthorizedOrigins } from '@/lib/domain-verification'
@@ -88,7 +88,35 @@ export async function middleware(request: NextRequest) {
   const res = NextResponse.next()
   
   // Create Supabase client with proper cookie handling
-  const supabase = createMiddlewareClient({ req: request, res })
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: any) {
+          res.cookies.set({
+            name,
+            value,
+            ...options,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            httpOnly: true,
+          })
+        },
+        remove(name: string, options: any) {
+          res.cookies.set({
+            name,
+            value: '',
+            ...options,
+            maxAge: 0,
+          })
+        },
+      },
+    }
+  )
   
   // Apply comprehensive security headers
   const securityHeaders = getSecurityHeaders()
@@ -157,12 +185,21 @@ export async function middleware(request: NextRequest) {
     }
   }
   
-  // Refresh session if expired
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-  
-  // If there's an error getting the session, try to refresh it
-  if (sessionError) {
-    await supabase.auth.refreshSession()
+  // Get and validate session
+  let session = null
+  try {
+    const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession()
+    
+    if (sessionError) {
+      // Try to refresh the session
+      const { data: { session: refreshedSession } } = await supabase.auth.refreshSession()
+      session = refreshedSession
+    } else {
+      session = currentSession
+    }
+  } catch (error) {
+    console.error('Session check error:', error)
+    session = null
   }
   
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')

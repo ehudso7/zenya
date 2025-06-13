@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Mail, Lock, Loader, ArrowLeft, LogIn, UserPlus, AlertCircle } from 'lucide-react'
@@ -30,7 +30,7 @@ export default function SignInPasswordPage() {
   const [lastSignupEmail, setLastSignupEmail] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({})
   const router = useRouter()
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()

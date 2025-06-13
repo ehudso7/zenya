@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen, BarChart3, Brain, LogOut, User, Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { toast } from 'react-hot-toast'
 import { useStore } from '@/lib/store'
 import { useState, useEffect } from 'react'
@@ -15,7 +14,6 @@ import { signOut } from '@/lib/supabase/session'
 export default function AppNavigation() {
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = createClientComponentClient()
   const { clearUser } = useStore()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -38,25 +36,22 @@ export default function AppNavigation() {
 
   const handleLogout = async () => {
     try {
-      // Sign out from Supabase
-      const { error } = await supabase.auth.signOut()
+      // Use the signOut helper which handles everything
+      const result = await signOut()
       
-      if (error) {
-        throw error
+      if (result.success) {
+        // Clear store
+        clearUser()
+        
+        // Show success message
+        toast.success('Logged out successfully')
+        
+        // Redirect to landing page
+        router.push('/landing')
+        router.refresh()
+      } else {
+        throw new Error('Failed to sign out')
       }
-      
-      // Clear all sessions and local data
-      await signOut()
-      
-      // Clear store
-      clearUser()
-      
-      // Show success message
-      toast.success('Logged out successfully')
-      
-      // Redirect to landing page
-      router.push('/landing')
-      router.refresh()
     } catch (error) {
       console.error('Logout error:', error)
       toast.error('Failed to sign out. Please try again.')

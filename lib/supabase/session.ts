@@ -2,20 +2,12 @@
  * Session management utilities for Supabase auth
  */
 
-import { createBrowserClient } from '@supabase/ssr'
 import { Session, User } from '@supabase/supabase-js'
+import { createClient } from './client'
 
-// Create a singleton Supabase client for session management
-let supabaseClient: ReturnType<typeof createBrowserClient> | null = null
-
+// Use the singleton client from client.ts
 function getSupabaseClient() {
-  if (!supabaseClient) {
-    supabaseClient = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-  }
-  return supabaseClient
+  return createClient()
 }
 
 /**
@@ -72,23 +64,7 @@ export async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) {
       console.error('Error signing out:', error)
-      // Force clear session
-      await supabase.auth.admin?.signOut()
-    }
-    
-    // Clear any cached data
-    if (typeof window !== 'undefined') {
-      // Clear local storage
-      const keysToRemove = Object.keys(localStorage).filter(key => 
-        key.startsWith('sb-') || key.includes('supabase')
-      )
-      keysToRemove.forEach(key => localStorage.removeItem(key))
-      
-      // Clear session storage
-      const sessionKeysToRemove = Object.keys(sessionStorage).filter(key => 
-        key.startsWith('sb-') || key.includes('supabase')
-      )
-      sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key))
+      // Don't force clear - let Supabase handle it
     }
     
     return { success: true }
@@ -109,11 +85,9 @@ export function setupSessionRecovery() {
   // Listen for auth state changes
   supabase.auth.onAuthStateChange(async (event: any, _session: any) => {
     if (event === 'TOKEN_REFRESHED') {
-      console.warn('Session token refreshed')
-    } else if (event === 'SIGNED_OUT') {
-      // Ensure complete cleanup
-      await signOut()
+      // Session token refreshed successfully
     }
+    // Don't call signOut on SIGNED_OUT event - it's already signed out
   })
   
   // Check session on visibility change

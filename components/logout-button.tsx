@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { LogOut, Loader } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useStore } from '@/lib/store'
@@ -27,32 +26,26 @@ export function LogoutButton({
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const clearUser = useStore(state => state.clearUser)
-  const supabase = createClientComponentClient()
-
   const handleLogout = async () => {
     setIsLoading(true)
     
     try {
-      // Sign out from Supabase
-      const { error } = await supabase.auth.signOut()
+      // Use the signOut helper which handles everything
+      const result = await signOut()
       
-      if (error) {
-        throw error
+      if (result.success) {
+        // Reset store
+        clearUser()
+        
+        // Show success message
+        toast.success('Signed out successfully')
+        
+        // Redirect to landing page
+        router.push('/landing')
+        router.refresh()
+      } else {
+        throw new Error('Failed to sign out')
       }
-      
-      // Clear all sessions and local data
-      await signOut()
-      
-      // Reset store
-      clearUser()
-      
-      // Show success message
-      toast.success('Signed out successfully')
-      
-      // Redirect to landing page
-      router.push('/landing')
-      router.refresh()
-      
     } catch (error) {
       console.error('Logout error:', error)
       toast.error('Failed to sign out. Please try again.')

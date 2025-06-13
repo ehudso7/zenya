@@ -7,7 +7,7 @@ import { Home, Info, Mail, HelpCircle, LogOut, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 import { toast } from 'react-hot-toast'
 
 const navItems = [
@@ -23,7 +23,7 @@ export function Navigation() {
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   
   // Handle escape key to close mobile menu
   useEffect(() => {
@@ -44,7 +44,7 @@ export function Navigation() {
     }
     checkUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       setUser(session?.user ?? null)
     })
 
@@ -52,9 +52,17 @@ export function Navigation() {
   }, [supabase.auth])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    toast.success('Logged out successfully')
-    router.push('/landing')
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      
+      toast.success('Logged out successfully')
+      router.push('/landing')
+      router.refresh()
+    } catch (error) {
+      console.error('Logout error:', error)
+      toast.error('Failed to sign out. Please try again.')
+    }
   }
 
   return (
