@@ -9,7 +9,10 @@ const SECURITY_CONFIG = {
     'https://app.zenya.ai',
     'https://zenya-ai.vercel.app',
     'https://zenya-ai-*.vercel.app',
-    ...(process.env.NODE_ENV === 'development' ? ['http://localhost:3000', 'http://localhost:3001'] : [])
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3000',
+    'http://0.0.0.0:3000'
   ],
   blockedUserAgents: [
     'bot', 'spider', 'crawler', 'scraper', 'scanner'

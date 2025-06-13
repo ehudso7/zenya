@@ -27,11 +27,9 @@ export function isAuthorizedDomain(hostname: string | null): boolean {
   // Strip port number if present
   const domain = hostname.split(':')[0];
 
-  // Domain checking logic follows
-
-  // Allow development domains only in development mode
-  if (process.env.NODE_ENV === 'development') {
-    if (DEV_DOMAINS.includes(domain)) return true;
+  // Always allow development domains (localhost, 127.0.0.1, etc)
+  if (DEV_DOMAINS.includes(domain)) {
+    return true;
   }
 
   // Check against authorized domains
@@ -42,8 +40,6 @@ export function isAuthorizedDomain(hostname: string | null): boolean {
     // Regex pattern matching for preview deployments
     return authorized.test(domain);
   });
-
-  // Return authorization result
 
   return isAuthorized;
 }
@@ -57,16 +53,12 @@ export function getAuthorizedOrigins(): string[] {
   const origins = [
     'https://zenyaai.com',
     'https://www.zenyaai.com',
+    // Always include localhost origins for development
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3000',
+    'http://0.0.0.0:3000'
   ];
-
-  // Add development origins only in development
-  if (process.env.NODE_ENV === 'development') {
-    origins.push(
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://127.0.0.1:3000',
-    );
-  }
 
   return origins;
 }

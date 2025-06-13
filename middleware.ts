@@ -58,8 +58,13 @@ export async function middleware(request: NextRequest) {
   // Domain verification - ensure app only runs on authorized domains
   const hostname = request.headers.get('host') || request.headers.get('x-forwarded-host')
   
+  // Skip domain verification for localhost development
+  const isLocalhost = hostname?.includes('localhost') || hostname?.includes('127.0.0.1') || hostname?.includes('0.0.0.0')
+  if (isLocalhost) {
+    // Allow localhost without domain verification
+  }
   // Special handling for Vercel deployments
-  if (process.env.VERCEL) {
+  else if (process.env.VERCEL) {
     // Allow all Vercel deployments during preview/development
     if (process.env.VERCEL_ENV !== 'production' && hostname?.includes('.vercel.app')) {
       // Continue without domain check
