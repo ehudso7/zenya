@@ -5,13 +5,19 @@ class DebugLogger {
   private sessionId: string | null = null
   private queue: any[] = []
   private isConnected = false
+  private isDevelopment = false
 
   private constructor() {
-    // Enable debug mode based on localStorage or hostname
+    // Check environment once during initialization
     if (typeof window !== 'undefined') {
-      const isDevelopment = window.location.hostname === 'localhost' || 
+      try {
+        this.isDevelopment = window.location.hostname === 'localhost' || 
                            window.location.hostname === '127.0.0.1'
-      this.enabled = isDevelopment || window.localStorage?.getItem('DEBUG') === 'true'
+        this.enabled = this.isDevelopment || window.localStorage?.getItem('DEBUG') === 'true'
+      } catch {
+        // Silently fail if window.location access fails
+        this.enabled = false
+      }
     } else {
       this.enabled = false
     }
@@ -27,14 +33,22 @@ class DebugLogger {
   enable() {
     this.enabled = true
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem('DEBUG', 'true')
+      try {
+        window.localStorage.setItem('DEBUG', 'true')
+      } catch {
+        // Silently fail if localStorage is not available
+      }
     }
   }
 
   disable() {
     this.enabled = false
     if (typeof window !== 'undefined') {
-      window.localStorage.removeItem('DEBUG')
+      try {
+        window.localStorage.removeItem('DEBUG')
+      } catch {
+        // Silently fail if localStorage is not available
+      }
     }
   }
 
@@ -47,8 +61,8 @@ class DebugLogger {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type, data, sessionId: this.sessionId })
       })
-    } catch (error) {
-      console.error('Failed to send debug log:', error)
+    } catch {
+      // Silently fail - don't log errors about logging
     }
   }
 
@@ -109,20 +123,16 @@ class DebugLogger {
 // Export singleton instance
 export const debugLogger = DebugLogger.getInstance()
 
-// Browser-only: Connect to debug stream
+// Browser-only: Add global debug commands
 if (typeof window !== 'undefined') {
-  // Auto-enable in development (check hostname)
-  const isDevelopment = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1'
-  
-  if (isDevelopment) {
-    debugLogger.enable()
-  }
-  
   // Add global debug commands
-  ;(window as any).debug = {
-    enable: () => debugLogger.enable(),
-    disable: () => debugLogger.disable(),
-    log: (message: string, data?: any) => debugLogger.log(message, data),
+  try {
+    ;(window as any).debug = {
+      enable: () => debugLogger.enable(),
+      disable: () => debugLogger.disable(),
+      log: (message: string, data?: any) => debugLogger.log(message, data),
+    }
+  } catch {
+    // Silently fail if we can't add to window
   }
 }

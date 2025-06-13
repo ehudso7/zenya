@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,64 +23,91 @@ export default function DebugMonitor() {
   const [sessionId, setSessionId] = useState<string>('')
   const eventSourceRef = useRef<EventSource | null>(null)
   const logsEndRef = useRef<HTMLDivElement>(null)
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isPausedRef = useRef(isPaused)
+
+  // Keep isPausedRef in sync
+  useEffect(() => {
+    isPausedRef.current = isPaused
+  }, [isPaused])
 
   useEffect(() => {
     const connectToStream = () => {
+      // Clear any existing reconnect timeout
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+        reconnectTimeoutRef.current = null
+      }
+
+      // Close any existing connection
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close()
+      }
+
       const eventSource = new EventSource('/api/debug/stream')
       eventSourceRef.current = eventSource
 
       eventSource.onopen = () => {
         setIsConnected(true)
-        // eslint-disable-next-line no-console
-        console.log('Debug stream connected')
       }
 
       eventSource.onmessage = (event) => {
-        if (isPaused) return
-        
         try {
           const data = JSON.parse(event.data)
           
           if (data.type === 'connected') {
             setSessionId(data.sessionId)
-          } else {
+          } else if (!isPausedRef.current) {
             const log: DebugLog = {
               id: crypto.randomUUID(),
               ...data
             }
             
-            setLogs(prev => [...prev.slice(-999), log]) // Keep last 1000 logs
+            setLogs(prev => {
+              const newLogs = [...prev, log]
+              // Keep only last 1000 logs to prevent memory issues
+              return newLogs.length > 1000 ? newLogs.slice(-1000) : newLogs
+            })
           }
-        } catch (error) {
-          console.error('Failed to parse debug message:', error)
+        } catch {
+          // Silently ignore parse errors
         }
       }
 
       eventSource.onerror = () => {
         setIsConnected(false)
-        console.error('Debug stream disconnected')
+        eventSourceRef.current?.close()
+        eventSourceRef.current = null
         
         // Reconnect after 5 seconds
-        setTimeout(connectToStream, 5000)
+        reconnectTimeoutRef.current = setTimeout(connectToStream, 5000)
       }
     }
 
     connectToStream()
 
+    // Cleanup function
     return () => {
-      eventSourceRef.current?.close()
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+        reconnectTimeoutRef.current = null
+      }
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close()
+        eventSourceRef.current = null
+      }
     }
-  }, [isPaused])
+  }, []) // Empty dependency array - only connect once
 
   useEffect(() => {
-    if (!isPaused) {
+    if (!isPaused && logs.length > 0) {
       logsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [logs, isPaused])
+  }, [logs.length, isPaused])
 
-  const clearLogs = () => setLogs([])
+  const clearLogs = useCallback(() => setLogs([]), [])
   
-  const downloadLogs = () => {
+  const downloadLogs = useCallback(() => {
     const data = JSON.stringify(logs, null, 2)
     const blob = new Blob([data], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -89,7 +116,7 @@ export default function DebugMonitor() {
     a.download = `debug-logs-${new Date().toISOString()}.json`
     a.click()
     URL.revokeObjectURL(url)
-  }
+  }, [logs])
 
   const filteredLogs = filter === 'all' 
     ? logs 
