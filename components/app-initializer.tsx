@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useDailyReset } from '@/hooks/use-daily-reset'
 import { usePreferences } from '@/hooks/use-preferences'
+import { DebugInitializer } from './debug-initializer'
 
 /**
  * Client component that initializes app-level hooks
@@ -20,5 +21,10 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
     // Daily reset and preferences are now active
   }, [])
   
-  return <>{children}</>
+  return (
+    <>
+      <DebugInitializer />
+      {children}
+    </>
+  )
 }

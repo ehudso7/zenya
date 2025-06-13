@@ -42,9 +42,12 @@ export async function GET(request: NextRequest) {
       const { data: curriculums, error, count } = await query
 
       if (error) {
-        // Error will be monitored by error tracking service
+        console.error('[API] Failed to fetch curriculums:', error)
         return NextResponse.json(
-          { error: 'Failed to fetch curriculums' },
+          { 
+            error: 'Failed to fetch curriculums',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+          },
           { status: 500 }
         )
       }
@@ -68,9 +71,12 @@ export async function GET(request: NextRequest) {
         }
       )
   } catch (_error) {
-    // Error will be monitored by error tracking service
+      console.error('[API] Curriculums endpoint error:', _error)
       return NextResponse.json(
-        { error: 'Internal server error' },
+        { 
+          error: 'Internal server error',
+          details: process.env.NODE_ENV === 'development' ? (_error as Error).message : undefined
+        },
         { status: 500 }
       )
     }

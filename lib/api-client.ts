@@ -94,11 +94,20 @@ export async function apiClient<T = any>(
 
       if (!response.ok) {
         const errorData = isJson ? await response.json() : await response.text()
-        debugLogger.api(fetchOptions.method || 'GET', url, fetchOptions.body, {
+        
+        // Always log errors to debug stream
+        const errorInfo = {
           status: response.status,
           error: errorData,
-          attempt: attempt + 1
-        })
+          message: errorData.message || errorData.error || `HTTP ${response.status} error`,
+          attempt: attempt + 1,
+          url,
+          method: fetchOptions.method || 'GET'
+        }
+        
+        debugLogger.api(fetchOptions.method || 'GET', url, fetchOptions.body, errorInfo)
+        debugLogger.error(`API Error: ${fetchOptions.method || 'GET'} ${url}`, errorInfo)
+        
         throw new ApiError(
           errorData.message || errorData.error || `HTTP ${response.status} error`,
           response.status,

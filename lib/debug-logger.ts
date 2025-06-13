@@ -93,7 +93,7 @@ class DebugLogger {
   }
 
   error(message: string, error?: any) {
-    if (!this.enabled) return
+    // Always log errors, even if debug is disabled
     console.error(`[DEBUG ERROR] ${message}`, error)
     this.sendToStream('error', { 
       message, 
