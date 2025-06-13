@@ -14,6 +14,11 @@ class DebugLogger {
         this.isDevelopment = window.location.hostname === 'localhost' || 
                            window.location.hostname === '127.0.0.1'
         this.enabled = this.isDevelopment || window.localStorage?.getItem('DEBUG') === 'true'
+        
+        // Log initialization
+        if (this.enabled) {
+          console.log('[DebugLogger] Initialized - enabled:', this.enabled, 'isDevelopment:', this.isDevelopment)
+        }
       } catch {
         // Silently fail if window.location access fails
         this.enabled = false
@@ -53,16 +58,28 @@ class DebugLogger {
   }
 
   private async sendToStream(type: string, data: any) {
-    if (!this.enabled || typeof window === 'undefined') return
+    // Always send errors, even if debug is disabled
+    const isError = type === 'error' || data?.isError
+    if (!this.enabled && !isError || typeof window === 'undefined') return
 
     try {
-      await fetch('/api/debug/stream', {
+      // Try the new broadcast endpoint first
+      await fetch('/api/debug/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type, data, sessionId: this.sessionId })
       })
     } catch {
-      // Silently fail - don't log errors about logging
+      // Fallback to the stream endpoint
+      try {
+        await fetch('/api/debug/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, data, sessionId: this.sessionId })
+        })
+      } catch {
+        // Silently fail - don't log errors about logging
+      }
     }
   }
 
@@ -85,10 +102,26 @@ class DebugLogger {
   }
 
   api(method: string, url: string, data?: any, response?: any) {
-    if (!this.enabled) return
-    // eslint-disable-next-line no-console
-    console.log(`[DEBUG API] ${method} ${url}`, { data, response })
-    this.sendToStream('api', { method, url, data, response })
+    // Always log API errors even if debug is disabled
+    const isError = response?.error || response?.status >= 400
+    
+    // Always send errors to stream regardless of enabled state
+    if (isError) {
+      console.error(`[DEBUG API ERROR] ${method} ${url}`, { data, response })
+      // Force send errors to stream
+      this.sendToStream('error', { 
+        message: `API Error: ${method} ${url}`,
+        method, 
+        url, 
+        data, 
+        response,
+        error: response?.error || response?.message || `HTTP ${response?.status}` 
+      })
+    } else if (this.enabled) {
+      // eslint-disable-next-line no-console
+      console.log(`[DEBUG API] ${method} ${url}`, { data, response })
+      this.sendToStream('api', { method, url, data, response, isError })
+    }
   }
 
   user(action: string, data?: any) {

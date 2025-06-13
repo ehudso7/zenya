@@ -44,11 +44,13 @@ export default function DebugMonitor() {
         eventSourceRef.current.close()
       }
 
-      const eventSource = new EventSource('/api/debug/stream')
+      // Use the new broadcast endpoint for better real-time connection
+      const eventSource = new EventSource('/api/debug/connect')
       eventSourceRef.current = eventSource
 
       eventSource.onopen = () => {
         setIsConnected(true)
+        console.log('[Debug Monitor] Connected to debug broadcast')
       }
 
       eventSource.onmessage = (event) => {
@@ -57,10 +59,16 @@ export default function DebugMonitor() {
           
           if (data.type === 'connected') {
             setSessionId(data.sessionId)
-          } else if (!isPausedRef.current) {
+            console.log('[Debug Monitor] Session established:', data.sessionId)
+          } else if (data.type === 'heartbeat') {
+            // Keep-alive signal, ignore
+          } else if (!isPausedRef.current && data.type && data.data) {
             const log: DebugLog = {
               id: crypto.randomUUID(),
-              ...data
+              type: data.type,
+              data: data.data,
+              timestamp: data.timestamp || new Date().toISOString(),
+              sessionId: data.sessionId
             }
             
             setLogs(prev => {
@@ -74,13 +82,14 @@ export default function DebugMonitor() {
         }
       }
 
-      eventSource.onerror = () => {
+      eventSource.onerror = (error) => {
+        console.error('[Debug Monitor] Connection error:', error)
         setIsConnected(false)
         eventSourceRef.current?.close()
         eventSourceRef.current = null
         
-        // Reconnect after 5 seconds
-        reconnectTimeoutRef.current = setTimeout(connectToStream, 5000)
+        // Reconnect after 3 seconds
+        reconnectTimeoutRef.current = setTimeout(connectToStream, 3000)
       }
     }
 

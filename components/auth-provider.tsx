@@ -129,6 +129,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Check session on mount
     checkSession()
+    
+    // Initialize CSRF token with retry
+    const initCSRF = async () => {
+      try {
+        const response = await fetch('/api/csrf', {
+          credentials: 'include',
+          cache: 'no-cache'
+        })
+        
+        if (!response.ok) {
+          console.warn('Failed to initialize CSRF token:', response.status)
+          // Retry after 1 second
+          setTimeout(initCSRF, 1000)
+        }
+      } catch (error) {
+        console.warn('CSRF initialization error:', error)
+        // Retry after 2 seconds
+        setTimeout(initCSRF, 2000)
+      }
+    }
+    
+    initCSRF()
 
     // Cleanup
     return () => {

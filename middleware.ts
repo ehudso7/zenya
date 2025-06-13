@@ -150,7 +150,11 @@ export async function middleware(request: NextRequest) {
   // Add CORS headers for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
     // CSRF Protection for state-changing operations
-    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+    // Skip CSRF check for the CSRF endpoint itself and debug endpoints
+    const skipCSRFPaths = ['/api/csrf', '/api/debug/']
+    const shouldCheckCSRF = !skipCSRFPaths.some(path => request.nextUrl.pathname.startsWith(path))
+    
+    if (shouldCheckCSRF && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
       const isValidCSRF = await validateCSRFToken(request)
       if (!isValidCSRF) {
         return new NextResponse(

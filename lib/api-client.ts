@@ -32,12 +32,32 @@ export async function apiClient<T = any>(
   } = options
 
   // Get CSRF token from cookies
-  const csrfToken = typeof window !== 'undefined' 
-    ? document.cookie
-        .split('; ')
-        .find(row => row.startsWith('zenya-csrf-token='))
-        ?.split('=')[1]
-    : null
+  let csrfToken: string | null = null
+  if (typeof window !== 'undefined') {
+    csrfToken = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('zenya-csrf-token='))
+      ?.split('=')[1] || null
+    
+    // If no CSRF token, try to get one
+    if (!csrfToken && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(fetchOptions.method || 'GET')) {
+      try {
+        const csrfResponse = await fetch('/api/csrf', { 
+          credentials: 'include',
+          cache: 'no-cache' 
+        })
+        if (csrfResponse.ok) {
+          // Check cookies again after fetching
+          csrfToken = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('zenya-csrf-token='))
+            ?.split('=')[1] || null
+        }
+      } catch (error) {
+        debugLogger.error('Failed to fetch CSRF token', error)
+      }
+    }
+  }
 
   let lastError: Error | null = null
 

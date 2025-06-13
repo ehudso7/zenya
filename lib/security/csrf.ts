@@ -25,7 +25,7 @@ export async function setCSRFToken(): Promise<string> {
   const cookieStore = await cookies()
   
   cookieStore.set(CSRF_COOKIE_NAME, token, {
-    httpOnly: true,
+    httpOnly: false, // Allow JavaScript to read the token for AJAX requests
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
