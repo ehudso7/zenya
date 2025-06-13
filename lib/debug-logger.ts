@@ -17,6 +17,7 @@ class DebugLogger {
         
         // Log initialization
         if (this.enabled) {
+          // eslint-disable-next-line no-console
           console.log('[DebugLogger] Initialized - enabled:', this.enabled, 'isDevelopment:', this.isDevelopment)
         }
       } catch {

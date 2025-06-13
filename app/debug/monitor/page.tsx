@@ -50,6 +50,7 @@ export default function DebugMonitor() {
 
       eventSource.onopen = () => {
         setIsConnected(true)
+        // eslint-disable-next-line no-console
         console.log('[Debug Monitor] Connected to debug broadcast')
       }
 
@@ -59,6 +60,7 @@ export default function DebugMonitor() {
           
           if (data.type === 'connected') {
             setSessionId(data.sessionId)
+            // eslint-disable-next-line no-console
             console.log('[Debug Monitor] Session established:', data.sessionId)
           } else if (data.type === 'heartbeat') {
             // Keep-alive signal, ignore

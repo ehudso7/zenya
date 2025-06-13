@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Log to console for CI/CD
+    // eslint-disable-next-line no-console
     console.log(`[E2E Test] ${action}: ${testName}`, data)
 
     return NextResponse.json({ success: true })
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Start an E2E test session
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const headersList = await headers()
   const host = headersList.get('host') || ''
   const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1')

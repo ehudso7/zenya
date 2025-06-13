@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
       success: true, 
       activeSessions: debugSessions.size 
     })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: 'Failed to broadcast debug message' },
       { status: 500 }
