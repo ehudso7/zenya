@@ -7,6 +7,8 @@ const SECURITY_CONFIG = {
     'https://zenya.ai',
     'https://www.zenya.ai',
     'https://app.zenya.ai',
+    'https://zenya-ai.vercel.app',
+    'https://zenya-ai-*.vercel.app',
     ...(process.env.NODE_ENV === 'development' ? ['http://localhost:3000', 'http://localhost:3001'] : [])
   ],
   blockedUserAgents: [
@@ -61,14 +63,23 @@ export function detectSecurityThreats(request: NextRequest): {
   // Check for missing or invalid user agent
   if (!userAgent || userAgent.length < 10) {
     threats.push('missing_user_agent')
-    riskScore += 20
+    riskScore += 15 // Reduced from 20
   }
   
   // Check origin validation for non-GET requests
   if (request.method !== 'GET' && origin) {
-    if (!SECURITY_CONFIG.allowedOrigins.includes(origin)) {
+    const isAllowedOrigin = SECURITY_CONFIG.allowedOrigins.some(allowed => {
+      // Support wildcard matching for Vercel preview deployments
+      if (allowed.includes('*')) {
+        const pattern = allowed.replace('*', '.*')
+        return new RegExp(pattern).test(origin)
+      }
+      return allowed === origin
+    })
+    
+    if (!isAllowedOrigin) {
       threats.push('invalid_origin')
-      riskScore += 50
+      riskScore += 40 // Reduced from 50
     }
   }
   
@@ -99,7 +110,7 @@ export function detectSecurityThreats(request: NextRequest): {
   }
   
   return {
-    isThreat: riskScore >= 50,
+    isThreat: riskScore >= 70, // Increased threshold from 50
     reasons: threats,
     riskScore
   }

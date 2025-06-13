@@ -351,9 +351,29 @@ export default function EnhancedCurriculumPage({ params }: Props) {
     }
   }
 
-  const handlePracticeMode = () => {
-    setShowPracticeMode(true)
-    toast.success('Practice mode activated! Work through exercises at your own pace.')
+  const handlePracticeMode = async () => {
+    if (!currentLesson || !curriculum) {
+      toast.error('Please select a lesson first')
+      return
+    }
+
+    try {
+      setShowPracticeMode(true)
+      
+      // Call the practice API to track the interaction
+      await api.post('/api/practice', {
+        lessonId: currentLesson.id,
+        curriculumId: curriculum.id,
+        action: 'start',
+        mood: user?.mood
+      })
+      
+      toast.success('Practice mode activated! Work through exercises at your own pace.')
+    } catch (error) {
+      console.error('Practice mode error:', error)
+      // Still show practice mode even if tracking fails
+      toast.success('Practice mode activated!')
+    }
   }
 
   const renderLessonContent = () => {

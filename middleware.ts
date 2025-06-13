@@ -25,13 +25,16 @@ export async function middleware(request: NextRequest) {
     return new NextResponse(
       JSON.stringify({
         error: 'Request Blocked',
-        message: 'Security policy violation detected'
+        message: 'Security policy violation detected',
+        reasons: process.env.NODE_ENV === 'development' ? threatAnalysis.reasons : undefined,
+        help: 'If you believe this is an error, please try refreshing the page or contact support.'
       }),
       {
         status: 403,
         headers: {
           'Content-Type': 'application/json',
-          'X-Security-Block': 'true'
+          'X-Security-Block': 'true',
+          'X-Risk-Score': threatAnalysis.riskScore.toString()
         }
       }
     )
