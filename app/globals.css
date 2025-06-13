@@ -732,3 +732,81 @@ html {
     -webkit-overflow-scrolling: touch;
   }
 }
+
+/* ===========================================
+   FIX FOR UI INTERACTION ISSUES
+   =========================================== */
+
+/* Ensure mood selector buttons have proper z-index */
+.mood-button {
+  position: relative;
+  z-index: 10;
+}
+
+/* Ensure all interactive elements are clickable */
+button:not(:disabled) {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Fix mobile touch issues specifically */
+@media (max-width: 768px) {
+  button, a, input, select, textarea {
+    -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+    touch-action: manipulation;
+  }
+  
+  /* Ensure mood buttons work on mobile */
+  .mood-button {
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    cursor: pointer !important;
+  }
+}
+
+/* Prevent overlays from blocking interactions */
+.pointer-events-none {
+  pointer-events: none !important;
+}
+
+/* Fix navigation overlay - ensure backdrop doesn't block when hidden */
+.nav-backdrop {
+  pointer-events: auto;
+}
+
+.nav-backdrop.hidden,
+.nav-backdrop[aria-hidden="true"] {
+  pointer-events: none !important;
+}
+
+/* Ensure modals and dropdowns are above other content */
+.modal, .dropdown {
+  z-index: 50;
+}
+
+/* Fix any z-index stacking issues */
+.z-overlay {
+  z-index: 40;
+}
+
+.z-interactive {
+  z-index: 20;
+}
+
+/* Ensure forms are submittable */
+form {
+  pointer-events: auto;
+}
+
+/* Fix disabled state styling */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Ensure active states work properly */
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
