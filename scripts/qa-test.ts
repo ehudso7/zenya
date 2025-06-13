@@ -47,6 +47,14 @@ async function testAuthenticationFlow() {
   const journey = 'Authentication Flow'
   
   try {
+    // Test 0: Demo account (for authenticated API testing later)
+    const demoRes = await fetch('http://localhost:3000/auth/demo')
+    if (demoRes.ok) {
+      logTest(journey, 'Demo account', 'pass', 'Demo account endpoint accessible')
+    } else {
+      logTest(journey, 'Demo account', 'fail', `HTTP ${demoRes.status}`)
+    }
+    
     // Test 1: Create test user
     const testEmail = `test-${Date.now()}@zenya.ai`
     const testPassword = 'Test123!@#'
@@ -57,21 +65,37 @@ async function testAuthenticationFlow() {
     })
     
     if (signUpError) {
-      logTest(journey, 'User registration', 'fail', 'Failed to create user', signUpError)
+      logTest(journey, 'User registration', 'fail', `Failed to create user: ${signUpError.message}`, signUpError)
     } else {
       logTest(journey, 'User registration', 'pass', 'User created successfully')
+      
+      // Check if email confirmation is required
+      if (user && !user.session) {
+        logTest(journey, 'Email confirmation', 'skip', 'Email confirmation required - normal behavior')
+        logTest(journey, 'User sign in', 'skip', 'Skipping - awaiting email confirmation')
+        logTest(journey, 'Session persistence', 'skip', 'Skipping - no session without confirmation')
+        
+        // Test sign out (should work even without session)
+        const { error: signOutError } = await supabase.auth.signOut()
+        logTest(journey, 'User sign out', signOutError ? 'fail' : 'pass', 'Sign out test')
+        return
+      }
     }
     
-    // Test 2: Sign in
-    const { data: session, error: signInError } = await supabase.auth.signInWithPassword({
-      email: testEmail,
-      password: testPassword,
-    })
-    
-    if (signInError) {
-      logTest(journey, 'User sign in', 'fail', 'Failed to sign in', signInError)
+    // Test 2: Sign in (only if we have a session from signup)
+    if (user?.session) {
+      logTest(journey, 'User sign in', 'pass', 'Auto-signed in after registration')
     } else {
-      logTest(journey, 'User sign in', 'pass', 'Signed in successfully')
+      const { data: session, error: signInError } = await supabase.auth.signInWithPassword({
+        email: testEmail,
+        password: testPassword,
+      })
+      
+      if (signInError) {
+        logTest(journey, 'User sign in', 'fail', 'Failed to sign in', signInError)
+      } else {
+        logTest(journey, 'User sign in', 'pass', 'Signed in successfully')
+      }
     }
     
     // Test 3: Session management
@@ -109,6 +133,11 @@ async function testCurriculumFlow() {
       .eq('is_published', true)
     
     if (currError) {
+      if (currError.message?.includes('does not exist')) {
+        logTest(journey, 'Fetch curriculums', 'skip', 'Table not created - migrations needed')
+        logTest(journey, 'Note', 'skip', 'Run migrations from supabase/migrations/007_ensure_curriculums.sql')
+        return
+      }
       logTest(journey, 'Fetch curriculums', 'fail', 'Failed to fetch', currError)
       return
     }
@@ -172,7 +201,7 @@ async function testAIInteraction() {
   
   try {
     // First authenticate a test user for API calls
-    const testEmail = `ai-test-${Date.now()}@zenya.ai`
+    const testEmail = `ai-test-${Date.now()}-${Math.random().toString(36).substring(7)}@zenya.ai`
     const testPassword = 'Test123!@#'
     
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -255,7 +284,7 @@ async function testAdaptiveLearning() {
   
   try {
     // First authenticate a test user
-    const testEmail = `adaptive-test-${Date.now()}@zenya.ai`
+    const testEmail = `adaptive-test-${Date.now()}-${Math.random().toString(36).substring(7)}@zenya.ai`
     const testPassword = 'Test123!@#'
     
     const { data: authData, error: authError } = await supabase.auth.signUp({

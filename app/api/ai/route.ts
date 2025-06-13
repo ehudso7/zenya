@@ -22,6 +22,7 @@ import { semanticSearch } from '@/lib/ai/semantic-search'
 import { ZenyaOpenAIProvider } from '@/lib/ai/zenya-openai-provider'
 import type { UserContext } from '@/lib/ai/zenya-model-config'
 import { protectPrompt } from '@/lib/security/prompt-protection'
+import { classifyAndRoute, embeddingClassifier } from '@/lib/ai/embedding-classifier'
 
 // Provider configuration
 interface ProviderConfig {
@@ -475,6 +476,13 @@ export async function POST(request: NextRequest) {
         abTestGroup: undefined // Will be determined by model selector
       }
 
+      // Classify the input for routing and personalization
+      const { classification, routing } = await classifyAndRoute(processedPrompt, {
+        userId: user.id,
+        lessonContext: context,
+        previousMessages: [] // Could be populated from session
+      })
+
       // Enhanced semantic search integration
       const semanticContext = await semanticSearch.enhancedSearch({
         query: message,
@@ -552,7 +560,28 @@ export async function POST(request: NextRequest) {
       
       performanceMonitor.trackUserInteraction('ai_request_completed', response.provider, 1)
 
-      return NextResponse.json(response)
+      // Apply personalization based on classification
+      if (classification.personalization) {
+        const personalizedMessage = await embeddingClassifier.personalizeResponse(
+          response.message,
+          classification,
+          profile
+        )
+        response.message = personalizedMessage
+      }
+
+      // Add classification metadata to response
+      const enhancedResponse = {
+        ...response,
+        classification: {
+          category: classification.category,
+          intent: classification.intent,
+          topics: classification.topics,
+          routing: routing.handler
+        }
+      }
+
+      return NextResponse.json(enhancedResponse)
     } catch (_error) {
       // Enhanced error tracking and monitoring with tracing
       const error = _error as Error
