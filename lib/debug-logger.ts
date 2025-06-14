@@ -92,10 +92,27 @@ class DebugLogger {
   error(message: string, error?: any) {
     // Always log errors, even if debug is disabled
     console.error(`[DEBUG ERROR] ${message}`, error)
+    
+    // Safely extract error information to avoid circular references
+    let errorInfo: any = error
+    if (error instanceof Error) {
+      errorInfo = {
+        message: error.message,
+        name: error.name,
+        stack: error.stack?.split('\n').slice(0, 5).join('\n') // Limit stack trace
+      }
+    } else if (error && typeof error === 'object') {
+      try {
+        // Try to safely stringify the error object
+        errorInfo = JSON.parse(JSON.stringify(error))
+      } catch {
+        errorInfo = String(error)
+      }
+    }
+    
     this.sendToStream('error', { 
       message, 
-      error: error?.message || error,
-      stack: error?.stack,
+      error: errorInfo,
       isError: true 
     })
   }
@@ -104,25 +121,52 @@ class DebugLogger {
     // Always log API errors even if debug is disabled
     const isError = response?.error || response?.status >= 400
     
-    console.log(`[DebugLogger] API call:`, { method, url, isError, response })
+    // Safely process data and response to avoid circular references
+    let safeData = data
+    let safeResponse = response
+    
+    try {
+      if (data && typeof data === 'string') {
+        // Try to parse JSON body data
+        try {
+          safeData = JSON.parse(data)
+        } catch {
+          safeData = data
+        }
+      }
+      
+      if (response && typeof response === 'object') {
+        // Extract only safe properties from response
+        safeResponse = {
+          status: response.status,
+          error: response.error,
+          message: response.message,
+          ...(response.data && { data: response.data })
+        }
+      }
+    } catch {
+      // If processing fails, use string representation
+      safeData = String(data)
+      safeResponse = String(response)
+    }
     
     // Always send errors to stream regardless of enabled state
     if (isError) {
-      console.error(`[DEBUG API ERROR] ${method} ${url}`, { data, response })
+      console.error(`[DEBUG API ERROR] ${method} ${url}`, { data: safeData, response: safeResponse })
       // Force send errors to stream
       this.sendToStream('error', { 
         message: `API Error: ${method} ${url}`,
         method, 
         url, 
-        data, 
-        response,
-        error: response?.error || response?.message || `HTTP ${response?.status}`,
+        data: safeData, 
+        response: safeResponse,
+        error: safeResponse?.error || safeResponse?.message || `HTTP ${safeResponse?.status}`,
         isError: true 
       })
     } else if (this.enabled) {
       // eslint-disable-next-line no-console
-      console.log(`[DEBUG API] ${method} ${url}`, { data, response })
-      this.sendToStream('api', { method, url, data, response, isError })
+      console.log(`[DEBUG API] ${method} ${url}`, { data: safeData, response: safeResponse })
+      this.sendToStream('api', { method, url, data: safeData, response: safeResponse, isError })
     }
   }
 

@@ -20,8 +20,8 @@ export function initializeDebugInterceptor() {
           const errorData = await clonedResponse.json()
           debugLogger.api(method, url.toString(), options?.body, {
             status: response.status,
-            error: errorData,
-            message: errorData.error || `HTTP ${response.status}`
+            error: errorData?.error || errorData?.message || errorData,
+            message: errorData?.error || errorData?.message || `HTTP ${response.status}`
           })
         } catch {
           debugLogger.api(method, url.toString(), options?.body, {
