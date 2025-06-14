@@ -119,7 +119,17 @@ export default function DebugMonitor() {
   const clearLogs = useCallback(() => setLogs([]), [])
   
   const downloadLogs = useCallback(() => {
-    const data = JSON.stringify(logs, null, 2)
+    // Handle circular references when downloading
+    const seen = new WeakSet()
+    const data = JSON.stringify(logs, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return '[Circular Reference]'
+        }
+        seen.add(value)
+      }
+      return value
+    }, 2)
     const blob = new Blob([data], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -237,7 +247,17 @@ export default function DebugMonitor() {
                           <pre className="text-xs whitespace-pre-wrap break-all">
                             {(() => {
                               try {
-                                return JSON.stringify(log.data, null, 2)
+                                // Handle circular references
+                                const seen = new WeakSet()
+                                return JSON.stringify(log.data, (key, value) => {
+                                  if (typeof value === 'object' && value !== null) {
+                                    if (seen.has(value)) {
+                                      return '[Circular Reference]'
+                                    }
+                                    seen.add(value)
+                                  }
+                                  return value
+                                }, 2)
                               } catch (e) {
                                 return `[Error stringifying data: ${e}]`
                               }

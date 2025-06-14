@@ -117,10 +117,11 @@ export async function POST(request: NextRequest) {
 
     // Broadcast to all active debug sessions
     if (broadcast) {
+      const encoder = new TextEncoder()
       debugSessions.forEach(session => {
         try {
           session.lastActivity = new Date()
-          session.stream.enqueue(
+          const message = encoder.encode(
             `data: ${JSON.stringify({
               type,
               data,
@@ -128,6 +129,7 @@ export async function POST(request: NextRequest) {
               sessionId: session.sessionId
             })}\n\n`
           )
+          session.stream.enqueue(message)
         } catch {
           // Session might be closed
           debugSessions.delete(session.sessionId)

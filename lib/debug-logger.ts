@@ -70,8 +70,8 @@ class DebugLogger {
 
     // Use setTimeout to avoid blocking and potential recursion
     setTimeout(() => {
-      // Try the stream endpoint
-      fetch('/api/debug/stream', {
+      // Try the connect endpoint (where the monitor is listening)
+      fetch('/api/debug/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type, data, sessionId: this.sessionId })
