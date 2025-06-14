@@ -4,17 +4,36 @@
  */
 
 import { cookies } from 'next/headers'
-import crypto from 'crypto'
 
 const CSRF_COOKIE_NAME = 'zenya-csrf-token'
 const CSRF_HEADER_NAME = 'x-csrf-token'
 const TOKEN_LENGTH = 32
 
 /**
+ * Timing-safe string comparison for edge runtime
+ * Prevents timing attacks by ensuring constant-time comparison
+ */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    return false
+  }
+  
+  let result = 0
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  }
+  
+  return result === 0
+}
+
+/**
  * Generate a cryptographically secure CSRF token
  */
 export function generateCSRFToken(): string {
-  return crypto.randomBytes(TOKEN_LENGTH).toString('hex')
+  // Use Web Crypto API for edge runtime compatibility
+  const array = new Uint8Array(TOKEN_LENGTH)
+  crypto.getRandomValues(array)
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
 }
 
 /**
@@ -75,10 +94,8 @@ export async function validateCSRFToken(request: Request): Promise<boolean> {
   }
   
   // Constant-time comparison to prevent timing attacks
-  return crypto.timingSafeEqual(
-    Buffer.from(cookieToken),
-    Buffer.from(requestToken)
-  )
+  // Using a timing-safe comparison compatible with edge runtime
+  return timingSafeEqual(cookieToken, requestToken)
 }
 
 /**
